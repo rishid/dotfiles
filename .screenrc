@@ -1,0 +1,19 @@
+encoding UTF-8
+defencoding UTF-8
+defutf8 on
+vbell on
+vbell_msg ""
+nethack on
+defscrollback 10000
+startup_message off
+autodetach on
+pastefont off
+altscreen off
+hardstatus off
+hardcopy_append on
+time "%Y-%m-%d %c:%s %H%? %l%?"
+#escape "^Oo"
+
+# Remove silly bindings
+bind W
+bind ^g
