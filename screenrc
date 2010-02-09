@@ -1,8 +1,34 @@
-# trick to make ssh-agent reconnect when resuming screen
-setenv SSH_AUTH_SOCK "/tmp/ssh-agent-$USER-screen"
+# allow ctrl + left/right to cycle windows
+bindkey "^[Od" prev  # change window with ctrl-left
+bindkey "^[Oc" next  # change window with ctrl-right
+ 
+# allow shift + pgup/pgdn to scroll
+termcapinfo rxvt-unicode ti@:te@
+ 
+# disable startup message
 startup_message off
-vbell on
+ 
+# set up bottom statusbar
 hardstatus alwayslastline
 hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{=kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B}%Y-%m-%d %{W}%c %{g}]'
+#hardstatus alwayslastline '%{= kG} %= %{= kw}%-w%{b}%n %t%{b}%{w}%+w %= '
+ 
+# other options
+setenv LC_CTYPE en_US.UTF-8
+defutf8 on
+setenv DISPLAY ':0'
+nonblock on
+vbell off
+vbell_msg ""
+msgwait 10
+defscrollback 5000
+bind c screen 1
+bind 0 select 10
+terminfo rxvt-unicode 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+termcapinfo rxvt* 'hs:ts=\E]2;:fs=\007:ds=\E]2;\007'
+
+# trick to make ssh-agent reconnect when resuming screen
+setenv SSH_AUTH_SOCK "/tmp/ssh-agent-$USER-screen"
+
 altscreen on
-source $HOME/.screenrc.local
+
