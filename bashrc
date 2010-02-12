@@ -47,7 +47,7 @@ shopt -s expand_aliases
 stty -ctlecho
 
 # env vars
-export CDPATH=".:~/:~/dev"
+#export CDPATH=".:~/:~/dev"
 export INPUTRC="/etc/inputrc"
 export EDITOR="emacs"
 export PAGER="less"
