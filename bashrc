@@ -75,6 +75,14 @@ fi
 #-----------
 #  aliases
 #-----------
+ALIASES=~/.aliases
+
+function add_alias {
+    echo "alias $1='$2'" >> $ALIASES;
+    echo Adding alias: `tail -1 $ALIASES`;
+    source $ALIASES;
+}
+
 alias ls="ls --color=auto -h1"
 alias lsd='ls -ld *(-/DN)'
 alias ll="ls -l --color=auto"
