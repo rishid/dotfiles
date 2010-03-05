@@ -1,6 +1,7 @@
 # ~/.bashrc
 # Rishi Dhupar
-# shamelessly stolen from http://github.com/axedcode/dotfiles/blob/master/.bashrc
+# sources of this chaos:
+# http://github.com/axedcode/dotfiles/blob/master/.bashrc
 
 #-----------
 # PATH
@@ -24,7 +25,7 @@ SAVEHIST=$HISTSIZE
 HISTFILE=~/.history
 
 # append to HISTFILE when command is typed
-setopt -s histappend
+shopt -s histappend
 shopt -s cmdhist
 export HISTCONTROL="ignoreboth"
 
@@ -37,7 +38,7 @@ export HISTCONTROL="ignoreboth"
 #-------
 # prompt
 #-------
-export PS1="[\[\033[36m\]\u\[\033[37m\]@\[\033[32m\]\h:\[\033[34;1m\]\w\[\033[m\]]$ "
+export PS1="[\[\033[36m\]\u\[\033[37m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]]$ "
 
 # shell options
 shopt -s cdable_vars
@@ -48,7 +49,7 @@ shopt -s expand_aliases
 stty -ctlecho
 
 # env vars
-#export CDPATH=".:~/:~/dev"
+export CDPATH=".:~/:~/dev"
 export INPUTRC="/etc/inputrc"
 export EDITOR="emacs"
 export PAGER="less"
@@ -76,14 +77,6 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 #-----------
 #  aliases
 #-----------
-ALIASES=~/.aliases
-
-function add_alias {
-    echo "alias $1='$2'" >> $ALIASES;
-    echo Adding alias: `tail -1 $ALIASES`;
-    source $ALIASES;
-}
-
 alias ls="ls --color=auto -h1"
 alias lsd='ls -ld *(-/DN)'
 alias ll="ls -l --color=auto"
@@ -110,6 +103,10 @@ alias ...='..;..'
 alias e=$EDIT
 alias h='history -i 1 | less +G'
 alias bashrc="source ~/.bashrc"
+
+if [ -f ~/.bashrc.local ]; then
+    . ~/.bashrc.local
+fi 
  
 # make a directory then cd into it
 function mkcd() { mkdir "$1" && cd "$1"; }
