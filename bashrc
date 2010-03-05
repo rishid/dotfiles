@@ -36,7 +36,7 @@ export HISTCONTROL="ignoreboth"
 #-------
 # prompt
 #-------
-export PS1="[\[\033[36m\]\u\[\033[37m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]]$ "
+export PS1="[\[\033[36m\]\u\[\033[37m\]@\[\033[32m\]\h:\[\033[34;1m\]\w\[\033[m\]]$ "
 
 # shell options
 shopt -s cdable_vars
@@ -67,10 +67,10 @@ export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
  
 # start/attach screen session after logging in via ssh
-if [ -n "$SSH_CONNECTION" ] && [ -z "$SCREEN_EXIST" ] && [ "$TERM" != "screen" ] ; then
-  export SCREEN_EXIST=1
-  screen -DR
-fi
+#if [ -n "$SSH_CONNECTION" ] && [ -z "$SCREEN_EXIST" ] && [ "$TERM" != "screen" ] ; then
+#  export SCREEN_EXIST=1
+#  screen -DR
+#fi
  
 #-----------
 #  aliases
@@ -104,7 +104,6 @@ alias ~="cd && clear"
 alias home="~"
 alias ..='cd ..'
 alias ...='..;..'
-alias cd=pushd
 
 # aliases: custom
 alias e=$EDIT
