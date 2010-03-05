@@ -7,6 +7,7 @@
 #-----------
 USER_PATH=~/bin
 export PATH=$USER_PATH:$PATH
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 #-----------
 # completion
