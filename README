@@ -1,6 +1,6 @@
 cd ~
-git clone <this repo> .dotfiles
-./.dotfiles/setup.sh
+git clone http://github.com/rishid/dotfiles.git .dotfiles
+./.dotfiles/install.py
 
 
 
