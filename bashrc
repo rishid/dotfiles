@@ -13,6 +13,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 #-----------
 # completion
 #-----------
+# Make sure bash-completion is activated
 if [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
 fi
@@ -20,14 +21,16 @@ fi
 #-----------
 #  history
 #-----------
-HISTSIZE=10000
-SAVEHIST=$HISTSIZE
-HISTFILE=~/.history
+export HISTSIZE=100000
+export HISTFILESIZE=$HISTSIZE
+export HISTFILE=~/.bash_history
+export HISTIGNORE="cd:ls:[bf]g"
 
 # append to HISTFILE when command is typed
 shopt -s histappend
 shopt -s cmdhist
 export HISTCONTROL="ignoreboth"
+export HISTTIMEFORMAT="%F %T "
 
 #--------
 #  MOTD
@@ -59,7 +62,9 @@ export LANG=en_US.UTF-8
  
 # colors for: console, ls, grep, less, man
 eval `dircolors -b`
+# display grep matches in a color
 export GREP_COLOR="1;33"
+# For colorful man pages
 export LESS_TERMCAP_mb=$'\E[01;31m'
 export LESS_TERMCAP_md=$'\E[01;31m'
 export LESS_TERMCAP_me=$'\E[0m'
@@ -77,9 +82,9 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 #-----------
 #  aliases
 #-----------
-alias ls="ls --color=auto -h1"
-alias lsd='ls -ld *(-/DN)'
-alias ll="ls -l --color=auto"
+alias ls="ls --color=auto -h"
+alias lsd="ls -ld *(-/DN)"
+alias ll="ls -lh --color=auto"
 alias shred="shred -fuz"
 #alias nano="nano -AOSWx"
 alias cp="cp -rpv"
@@ -87,7 +92,7 @@ alias mv="mv -v"
 alias rm="rm -v"
 alias mkdir="mkdir -pv"
 alias df="df -h"
-alias du="du -shc"
+alias du="du -hc"
 alias free="free -m"
 alias grep="grep --color"
 alias wget="wget -c"
@@ -137,7 +142,7 @@ extract () {
       *.Z)         uncompress $1 ;;
       *.rar)       7z x $1       ;;
       *.7z)        7z x $1       ;;
-      *)           echo "'$1' cannot be extracted via ex()" ;;
+      *)           echo "'$1' cannot be extracted via extract()" ;;
     esac
   else
     echo "'$1' is not a valid file"
