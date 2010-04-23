@@ -1,6 +1,11 @@
 ;; init.el file
 ;; Rishi Dhupar
-;; Time-stamp: <02-11-2010 11:03:35 (rkd4127)>
+;; Time-stamp: <04-22-2010 14:49:00 (rkd4127)>
+
+;; Check for Linux and start the server
+(if (string-equal system-type "gnu/linux")
+  (server-start)
+  (message "emacsserver started."))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; loadpath; this will recursivel add all dirs in 'elisp-path' to load-path
@@ -227,6 +232,12 @@
 ;   uniquify-separator ":"
     uniquify-after-kill-buffer-p t
     uniquify-ignore-buffers-re "^\\*"))
+
+;; use AnsiTerm which does support colors or you can enable AnsiColor for the normal shell:
+;; http://www.emacswiki.org/emacs/AnsiTerm
+(autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -256,11 +267,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;(when (require 'color-theme)  ;; use color theme...
-;(eval-after-load "color-theme"
-;  '(progn
-;     (color-theme-initialize)
-;     (color-theme-hober)))) 
+(when (require 'color-theme)  ;; use color theme...
+(eval-after-load "color-theme"
+  '(progn
+     (color-theme-initialize)
+     (color-theme-almost-monokai)))) 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -413,7 +424,7 @@
   (lambda() 
     (set-fill-column 78)                    ; lines are 78 chars long ...
     (auto-fill-mode t)                      ; ... and wrapped around 
-    (set-input-method "latin-1-prefix")))    ; make " + e => ￫ etc.
+    (set-input-method "latin-1-prefix")))    ; make " + e => ë etc.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
