@@ -1,6 +1,6 @@
 ;; init.el file
 ;; Rishi Dhupar
-;; Time-stamp: <04-22-2010 14:49:00 (rkd4127)>
+;; Time-stamp: <04-23-2010 09:41:01 (rkd4127)>
 
 ;; Check for Linux and start the server
 (if (string-equal system-type "gnu/linux")
@@ -8,7 +8,7 @@
   (message "emacsserver started."))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; loadpath; this will recursivel add all dirs in 'elisp-path' to load-path
+;; loadpath; this will recursively add all dirs in 'elisp-path' to load-path
 (defconst elisp-path '("~/.emacs.d")) ;; my elisp directories
 (mapcar '(lambda(p)
            (add-to-list 'load-path p)
@@ -178,6 +178,8 @@
 ;     (file-cache-add-directory-list (list "~/Desktop" "~/Documents"))))
 ;;
 ;; backups
+(setq auto-save-list-file-name nil)     ; no .saves files
+(setq auto-save-default        t)       ; auto saving
 (setq djcb-backup-dir (concat djcb-tmp-dir "/backups"))
 (setq make-backup-files t ;; do make backups
   backup-by-copying t     ;; and copy them here
