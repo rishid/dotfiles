@@ -14,6 +14,10 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 # completion
 #-----------
 # Make sure bash-completion is activated
+
+# File ignore
+export FIGNORE=CVS:\~:.o:.svn 
+
 if [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
 fi
