@@ -1,6 +1,6 @@
 ;; init.el file
 ;; Rishi Dhupar
-;; Time-stamp: <04-23-2010 09:41:01 (rkd4127)>
+;; Time-stamp: <04-23-2010 13:38:45 (rkd4127)>
 
 ;; Check for Linux and start the server
 (if (string-equal system-type "gnu/linux")
@@ -476,6 +476,15 @@
       '(("\\<\\(djcb-require-maybe\\|add-hook\\|setq\\)" 
           1 font-lock-keyword-face prepend)))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org mode
+(require 'org-install)
+(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(setq org-log-done t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; perl/cperl mode
