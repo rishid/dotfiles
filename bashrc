@@ -1,3 +1,4 @@
+# -*- mode:shell-script; sh-shell:bash -*-
 # ~/.bashrc
 # Rishi Dhupar
 # sources of this chaos:
@@ -46,6 +47,11 @@ export HISTTIMEFORMAT="%F %T "
 # prompt
 #-------
 export PS1="[\[\033[36m\]\u\[\033[37m\]@\[\033[32m\]\h:\[\033[34;1m\]\w\[\033[m\]]$ "
+if [ -z "$PROMPT_COMMAND" ]; then
+    export PROMPT_COMMAND="history -a";
+else
+    export PROMPT_COMMAND="$PROMPT_COMMAND;history -a";
+fi
 
 # shell options
 shopt -s cdable_vars
@@ -53,7 +59,7 @@ shopt -s cdspell
 shopt -s checkwinsize
 shopt -s dotglob
 shopt -s expand_aliases
-stty -ctlecho
+
 
 # env vars
 #export CDPATH=".:~/:~/dev"

@@ -1,3 +1,7 @@
+# -*- mode:shell-script; sh-shell:bash -*-
+
+stty -ctlecho
+
 if [ -f /etc/bashrc ]; then
    source /etc/bashrc
 fi
