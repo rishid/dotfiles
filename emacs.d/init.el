@@ -1,6 +1,6 @@
 ;; init.el file
 ;; Rishi Dhupar
-;; Time-stamp: <04-13-2011 16:57:12 (rkd4127)>
+;; Time-stamp: <05-25-2011 09:54:51 (rkd4127)>
 
 ;; Check for Linux and start the server
 ;(if (string-equal system-type "gnu/linux")
@@ -57,7 +57,7 @@
 ;; the modeline
 (line-number-mode t)                     ; show line numbers
 (global-linum-mode t)                    ; display line numbers in margin. emacs 23 only.
-;(column-number-mode t)                   ; show column numbers
+(column-number-mode t)                   ; show column numbers
 (when (fboundp size-indication-mode)
   (size-indication-mode t))              ; show file size (emacs 22+)
 (display-time-mode -1)                   ; don't show the time
@@ -523,6 +523,14 @@
     (local-set-key (kbd "s-g") 'gtags-find-with-grep)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+;; espresso-mode or now called js-mode in Emacs 23.2
+(autoload #'espresso-mode "espresso" "Start espresso-mode" t)
+(add-to-list 'auto-mode-alist '("\\.js$" . espresso-mode))
+(add-to-list 'auto-mode-alist '("\\.json$" . espresso-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; c-mode / c++-mode
 (defconst djcb-c-style '((c-tab-always-indent . t)))
@@ -539,6 +547,9 @@
   (font-lock-add-keywords nil 
     '(("\\<\\(__FUNCTION__\\|__PRETTY_FUNCTION__\\|__LINE__\\)" 
         1 font-lock-preprocessor-face prepend)))
+
+  (add-hook 'before-save-hook
+    'delete-trailing-whitespace nil t)
  
   (setq 
     compilation-scroll-output 'first-error  ; scroll until first error
