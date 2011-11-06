@@ -2,8 +2,12 @@
 ;; Rishi Dhupar
 ;; Time-stamp: <09-01-2011 16:53:24 (rkd4127)>
 
-;; Global key bindings
-
+;; require-soft  (http://www.emacswiki.org/cgi-bin/wiki/LocateLibrary)
+;; this is useful when this .emacs is used in an env where not all of the other stuff is available
+(defmacro require-soft (feature &optional file)
+      "*Try to require FEATURE, but don't signal an error if `require' fails."
+      `(require ,feature ,file 'noerror))
+      
 (defmacro djcb-program-shortcut (name key &optional use-existing)
   "* macro to create a key binding KEY to start some terminal program PRG;
     if USE-EXISTING is true, try to switch to an existing buffer"
