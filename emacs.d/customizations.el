@@ -85,7 +85,7 @@
 (setq
  mouse-1-click-in-non-selected-windows nil
  mouse-yank-at-point t)
-(mouse-avoidance-mode 'exile)
+(mouse-avoidance-mode 'none)
 
 (setq-default indicate-empty-lines t)
 
