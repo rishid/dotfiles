@@ -99,8 +99,8 @@
 ;; Start a new eshell even if one is active.
 (global-set-key (kbd "C-x M") (lambda () (interactive) (eshell t)))
 
-;; replace buffer-menu with ibuffer
-(global-set-key (kbd "C-x C-b") 'ibuffer)
+;; always indent new lines by default
+(global-set-key (kbd "RET") 'newline-and-indent)
 
 ;; interactive text replacement
 (global-set-key (kbd "C-c C-r") 'iedit-mode)
@@ -173,7 +173,7 @@
 (global-set-key (kbd "C-c y") 'bury-buffer)
 (global-set-key (kbd "C-c r") 'revert-buffer)
 (global-set-key (kbd "M-`") 'file-cache-minibuffer-complete)
-(global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "C-x C-b") 'ibuffer)  ;; replace buffer-menu with ibuffer
 
 ;; Window switching. (C-x o goes to the next window)
 (windmove-default-keybindings) ;; Shift+direction

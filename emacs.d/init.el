@@ -50,6 +50,7 @@
 (require 'defuns)
 (require 'bindings)
 (require 'misc)
+(require 'init-color-theme)
 (require 'registers)
 (require 'c)
 (require 'eshell)

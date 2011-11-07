@@ -10,14 +10,7 @@
   "Are we in a console?")
 (defconst djcb-machine (substring (shell-command-to-string "hostname") 0 -1))
 
-;; the modeline
-(line-number-mode t)                     ; show line numbers
-(global-linum-mode t)                    ; display line numbers in margin. emacs 23 only.
-(column-number-mode t)                   ; show column numbers
-(when (fboundp size-indication-mode)
-  (size-indication-mode t))              ; show file size (emacs 22+)
-(display-time-mode -1)                   ; don't show the time
-(ruler-mode -1)
+
 
 ;;(scroll-bar-mode t)                      ; show a scrollbar...
 ;;(set-scroll-bar-mode 'right)             ; ... on the right
@@ -29,44 +22,18 @@
   time-stamp-format "%02m-%02d-%04y %02H:%02M:%02S (%u)") ; date format
 (add-hook 'write-file-hooks 'time-stamp) ; update when saving
 
-;; highlight the current line
-(when (fboundp 'global-hl-line-mode)
-  (global-hl-line-mode t)) ;; turn it on for all modes by default
 
-(when window-system
-  (setq frame-title-format '(buffer-file-name "%f" ("%b")))
-  (tooltip-mode -1)
-  (mouse-wheel-mode t)
-  (blink-cursor-mode -1))
 
 (add-hook 'before-make-frame-hook 'turn-off-tool-bar)
 
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
 (ansi-color-for-comint-mode-on)
 
-(setq search-highlight t                 ; highlight when searching... 
-  query-replace-highlight t)             ; ...and replacing
-(fset 'yes-or-no-p 'y-or-n-p)            ; enable y/n answers to yes/no 
-
-(when (require 'color-theme)  ;; use color theme...
-(eval-after-load "color-theme"
-  '(progn
-     (color-theme-initialize)
-     (color-theme-almost-monokai)))) 
-     
 (setq visible-bell t
       fringe-mode (cons 4 0)
       echo-keystrokes 0.1
       font-lock-maximum-decoration t
-      inhibit-startup-message t
       delete-selection-mode t
-      transient-mark-mode t 
-      color-theme-is-global t
       shift-select-mode nil
-      mouse-yank-at-point t
-      require-final-newline t
       truncate-partial-width-windows nil
       uniquify-buffer-name-style 'post-forward
       uniquify-after-kill-buffer-p t
@@ -96,32 +63,19 @@
 ;; Transparently open compressed files
 (auto-compression-mode t)
 
-;; Enable syntax highlighting for older Emacsen that have it off
-(global-font-lock-mode t)
-
 ;; recentf - Save a list of recent files visited.
 (when (require-soft 'recentf)    
   (setq recentf-save-file (concat djcb-tmp-dir "/recentf")  ;; keep ~/ clean
         recentf-max-saved-items 100                         ;; max save 100
         recentf-max-menu-items 15)                          ;; max 15 in menu
         (recentf-mode t))                                   ;; turn it on
-
-;; Highlight matching parentheses when the point is on them.
-;; show-paren-mode: subtle blinking of matching paren (defaults are ugly)
-;; http://www.emacswiki.org/cgi-bin/wiki/ShowParenMode
-(when (fboundp 'show-paren-mode)
-  (setq show-paren-delay 0)
-  (show-paren-mode t)
-  (setq show-paren-style 'mixed))
-  
+ 
+ ;; scroll just one line when hitting the bottom of the window
+(setq scroll-preserve-screen-position 1)
 (setq scroll-margin 1                    ; do smooth scrolling, ...
   scroll-conservatively 100000           ; ... the defaults ...
   scroll-up-aggressively 0.01            ; ... are very ...
   scroll-down-aggressively 0.01)         ; ... annoying
-
-(icomplete-mode t)                       ; completion in minibuffer
-(setq icomplete-prospects-height 2)      ; don't spam my minibuffer
-(partial-completion-mode t)              ; be smart with completion
 
 ;; ido makes completing buffers and finding files easier
 ;; http://www.emacswiki.org/cgi-bin/wiki/InteractivelyDoThings
@@ -150,8 +104,7 @@
 (set-default 'indent-tabs-mode nil)
 (set-default 'indicate-empty-lines t)
 (set-default 'imenu-auto-rescan t)
-(setq completion-ignore-case t             ; ignore case when completing...
-  read-file-name-completion-ignore-case t) ; ...filenames too
+
 ;(put 'narrow-to-region 'disabled nil)    ; enable...
 (put 'erase-buffer 'disabled nil)        ; ... useful things
 (when (fboundp file-name-shadow-mode)    ; emacs22+
@@ -180,7 +133,6 @@
        '(("http"     . "rkd4127@gw6alt.draper.com:3128")
          ))
          
-(defalias 'yes-or-no-p 'y-or-n-p)
 (random t) ;; Seed the random-number generator
 
 (defalias 'auto-revert-tail-mode 'tail-mode)
