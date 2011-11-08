@@ -43,9 +43,9 @@
                                   face indentation space-after-tab)
       whitespace-line-column 100
       ediff-window-setup-function 'ediff-setup-windows-plain
-      oddmuse-directory (concat dotfiles-dir "oddmuse")
+      oddmuse-directory (concat emacs-dir "oddmuse")
       xterm-mouse-mode t
-      save-place-file (concat dotfiles-dir "places"))
+      save-place-file (concat emacs-dir "places"))
 
 (add-to-list 'safe-local-variable-values '(lexical-binding . t))
 (add-to-list 'safe-local-variable-values '(whitespace-line-column . 80))
@@ -65,7 +65,7 @@
 
 ;; recentf - Save a list of recent files visited.
 (when (require-soft 'recentf)    
-  (setq recentf-save-file (concat djcb-tmp-dir "/recentf")  ;; keep ~/ clean
+  (setq recentf-save-file (concat emacs-tmp-dir "/recentf")  ;; keep ~/ clean
         recentf-max-saved-items 100                         ;; max save 100
         recentf-max-menu-items 15)                          ;; max 15 in menu
         (recentf-mode t))                                   ;; turn it on
@@ -83,7 +83,7 @@
 (when (> emacs-major-version 21)
   (ido-mode 'both)
   (setq 
-    ido-save-directory-list-file (concat djcb-tmp-dir "/ido.last")
+    ido-save-directory-list-file (concat emacs-tmp-dir "/ido.last")
     ido-ignore-buffers ;; ignore these guys
     '("\\` " "^\*Mess" "^\*Back" ".*Completion" "^\*Ido")
     ido-work-directory-list '("~/" "~/Desktop" "~/Documents")
@@ -151,11 +151,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; saving things across sessions
 ;; bookmarks
-(setq bookmark-default-file "~/.emacs.d/bookmarks") ;; bookmarks
+(setq bookmark-default-file (concat emacs-tmp-dir "/bookmarks")) ;; bookmarks
 
 ;; saveplace: save location in file when saving files
 (setq save-place-file
-  (concat djcb-tmp-dir "/saveplace"))  ;; keep my ~/ clean
+  (concat emacs-tmp-dir "/saveplace"))  ;; keep my ~/ clean
 (setq-default save-place t)            ;; activate it for all buffers
 (require 'saveplace)                   ;; get the package
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -163,15 +163,15 @@
 ;; backups
 (setq auto-save-list-file-name nil)     ; no .saves files
 (setq auto-save-default        t)       ; auto saving
-(setq djcb-backup-dir (concat djcb-tmp-dir "/backups"))
+(setq djcb-backup-dir (concat emacs-tmp-dir "/backups"))
 (setq make-backup-files t ;; do make backups
   backup-by-copying t     ;; and copy them here
-  backup-directory-alist '(("." . "~/.emacs.tmp/backups")) ;; Don't clutter up directories with files~
+  backup-directory-alist `(("." . ,(expand-file-name (concat emacs-tmp-dir "/backups"))))  
   version-control t
   kept-new-versions 3
   kept-old-versions 5
   delete-old-versions t)  
-;;(setq backup-directory-alist `(("." . ,(expand-file-name (concat dotfiles-dir "backups")))))
+;;(setq backup-directory-alist `(("." . ,(expand-file-name (concat emacs-dir "backups")))))
 
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/cursor-chg.el
 ;; change cursor for verwrite/read-only/input 

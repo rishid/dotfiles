@@ -105,20 +105,15 @@
 ;; interactive text replacement
 (global-set-key (kbd "C-c C-r") 'iedit-mode)
 
-;; swap windows
-(global-set-key (kbd "C-c s") 'swap-windows)
-
 ;; duplicate the current line or region
 (global-set-key (kbd "C-c d") 'duplicate-current-line-or-region)
 
 ;; rename buffer & visited file
 (global-set-key (kbd "C-c r") 'rename-file-and-buffer)
 
-
 ;; programming/writing stuff; f5-f8
 (global-set-key (kbd "<f7>") 'compile)                     ;; compile
 (global-set-key (kbd "S-<f7>") 'delete-other-windows)      ;; close ...
-
 
 (global-set-key (kbd "<f8>") 'comment-or-uncomment-region) ;; (un)comment
 ;; for writing
