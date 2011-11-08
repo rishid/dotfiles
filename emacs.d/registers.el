@@ -8,9 +8,9 @@
 
 ;; You should add registers here for the files you edit most often.
 
-(dolist (r `((?i (file . ,(concat dotfiles-dir "init.el")))
-             (?b (file . ,(concat dotfiles-dir "bindings.el")))
-             (?r (file . ,(concat dotfiles-dir "registers.el")))))
+(dolist (r `((?i (file . ,(concat emacs-dir "init.el")))
+             (?b (file . ,(concat emacs-dir "bindings.el")))
+             (?r (file . ,(concat emacs-dir "registers.el")))))
   (set-register (car r) (cadr r)))
 
 (provide 'registers)
