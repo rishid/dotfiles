@@ -1,6 +1,6 @@
-;;; registers.el --- Set up registers
-;;
-;; Part of the Emacs Starter Kit
+;; -----------------------------------------------------------------------
+;; Register values
+;; -----------------------------------------------------------------------
 
 ;; Registers allow you to jump to a file or other location
 ;; quickly. Use C-x r j followed by the letter of the register (i for
@@ -14,4 +14,3 @@
   (set-register (car r) (cadr r)))
 
 (provide 'registers)
-;;; registers.el ends here

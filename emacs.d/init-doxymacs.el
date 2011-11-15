@@ -18,11 +18,15 @@ Key bindings:
  (lambda ()
    (doxymacs-mode 1)
    (doxymacs-font-lock)))
+  
+;; ----------------------------------------------------------- [ doxygen ]
+;; Disable doxymacs prompts
+(defadvice doxymacs-insert-function-comment (around no-prompt activate compile)
+  "Prevents tempo from prompting during doxymacs template insertion"
+  (let ((tempo-interactive nil)) ad-do-it))
 
-(defun doxymacs-settings ()
-  "Settings for `doxymacs'.")
+(defadvice doxymacs-insert-file-comment  (around no-prompt activate compile)
+  "Prevents tempo from prompting during doxymacs template insertion"
+  (let ((tempo-interactive nil)) ad-do-it))
 
-(eval-after-load "doxymacs"
-  `(doxymacs-settings))
-
-(provide 'doxymacs-settings)
+(provide 'init-doxymacs)

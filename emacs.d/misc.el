@@ -10,21 +10,12 @@
   "Are we in a console?")
 (defconst djcb-machine (substring (shell-command-to-string "hostname") 0 -1))
 
-
-
-;;(scroll-bar-mode t)                      ; show a scrollbar...
-;;(set-scroll-bar-mode 'right)             ; ... on the right
-
 ;; time-stamps 
 (setq ;; when there's "Time-stamp: <>" in the first 10 lines of the file
   time-stamp-active t        ; do enable time-stamps
   time-stamp-line-limit 10   ; check first 10 buffer lines for Time-stamp: <>
   time-stamp-format "%02m-%02d-%04y %02H:%02M:%02S (%u)") ; date format
 (add-hook 'write-file-hooks 'time-stamp) ; update when saving
-
-
-
-(add-hook 'before-make-frame-hook 'turn-off-tool-bar)
 
 (ansi-color-for-comint-mode-on)
 
@@ -34,7 +25,6 @@
       font-lock-maximum-decoration t
       delete-selection-mode t
       shift-select-mode nil
-      truncate-partial-width-windows nil
       uniquify-buffer-name-style 'post-forward
       uniquify-after-kill-buffer-p t
       uniquify-ignore-buffers-re "^\\*"
@@ -44,21 +34,10 @@
       whitespace-line-column 100
       ediff-window-setup-function 'ediff-setup-windows-plain
       oddmuse-directory (concat emacs-dir "oddmuse")
-      xterm-mouse-mode t
-      save-place-file (concat emacs-dir "places"))
+      xterm-mouse-mode t)
 
 (add-to-list 'safe-local-variable-values '(lexical-binding . t))
 (add-to-list 'safe-local-variable-values '(whitespace-line-column . 80))
-
-;; Set this to whatever browser you use
-;; (setq browse-url-browser-function 'browse-url-firefox)
-;; (setq browse-url-browser-function 'browse-default-macosx-browser)
-;; (setq browse-url-browser-function 'browse-default-windows-browser)
-;; (setq browse-url-browser-function 'browse-default-kde)
-;; (setq browse-url-browser-function 'browse-default-epiphany)
-;; (setq browse-url-browser-function 'browse-default-w3m)
-;; (setq browse-url-browser-function 'browse-url-generic
-;;       browse-url-generic-program "~/src/conkeror/conkeror")
 
 ;; Transparently open compressed files
 (auto-compression-mode t)
@@ -77,31 +56,6 @@
   scroll-up-aggressively 0.01            ; ... are very ...
   scroll-down-aggressively 0.01)         ; ... annoying
 
-;; ido makes completing buffers and finding files easier
-;; http://www.emacswiki.org/cgi-bin/wiki/InteractivelyDoThings
-;; ido-mode is like magic pixie dust!
-(when (> emacs-major-version 21)
-  (ido-mode 'both)
-  (setq 
-    ido-save-directory-list-file (concat emacs-tmp-dir "/ido.last")
-    ido-ignore-buffers ;; ignore these guys
-    '("\\` " "^\*Mess" "^\*Back" ".*Completion" "^\*Ido")
-    ido-work-directory-list '("~/" "~/Desktop" "~/Documents")
-    ido-everywhere t                                              ; use for many file dialogs
-    ido-case-fold  t                                              ; be case-insensitive
-    ido-enable-last-directory-history t                           ; remember last used dirs
-    ido-max-work-directory-list 30                                ; should be enough
-    ido-max-work-file-list      50                                ; remember many
-    ido-use-filename-at-point nil                                 ; don't use filename at point (annoying)
-    ido-use-url-at-point nil                                      ;  don't use url at point (annoying)ido-enable-prefix nil
-    ido-enable-flex-matching t                                    ; be flexible
-    ido-create-new-buffer 'always
-    ido-use-filename-at-point 'guess
-    ido-confirm-unique-completion t                              ; wait for RET, even with unique completion
-    ido-max-prospects 10)                                        ; don't spam my minibuffer
-)
-
-(set-default 'indent-tabs-mode nil)
 (set-default 'indicate-empty-lines t)
 (set-default 'imenu-auto-rescan t)
 
@@ -118,13 +72,6 @@
     (local-set-key (kbd "s-p") 'gtags-find-pattern)
     (local-set-key (kbd "s-g") 'gtags-find-with-grep)))
     
-;; text-mode
-(add-hook 'text-mode-hook
-  (lambda()     
-    (set-fill-column 78)                    ; lines are 78 chars long ...
-    (auto-fill-mode t)                      ; ... and wrapped around 
-    (turn-on-flyspell t)))                    ; on-the-fly spelling checking
-
 (defvar coding-hook nil
   "Hook that gets run on activation of any programming mode.")
 
@@ -137,33 +84,35 @@
 
 (defalias 'auto-revert-tail-mode 'tail-mode)
 
-;; Hippie expand: at times perhaps too hip
-(delete 'try-expand-line hippie-expand-try-functions-list)
-(delete 'try-expand-list hippie-expand-try-functions-list)
-(delete 'try-complete-file-name-partially hippie-expand-try-functions-list)
-(delete 'try-complete-file-name hippie-expand-try-functions-list)
-;(setq hippie-expand-try-functions-list
-;  '(yas/hippie-try-expand try-expand-all-abbrevs try-expand-dabbrev
-;     try-expand-dabbrev-from-kill
-;     try-complete-lisp-symbol-partially try-complete-lisp-symbol-partially
-;     try-expand-dabbrev-all-buffers))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; saving things across sessions
 ;; bookmarks
 (setq bookmark-default-file (concat emacs-tmp-dir "/bookmarks")) ;; bookmarks
 
-;; saveplace: save location in file when saving files
+;; ---------------------------------------------------------- [ saveplace ]
+;; save location in file when saving files
 (setq save-place-file
   (concat emacs-tmp-dir "/saveplace"))  ;; keep my ~/ clean
 (setq-default save-place t)            ;; activate it for all buffers
 (require 'saveplace)                   ;; get the package
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; backups
+;; ---------------------------------------------------------- [ diminish ]
+;; Makes minor mode names in the modeline shorter.
+(require 'diminish)
+
+(eval-after-load "filladapt"
+  '(diminish 'filladapt-mode "Fill"))
+(eval-after-load "abbrev"
+  '(diminish 'abbrev-mode "Abv"))
+(eval-after-load "doxymacs"
+  '(diminish 'doxymacs-mode "dox"))
+  
+;; -------------------------------------------------------- [ backup-dir ]
+;; Changes the location where backup files are placed. Instead of
+;; being spread out all over the filesystem, they're now placed in one
+;; location.
 (setq auto-save-list-file-name nil)     ; no .saves files
 (setq auto-save-default        t)       ; auto saving
-(setq djcb-backup-dir (concat emacs-tmp-dir "/backups"))
 (setq make-backup-files t ;; do make backups
   backup-by-copying t     ;; and copy them here
   backup-directory-alist `(("." . ,(expand-file-name (concat emacs-tmp-dir "/backups"))))  
@@ -171,7 +120,6 @@
   kept-new-versions 3
   kept-old-versions 5
   delete-old-versions t)  
-;;(setq backup-directory-alist `(("." . ,(expand-file-name (concat emacs-dir "backups")))))
 
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/cursor-chg.el
 ;; change cursor for verwrite/read-only/input 
@@ -252,7 +200,59 @@
       (quote ((auto-recompile . t)
               (outline-minor-mode . t)
               auto-recompile outline-minor-mode)))
-      
+			  
+;; -----------------------------------------------------------------------
+;; Prevent the bell from ringing all the time.
+;; -----------------------------------------------------------------------
+;; nice little alternative visual bell; Miles Bader <miles /at/ gnu.org>
+
+;; TODO(erg): Figure out why that note doesn't appear in the mode-line-bar...
+(defcustom mode-line-bell-string "ding" ; "?"
+  "Message displayed in mode-line by `mode-line-bell' function."
+  :group 'user)
+(defcustom mode-line-bell-delay 0.1
+  "Number of seconds `mode-line-bell' displays its message."
+  :group 'user)
+
+;; internal variables
+(defvar mode-line-bell-cached-string nil)
+(defvar mode-line-bell-propertized-string nil)
+
+(defun mode-line-bell ()
+  "Briefly display a highlighted message in the mode-line.
+
+The string displayed is the value of `mode-line-bell-string',
+with a red background; the background highlighting extends to the
+right margin.  The string is displayed for `mode-line-bell-delay'
+seconds.
+
+This function is intended to be used as a value of `ring-bell-function'."
+
+  (unless (equal mode-line-bell-string mode-line-bell-cached-string)
+    (setq mode-line-bell-propertized-string
+      (propertize
+       (concat
+        (propertize
+         "x"
+         'display
+         `(space :align-to (- right ,(string-width mode-line-bell-string))))
+        mode-line-bell-string)
+       'face '(:background "red")))
+    (setq mode-line-bell-cached-string mode-line-bell-string))
+  (message mode-line-bell-propertized-string)
+  (sit-for mode-line-bell-delay)
+  (message ""))
+
+(setq ring-bell-function 'mode-line-bell)
+
+;; -------------------------------------------------- [ browse-kill-ring ]
+;; Select something that you put in the kill ring ages ago.
+(autoload 'browse-kill-ring "browse-kill-ring" "Browse the kill ring." t)
+(global-set-key (kbd "C-c k") 'browse-kill-ring)
+(eval-after-load "browse-kill-ring"
+  '(progn
+     (setq browse-kill-ring-quit-action 'save-and-restore)))
+	 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;; BELOW CODE IS UNUSED ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
