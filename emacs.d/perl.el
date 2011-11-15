@@ -20,7 +20,8 @@
       cperl-indent-parens-as-block t
       cperl-continued-statement-offset 4
       cperl-indent-subs-specially nil
-      cperl-invalid-face 'underline)))    
+      cperl-invalid-face 'underline)
+	(my-start-scripting-mode "pl" "#!/usr/bin/perl")))    
 
 (custom-set-faces
   '(cperl-invalid-face default))

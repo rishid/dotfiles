@@ -5,21 +5,7 @@
 (require 'thingatpt)
 (require 'imenu)
 
-;; Network
-
-(defun view-url ()
-  "Open a new buffer containing the contents of URL."
-  (interactive)
-  (let* ((default (thing-at-point-url-at-point))
-         (url (read-from-minibuffer "URL: " default)))
-    (switch-to-buffer (url-retrieve-synchronously url))
-    (rename-buffer url t)
-    ;; TODO: switch to nxml/nxhtml mode
-    (cond ((search-forward "<?xml" nil t) (xml-mode))
-          ((search-forward "<html" nil t) (html-mode)))))
-
 ;; Buffer-related
-
 (defun ido-imenu ()
   "Update the imenu index and then use ido to select a symbol to navigate to.
 Symbols matching the text at point are put first in the completion list."
@@ -62,53 +48,9 @@ Symbols matching the text at point are put first in the completion list."
            (position (cdr (assoc selected-symbol name-and-pos))))
       (goto-char position))))
 
-;;; These belong in coding-hook:
-
-;; We have a number of turn-on-* functions since it's advised that lambda
-;; functions not go in hooks. Repeatedly evaling an add-to-list with a
-;; hook value will repeatedly add it since there's no way to ensure
-;; that a lambda doesn't already exist in the list.
-
-(defun local-column-number-mode ()
-  (make-local-variable 'column-number-mode)
-  (column-number-mode t))
-
-(defun local-comment-auto-fill ()
-  (set (make-local-variable 'comment-auto-fill-only-comments) t)
-  (auto-fill-mode t))
-
-(defun turn-on-hl-line-mode ()
-  (when (> (display-color-cells) 8) (hl-line-mode t)))
-
-(defun turn-on-save-place-mode ()
-  (setq save-place t))
-
-(defun turn-on-whitespace ()
-  (whitespace-mode t))
-
 (defun turn-on-paredit ()
-  (paredit-mode t))
-
-(defun turn-off-tool-bar ()
-  (tool-bar-mode -1))
-
-(defun add-watchwords ()
-  (font-lock-add-keywords
-   nil '(("\\<\\(FIX\\|TODO\\|FIXME\\|HACK\\|REFACTOR\\):"
-          1 font-lock-warning-face t))))
-
-(add-hook 'coding-hook 'local-column-number-mode)
-(add-hook 'coding-hook 'local-comment-auto-fill)
-(add-hook 'coding-hook 'turn-on-hl-line-mode)
-(add-hook 'coding-hook 'turn-on-save-place-mode)
-(add-hook 'coding-hook 'pretty-lambdas)
-(add-hook 'coding-hook 'add-watchwords)
-;(add-hook 'coding-hook 'turn-on-idle-highlight)
-  
-(defun run-coding-hook ()
-  "Enable things that are convenient across all coding buffers."
-  (run-hooks 'coding-hook))
-
+  (paredit-mode t))  
+ 
 (defun untabify-buffer ()
   (interactive)
   (untabify (point-min) (point-max)))
@@ -130,15 +72,6 @@ Symbols matching the text at point are put first in the completion list."
   (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
     (when file
       (find-file file))))
-
-;; Cosmetic
-
-(defun pretty-lambdas ()
-  (font-lock-add-keywords
-   nil `(("(?\\(lambda\\>\\)"
-          (0 (progn (compose-region (match-beginning 1) (match-end 1)
-                                    ,(make-char 'greek-iso8859-7 107))
-                    nil))))))
 
 ;; Other
 
@@ -190,6 +123,126 @@ Symbols matching the text at point are put first in the completion list."
           "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in "
           "culpa qui officia deserunt mollit anim id est laborum."))
 
+;; -------------------------------------------------- [ select-vc-status ]
+(defun select-vc-status ()
+  "Calls for a directory and calls `svn-status' or `git-status' depending on what
+type of version control found in that directory"
+  (interactive)
+  (let* ((local-default-dir (ftf-project-directory))
+         (targetDir
+          (read-directory-name "Status of directory: "
+                               local-default-dir
+                               local-default-dir
+                               nil)))
+    (cond ((file-exists-p (concat targetDir "/.git"))
+           (git-status targetDir))
+          ((file-exists-p (concat targetDir "/.svn"))
+           (svn-status targetDir))
+          ((file-exists-p (concat targetDir "/CVS"))
+           (cvs-status targetDir)))))
+
+;; -----------------------------------------------------------------------
+;; Helper Functions (used in mode startup)
+;; -----------------------------------------------------------------------
+;; --------------------------------------------- [ start-programing-mode ]
+(defun start-programing-mode()
+  (interactive)
+
+  ;; Setup flyspell to make me not look like an idiot to my coworkers
+  ;; and Haeleth and whoever else reads my code.
+  ;(flyspell-prog-mode)
+
+  ;; All trailing whitespace needs to be highlighted so it can die.
+  (setq show-trailing-whitespace t)
+
+  ;; Highlight matching parentheses when the point is on them.
+  ;; show-paren-mode: subtle blinking of matching paren (defaults are ugly)
+  ;; http://www.emacswiki.org/cgi-bin/wiki/ShowParenMode
+  (when (fboundp 'show-paren-mode)
+	(show-paren-mode t)
+	(setq show-paren-delay 0.0)  
+	(setq show-paren-style 'mixed))  
+	
+  (font-lock-add-keywords
+   nil '(("\\<\\(FIX\\|TODO\\|FIXME\\|BUG\\|HACK\\|REFACTOR\\):"
+          1 font-lock-warning-face t)))
+		  
+  (whitespace-mode t)
+  
+  (add-hook 'before-save-hook
+    'delete-trailing-whitespace nil t)
+  
+  (setq comment-auto-fill-only-comments t)
+  (auto-fill-mode t)
+)
+  
+;; ------------------------------------------- [ my-start-scripting-mode ]
+(defun my-start-scripting-mode (file-extension hash-bang)
+  ;; All scripting languages are programming languages
+  (start-programing-mode)
+
+  (local-set-key "\C-css" 'insert-script-seperator-line)
+  (local-set-key "\C-csh" 'insert-script-section-header)
+  (local-set-key "\C-csb" 'insert-script-big-header)
+
+  ;; Build a startup template for this mode.
+  (my-start-autoinsert)
+  (tempo-define-template (concat file-extension "startup")
+                         (list (concat hash-bang "\n\n")))
+  (push (cons (concat "\\." file-extension "$")
+              (intern (concat "tempo-template-" file-extension "startup")))
+        auto-insert-alist)
+
+  ;; Make the script executable on save
+  (add-hook 'after-save-hook
+            'executable-make-buffer-file-executable-if-script-p
+            nil t))
+			
+;; ----------------------------------------------- [ my-start-autoinsert ]
+(defun my-start-autoinsert ()
+  "Helper function called from anything that puts in a template
+from an empty file."
+  (interactive)
+  (require 'autoinsert)
+  (add-hook 'find-file-hooks 'auto-insert)
+  (setq auto-insert-alist '())
+  (setq auto-insert-query nil)
+  (require 'tempo))
+  
+;; ------------------------------------------------- [ intelligent-close ]
+(defun intelligent-close ()
+  "quit a frame the same way no matter what kind of frame you are on.
+
+This method, when bound to C-x C-c, allows you to close an emacs frame the
+same way, whether it's the sole window you have open, or whether it's
+a \"child\" frame of a \"parent\" frame.  If you're like me, and use emacs in
+a windowing environment, you probably have lots of frames open at any given
+time.  Well, it's a pain to remember to do Ctrl-x 5 0 to dispose of a child
+frame, and to remember to do C-x C-x to close the main frame (and if you're
+not careful, doing so will take all the child frames away with it).  This
+is my solution to that: an intelligent close-frame operation that works in
+all cases (even in an emacs -nw session).
+
+Stolen from http://www.dotemacs.de/dotfiles/BenjaminRutt.emacs.html"
+  (interactive)
+  (if (eq (car (visible-frame-list)) (selected-frame))
+      ;;for parent/master frame...
+      (if (> (length (visible-frame-list)) 1)
+          ;;close a parent with children present
+          (delete-frame (selected-frame))
+        ;;close a parent with no children present
+        (save-buffers-kill-emacs))
+    ;;close a child frame
+    (delete-frame (selected-frame))))
+
+(global-set-key "\C-x\C-c" 'intelligent-close) ;forward reference
+
+;; ------------------------------------------------------------- [ tempo ]
+(defun tempo-space ()
+  (interactive "*")
+  (or (tempo-expand-if-complete)
+      (insert " ")))
+	  
 (defun switch-or-start (function buffer)
   "If the buffer is current, bury it, otherwise invoke the function."
   (if (equal (buffer-name (current-buffer)) buffer)
@@ -202,11 +255,6 @@ Symbols matching the text at point are put first in the completion list."
   "Insert a time-stamp according to locale's date and time format."
   (interactive)
   (insert (format-time-string "%c" (current-time))))
-
-(defun pairing-bot ()
-  "If you can't pair program with a human, use this instead."
-  (interactive)
-  (message (if (y-or-n-p "Do you have a test for that? ") "Good." "Bad!")))
 
 (autoload 'paredit-mode "paredit"
     "Minor mode for pseudo-structurally editing Lisp code." t)
@@ -224,33 +272,6 @@ Symbols matching the text at point are put first in the completion list."
   '(add-to-list 'paredit-space-for-delimiter-predicates
                 'esk-space-for-delimiter?))
 
-(defun message-point ()
-  (interactive)
-  (message "%s" (point)))
-
-(defun esk-disapproval ()
-  (interactive)
-  (insert "ಠ_ಠ"))
-
-(defun esk-agent-path ()
-  (if (eq system-type 'darwin)
-      "*launch*/Listeners"
-    "*ssh*/agent\.*"))
-
-(defun esk-find-agent ()
-  (let* ((path-clause (format "-path \"%s\"" (esk-agent-path)))
-         (find-command (format "$(find -L /tmp -uid $UID %s -type s 2> /dev/null)"
-                               path-clause)))
-    (first (split-string
-            (shell-command-to-string
-             (format "/bin/ls -t1 %s | head -1" find-command))))))
-
-(defun fix-agent ()
-  (interactive)
-  (let ((agent (esk-find-agent)))
-    (setenv "SSH_AUTH_SOCK" agent)
-    (message agent)))
-
 (defun toggle-fullscreen ()
   (interactive)
   ;; TODO: this only works for X. patches welcome for other OSes.
@@ -259,12 +280,6 @@ Symbols matching the text at point are put first in the completion list."
   (x-send-client-message nil 0 nil "_NET_WM_STATE" 32
                          '(2 "_NET_WM_STATE_MAXIMIZED_HORZ" 0)))
 
-
-;; A monkeypatch to cause annotate to ignore whitespace
-(defun vc-git-annotate-command (file buf &optional rev)
-  (let ((name (file-relative-name file)))
-    (vc-git-command buf 0 name "blame" "-w" rev)))
-    
 (defun message-startup-time ()
   "Display a message of how long Emacs took to start up, in milliseconds."
   (message "Emacs loaded in %dms"

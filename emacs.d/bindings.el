@@ -27,18 +27,12 @@
 ;; Align your code in a pretty way.
 (global-set-key (kbd "C-x \\") 'align-regexp)
 
-;; Perform general cleanup.
-(global-set-key (kbd "C-c n") 'cleanup-buffer)
-
 ;; Font size
 (define-key global-map (kbd "C-+") 'text-scale-increase)
 (define-key global-map (kbd "C--") 'text-scale-decrease)
 
 ;; Jump to a definition in the current file. (This is awesome.)
 (global-set-key (kbd "M-i") 'ido-goto-symbol)
-
-;; Completion that uses many different methods to find options.
-(global-set-key (kbd "M-/") 'hippie-expand)
 
 ;; Window switching. (C-x o goes to the next window)
 (global-set-key (kbd "C-x O") (lambda ()
@@ -47,9 +41,6 @@
 
 ;; A complementary binding to the apropos-command(C-h a)
 (global-set-key (kbd "C-h A") 'apropos)
-
-;; Should be able to eval-and-replace anywhere.
-(global-set-key (kbd "C-c e") 'eval-and-replace)
 
 ;; Magit rules!
 (global-set-key (kbd "C-x g") 'magit-status)
@@ -64,6 +55,8 @@
 
 ;; Start eshell or switch to it if it's active.
 (global-set-key (kbd "C-x m") 'eshell)
+
+(global-set-key '[f3] 'select-vc-status)
 
 ;; Start a new eshell even if one is active.
 (global-set-key (kbd "C-x M") (lambda () (interactive) (eshell t)))
@@ -88,11 +81,6 @@
 (global-set-key (kbd "C-c s") 'replace-string)
 (global-set-key (kbd "C-c r") 'replace-regexp)
 
-;; Window switching. (C-x o goes to the next window)
-(windmove-default-keybindings) ;; Shift+direction
-(global-set-key (kbd "C-x O") (lambda () (interactive) (other-window -1))) ;; back one
-(global-set-key (kbd "C-x C-o") (lambda () (interactive) (other-window 2))) ;; forward two
-
 ;; Start eshell or switch to it if it's active.
 (global-set-key (kbd "C-x m") 'eshell)
 
@@ -113,12 +101,11 @@
 
 ;; programming/writing stuff; f5-f8
 (global-set-key (kbd "<f7>") 'compile)                     ;; compile
-(global-set-key (kbd "S-<f7>") 'delete-other-windows)      ;; close ...
+
 
 (global-set-key (kbd "<f8>") 'comment-or-uncomment-region) ;; (un)comment
 ;; for writing
 (global-set-key (kbd "C-<f5>") 'djcb-count-words)          ;; count words
-(global-set-key (kbd "C-<f6>") 'magit-status)              ;; ...git mode
 
 (global-set-key (kbd "C-c q") 'join-line)
 
@@ -129,18 +116,11 @@
 (global-set-key (kbd "<S-f9>")   'djcb-fullscreen-toggle)  ;; fullscreen
 (global-set-key (kbd "<S-<f10>")  'package-list-packages)  ;; elpa
 
-;;; bindings.el --- Set up some handy key bindings
-;;
-;; Part of the Emacs Starter Kit.
-
 ;; You know, like Readline.
 (global-set-key (kbd "C-M-h") 'backward-kill-word)
 
 ;; Align your code in a pretty way.
 (global-set-key (kbd "C-x \\") 'align-regexp)
-
-;; Completion that uses many different methods to find options.
-(global-set-key (kbd "M-/") 'hippie-expand)
 
 ;; Perform general cleanup.
 (global-set-key (kbd "C-c n") 'cleanup-buffer)
@@ -168,12 +148,12 @@
 (global-set-key (kbd "C-c y") 'bury-buffer)
 (global-set-key (kbd "C-c r") 'revert-buffer)
 (global-set-key (kbd "M-`") 'file-cache-minibuffer-complete)
-(global-set-key (kbd "C-x C-b") 'ibuffer)  ;; replace buffer-menu with ibuffer
 
 ;; Window switching. (C-x o goes to the next window)
 (windmove-default-keybindings) ;; Shift+direction
 (global-set-key (kbd "C-x O") (lambda () (interactive) (other-window -1))) ;; back one
 (global-set-key (kbd "C-x C-o") (lambda () (interactive) (other-window 2))) ;; forward two
+(global-set-key (kbd "S-<f7>") 'delete-other-windows)
 
 ;; Start eshell or switch to it if it's active.
 (global-set-key (kbd "C-x m") 'eshell)
@@ -196,12 +176,6 @@
 ;; Should be able to eval-and-replace anywhere.
 (global-set-key (kbd "C-c e") 'eval-and-replace)
 
-;; For debugging Emacs modes
-(global-set-key (kbd "C-c p") 'message-point)
-
-;; So good!
-(global-set-key (kbd "C-x g") 'magit-status)
-
 (global-set-key (kbd "C-c q") 'join-line)
 
 ;; This is a little hacky since VC doesn't support git add internally
@@ -217,10 +191,6 @@
   (lambda () (interactive)
     (let ((case-fold-search isearch-case-fold-search))
       (occur (if isearch-regexp isearch-string (regexp-quote isearch-string))))))
-
-;; Org
-(define-key global-map "\C-cl" 'org-store-link)
-(define-key global-map "\C-ca" 'org-agenda)
 
 (provide 'bindings)
 ;;; bindings.el ends here

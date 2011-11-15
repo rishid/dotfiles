@@ -1,0 +1,41 @@
+;; -----------------------------------------------------------------------
+;; Autoloads (aka, the way to make emacs fast)
+;; -----------------------------------------------------------------------
+(autoload 'hide-ifdef-define "hideif" nil t)
+(autoload 'hide-ifdef-undef  "hideif" nil t)
+(autoload 'c-mode "cc-mode" "C Editing Mode" t)
+(autoload 'c++-mode "cc-mode" "C++ Editing Mode" t)
+(autoload 'objc-mode "cc-mode" "ObjC Editing Mode" t)
+(autoload 'ruby-mode "ruby-mode" "Major mode for editing ruby scripts." t)
+(autoload 'bison-mode "bison-mode" "Major mode for editing yacc files." t)
+(autoload 'flex-mode "flex-mode" "Major mode for editing lex files." t)
+(autoload 'make-regexp "make-regexp"
+  "Return a regexp to match a string item in STRINGS." t)
+(autoload 'make-regexps "make-regexp"  "Return a regexp to REGEXPS." t)
+(autoload 'ascii-table "ascii-table" "Displays the ASCII table." t)
+(autoload 'filladapt-mode "filladapt" "Filladapt mode." t)
+(autoload 'doxymacs-mode "doxymacs" "Deal with doxygen." t)
+(autoload 'cg-mode "cg-mode" "Edit files written in nVidia's Cg language." t)
+(autoload 'lua-mode "lua-mode" "Lua editing mode." t)
+(autoload 'rubydb "rubydb3x" "Ruby debugger" t)
+(autoload 'git-status "git" "git status mode." t)
+(autoload 'svn-status "psvn" "psvn.el status mode." t)
+(autoload 'malyon "malyon" "Z-Machine interpreter." t)
+
+(autoload 'textile-mode "textile-mode" "Textile editing mode." t)
+(autoload 'markdown-mode "markdown-mode" "Markdown editing mode." t)
+
+
+;; Autoloads to my custom header inserters
+(autoload 'insert-c++-seperator-line "e-seperators" nil t)
+(autoload 'insert-c-seperator-line "e-seperators" nil t)
+(autoload 'insert-elisp-seperator-line "e-seperators" nil t)
+(autoload 'insert-script-seperator-line "e-seperators" nil t)
+(autoload 'insert-c-section-header "e-seperators" nil t)
+(autoload 'insert-c++-section-header "e-seperators" nil t)
+(autoload 'insert-elisp-section-header "e-seperators" nil t)
+(autoload 'insert-script-section-header "e-seperators" nil t)
+(autoload 'insert-c++-big-header "e-seperators" nil t)
+(autoload 'insert-elisp-big-header "e-seperators" nil t)
+(autoload 'insert-script-big-header "e-seperators" nil t)
+(autoload 'insert-text-seperator-line "e-seperators" nil t)

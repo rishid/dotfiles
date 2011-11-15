@@ -2,21 +2,28 @@
 ;;
 
 ;; disable some ui components
-(menu-bar-mode 0)
-(require 'tool-bar)
-(tool-bar-mode 0)
-(require 'scroll-bar)
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (scroll-bar-mode -1)
 
+(setq enable-local-variables :safe
+      inhibit-startup-message t  ;; no welcome message
+      default-major-mode 'text-mode
+      require-final-newline t
+      default-tab-width 4
+	  tab-width 4
+      backward-delete-char-untabify 4
+	  indent-tabs-mode nil
+      default-fill-column 80
+      global-hl-line-mode t ;; highlight current line
+      truncate-partial-width-windows nil)
+	  
 ;; defaults for graphical frames. important because emacsclient -c
 ;; doesn't respect the font of the default face.
 ;(setq window-system-default-frame-alist
 ;      '((x (font . "Bitstream Vera Sans Mono-8")
 ;           (background-color . "white")
 ;           (foreground-color . "black"))))
-
-;; no welcome message
-(setq inhibit-startup-message t)
 
 ;; no echo area help on startup
 (defun display-startup-echo-area-message ()
@@ -54,14 +61,6 @@
 ;; Enable syntax highlighting for older Emacsen that have it off
 (global-font-lock-mode t)
 
-;; Highlight matching parentheses when the point is on them.
-;; show-paren-mode: subtle blinking of matching paren (defaults are ugly)
-;; http://www.emacswiki.org/cgi-bin/wiki/ShowParenMode
-(when (fboundp 'show-paren-mode)
-  (show-paren-mode t)
-  (setq show-paren-delay 0.0)  
-  (setq show-paren-style 'mixed))
-  
 ;; make "yes or no" prompts show "y or n" instead
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -78,8 +77,6 @@
 ;; case insensitive completion
 (setq completion-ignore-case t             
   read-file-name-completion-ignore-case t) ; ...filenames too
-  
-(setq require-final-newline 'visit-save)
 
 ;; compilation
 (setq compilation-window-height 12)
@@ -101,10 +98,7 @@
             (when (buffer-file-name)
               (setq show-trailing-whitespace t))))
 
-(set-default 'fill-column 80)
 
-;; highlight current line
-(global-hl-line-mode t)
   
 (provide 'customizations)
 ;; customizations.el ends here
