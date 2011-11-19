@@ -42,8 +42,7 @@
 ;; A complementary binding to the apropos-command(C-h a)
 (global-set-key (kbd "C-h A") 'apropos)
 
-;; Magit rules!
-(global-set-key (kbd "C-x g") 'magit-status)
+;(define-key global-map [(control ?z) ?g] 'goto-longest-line)
 
 ;; Activate occur easily inside isearch
 (define-key isearch-mode-map (kbd "C-o")
@@ -67,6 +66,10 @@
 ;; C-pgup goes to the start, C-pgdw goes to the end
 (global-set-key(kbd "<C-prior>")(lambda()(interactive)(goto-char(point-min))))
 (global-set-key(kbd "<C-next>") (lambda()(interactive)(goto-char(point-max))))
+
+;; Do what I mean
+(global-set-key (kbd "C-a") 'beginning-or-indentation)
+(global-set-key (kbd "<home>") 'beginning-or-indentation)
 
 ;; Use regex searches by default.
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
@@ -100,6 +103,7 @@
 (global-set-key (kbd "C-c r") 'rename-file-and-buffer)
 
 ;; programming/writing stuff; f5-f8
+(global-set-key (kbd "<f5>") 'goto-matching-paren)
 (global-set-key (kbd "<f7>") 'compile)                     ;; compile
 
 
