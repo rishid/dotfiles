@@ -65,6 +65,42 @@ Symbols matching the text at point are put first in the completion list."
   (indent-buffer)
   (untabify-buffer)
   (delete-trailing-whitespace))
+  
+(defun goto-longest-line ()
+  "Finds the longest line and puts the point there."
+  (interactive)
+  (let ((width 0)
+        (pos 0))
+    (goto-char (point-min))
+    (while (= (forward-line 1) 0)
+      (end-of-line)
+      (let ((curwid (current-column)))
+        (unless (<= curwid width)
+          (setq width curwid)
+          (setq pos (point)))))
+    (goto-char pos)))
+	
+(defun goto-matching-paren ()
+  "If point is sitting on a parenthetic character, jump to its match."
+  (interactive)
+  (cond ((looking-at "\\s\(") (forward-list 1))
+        ((progn
+           (backward-char 1)
+           (looking-at "\\s\)")) (forward-char 1) (backward-list 1))))
+		   
+(defun beginning-or-indentation (&optional n)
+    "Move cursor to beginning of this line or to its indentation.
+  If at indentation position of this line, move to beginning of line.
+  If at beginning of line, move to beginning of previous line.
+  Else, move to indentation position of this line.
+  With arg N, move backward to the beginning of the Nth previous line.
+  Interactively, N is the prefix arg."
+    (interactive "P")
+    (cond ((or (bolp) n)
+           (forward-line (- (prefix-numeric-value n))))
+          ((save-excursion (skip-chars-backward " \t") (bolp)) ; At indentation.
+           (forward-line 0))
+          (t (back-to-indentation))))
 
 (defun recentf-ido-find-file ()
   "Find a recent file using ido."

@@ -90,6 +90,9 @@
 
 (setq-default indicate-empty-lines t)
 
+(autoload 'whitespace-mode           "whitespace"
+      "Toggle whitespace visualization."        t)
+
 ;; do not show trailing ws by default, but whenever some buffer
 ;; changes its major mode, enable it if the buffer is visiting a file
 (setq-default show-trailing-whitespace nil)

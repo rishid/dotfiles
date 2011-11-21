@@ -80,8 +80,6 @@
        '(("http"     . "rkd4127@gw6alt.draper.com:3128")
          ))
          
-(random t) ;; Seed the random-number generator
-
 (defalias 'auto-revert-tail-mode 'tail-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
