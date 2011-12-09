@@ -1,6 +1,6 @@
 ;; init.el file
 ;; Rishi Dhupar
-;; Time-stamp: <11-09-2011 21:29:00 (Rishi)>
+;; Time-stamp: <12-09-2011 12:23:27 (rkd4127)>
 ;; This is the first thing to get loaded.
 
 ;; List of sources
@@ -44,6 +44,7 @@
 (require 'init-color-theme)
 (require 'registers)
 (require 'c)
+(require 'init-python)
 (require 'eshell)
 (require 'perl)
 (require 'js)
