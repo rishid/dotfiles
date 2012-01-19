@@ -1,6 +1,6 @@
 ;; init.el file
 ;; Rishi Dhupar
-;; Time-stamp: <12-09-2011 12:23:27 (rkd4127)>
+;; Time-stamp: <01-18-2012 19:13:34 (ubuntu)>
 ;; This is the first thing to get loaded.
 
 ;; List of sources
@@ -43,11 +43,11 @@
 (require 'misc)
 (require 'init-color-theme)
 (require 'registers)
-(require 'c)
+(require 'init-c)
 (require 'init-python)
 (require 'eshell)
-(require 'perl)
-(require 'js)
+(require 'init-perl)
+(require 'init-js)
 (require 'init-ido)
 (require 'init-cmake)
 (require 'init-ibuffer)
