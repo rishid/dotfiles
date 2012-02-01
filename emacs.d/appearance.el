@@ -5,8 +5,8 @@
 
 ;(set-face-background 'region "#464740")
 
-;; Highlight current line
-(global-hl-line-mode 1)
+;; Global highlight current line
+(global-hl-line-mode t)
 
 ;; Customize background color of lighlighted line
 ;(set-face-background 'hl-line "#222222")
@@ -34,6 +34,10 @@
 (setq show-paren-delay 0.0)
 (setq show-paren-style 'mixed)
 
+;; Highwhen when searching and replacing
+(setq search-highlight t
+      query-replace-highlight t)
+
 ;; No menu bars
 (menu-bar-mode -1)
 
@@ -41,7 +45,7 @@
   (setq frame-title-format '(buffer-file-name "%f" ("%b")))
   (turn-off-tool-bar)
   (tooltip-mode -1)
-  (turn-off-tool-bar)
+  (mouse-wheel-mode t)
   (blink-cursor-mode -1))
 
 (add-hook 'before-make-frame-hook 'turn-off-tool-bar)
