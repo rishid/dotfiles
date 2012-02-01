@@ -191,14 +191,6 @@ type of version control found in that directory"
   ;; All trailing whitespace needs to be highlighted so it can die.
   (setq show-trailing-whitespace t)
 
-  ;; Highlight matching parentheses when the point is on them.
-  ;; show-paren-mode: subtle blinking of matching paren (defaults are ugly)
-  ;; http://www.emacswiki.org/cgi-bin/wiki/ShowParenMode
-  (when (fboundp 'show-paren-mode)
-	(show-paren-mode t)
-	(setq show-paren-delay 0.0)  
-	(setq show-paren-style 'mixed))  
-	
   (font-lock-add-keywords
    nil '(("\\<\\(FIX\\|TODO\\|FIXME\\|BUG\\|HACK\\|REFACTOR\\):"
           1 font-lock-warning-face t)))
