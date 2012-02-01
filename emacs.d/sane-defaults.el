@@ -52,28 +52,28 @@
 (setq fill-column 80)
 
 ;; Save a list of recent files visited.
-(require 'recentf)
+;(require 'recentf)
 (setq recentf-save-file (concat emacs-tmp-dir "/recentf")  ;; keep ~/ clean
-	  recentf-max-saved-items 100                          ;; max save 100
-	  recentf-max-menu-items 15)                           ;; max 15 in menu
+      recentf-max-saved-items 100                          ;; max save 100
+      recentf-max-menu-items 15)                           ;; max 15 in menu
 (recentf-mode t)                                           ;; turn it on
 
 ;; Never insert tabs
-(setq-default 'indent-tabs-mode nil)
+(set-default 'indent-tabs-mode nil)
 
 ;; Show me empty lines after buffer end
-(setq-default 'indicate-empty-lines t)
+(set-default 'indicate-empty-lines t)
 
 ;; Don't break lines for me, please
 ;(setq-default truncate-lines t)
 
 ;; Keep cursor away from edges when scrolling up/down
-(require 'smooth-scrolling)
+;(require 'smooth-scrolling)
 
 ;; Represent undo-history as an actual tree (visualize with C-x u)
-(setq undo-tree-mode-lighter "")
-(require 'undo-tree)
-(global-undo-tree-mode)
+;(setq undo-tree-mode-lighter "")
+;(require 'undo-tree)
+;(global-undo-tree-mode)
 
 ;; Add parts of each file's directory to the buffer name if not unique
 (require 'uniquify)

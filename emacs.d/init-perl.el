@@ -40,5 +40,5 @@
 ;; TODO: flymake
 ;; TODO: electric bugaloo 
 
-(provide 'perl)
+(provide 'init-perl)
 ;; perl.el ends here

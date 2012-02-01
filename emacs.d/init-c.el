@@ -85,4 +85,4 @@
 
 (add-hook 'c++-mode-hook 'my-c++-startup)
 
-(provide 'c)
+(provide 'init-c)
