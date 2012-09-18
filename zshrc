@@ -21,14 +21,30 @@ export LANG=en_US.UTF-8
 export EDITOR=emacs
 export VISUAL=emacs
 
+# `edit .zshrc`, `echo foo | edit`, `edit` == `edit .`
+edit() {
+    # check if stdin refers to terminal
+    if [[ -t 0 ]]; then
+        if [[ "$@" = "" ]]; then
+            eval "$EDIT ."
+        else
+            eval "$EDIT $@"
+        fi
+    else
+        eval "$EDIT -"
+    fi
+}
+
 #--------------
 #  completion
 #--------------
-autoload -U compinit
-compinit
+autoload -U compinit && compinit
 
 # make completion lists as compact as possible
 setopt list_packed
+
+# list by lines
+setopt list_rows_fist
 
 #-----------
 #  history
@@ -54,11 +70,11 @@ setopt hist_ignore_all_dups
 # if command duplicates the *previous* one, don't log it
 setopt hist_save_no_dups
 
-#--------
-#  MOTD
-#--------
-# example: stallman (Linux), up 29 days
-#python ~/.scripts/show_machine_info.py MacBook.local
+#-------------
+#  zsh magic
+#-------------
+
+autoload -U zmv
 
 #----------
 #  prompt
@@ -67,29 +83,100 @@ setopt hist_save_no_dups
 # subject PROMPT string to parameter expansion, command substitution,
 # and arithmetic expansion
 setopt prompt_subst
- 
-# show three trailing components of current path (replace $HOME with ~),
-# git prompt, and dollar sign
-PROMPT='%3~$(python ~/.scripts/git/prompt.py) $ '
+
+# set color names
+DEFAULT=$'%{\e[0m%}'
+RED=$'%{\e[0;31m%}'
+GREEN=$'%{\e[0;32m%}'
+BLUE=$'%{\e[0;34m%}'
+WHITE=$'%{\e[0;37m%}'
+
+# get git info for prompt
+#
+# full example: " ..master+&"
+# (two dirs deep in repo, on branch master, dirty, with stashed changes)
+git_prompt() {
+    # check status and exit if there's no repo
+    local status_dump="$(mktemp /tmp/git_prompt.XXXXXX)"
+    trap "rm $status_dump" EXIT
+    git status --porcelain > $status_dump 2> /dev/null
+    [[ $? -gt 0 ]] && return
+
+    # initial space
+    echo -n ' '
+
+    # depth
+    git rev-parse --show-cdup | awk '{
+        ORS = ""
+
+        split($0, a, "/")
+        depth = length(a) - 1
+        while (depth --> 0)
+            print "."
+    }'
+
+    # branch name
+    git branch | sed -ne 's/* \(.*\)/\1/p' | tr -d '\n'
+
+    # is dirty?
+    [[ "$(head -c1 $status_dump)" != "" ]] && echo -n "+"
+
+    # has stashed changes?
+    [[ "$(git stash list | head -c1)" != "" ]] && echo -n "&"
+}
+
+# zsh has troubles displaying "⚡" with "PROMPT='%3~'", so...
+short_pwd() {
+    pwd | awk '{
+        ORS = ""
+
+        split($0, a, "/")
+        a[3] = "~"
+
+        len = length(a)
+        start = len > 5 ? len - 2 : 3
+
+        for (i = start; i <= len; i++) {
+            print a[i]
+            if (i != len)
+                print "/"
+        }
+    }'
+}
+
+# show short path, git info and ">" sign
+PROMPT='${BLUE}$(short_pwd)${GREEN}$(git_prompt) ${WHITE}>${DEFAULT} '
+
+# show non-zero exit code
+RPROMPT='${RED}%(0?..%?)${DEFAULT}'
 
 #------------
 #  bindings
 #------------
+
 # ctrl + a/e
 bindkey '^a' beginning-of-line
 bindkey '^e' end-of-line
- 
-# alt + right/left arrow
-bindkey '^[f' forward-word
-bindkey '^[b' backward-word
+
+# up/down arrow: ipython-like history
+bindkey '^[[A' history-beginning-search-backward
+bindkey '^[[B' history-beginning-search-forward
+
+# alt + left/right: jump one word backward/forward
+bindkey '^[^[[D' emacs-backward-word
+bindkey '^[^[[C' emacs-forward-word
+
+# forward delete
+bindkey '^[[3~' delete-char
 
 #-----------
 #  aliases
 #-----------
+
 # change directory
 alias .='cd ..'
-alias ..='.; .'
-alias ...='.; .; .'
+alias ..='cd ../..'
+alias ...='cd ../../..'
 
 # clear the terminal screen
 alias cl='clear'
