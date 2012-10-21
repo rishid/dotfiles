@@ -17,26 +17,8 @@ def ask_yn(question):
 
     return answer.startswith('y')
 
-
-def brew():
-    # get installed apps
-    cellar_dir = '/usr/local/Cellar'
-    installed = listdir(cellar_dir) if exists(cellar_dir) else []
-
-    # get desired apps
-    with open(expanduser('~/.brew')) as f:
-        desired = map(str.strip, f.readlines())
-
-    # install missing apps
-    for app in sorted(set(desired) - set(installed)):
-        print app
-        run('brew install ' + app)
-        print
-
-
 def run(command):
     return call(command, shell=True)
-
 
 def _main():
     # get dotfiles directory
@@ -54,29 +36,6 @@ def _main():
                      'git submodule init',
                      'git submodule update']))
 
-    # install homebrew stuff
-    print '\n'
-    if ask_yn('install homebrew stuff?'):
-        brew()
-
-    # create tags for vim documentation
-    print '\n\ncreating tags for vim documentation...',
-    sys.stdout.flush()
-    sleep(2)
-    run('mvim -c "Helptags | quit"; sleep 1; open -a iterm')
-    print 'done'
-
-    # source ~/.osx
-    cmd = 'source ~/.osx'
-    print '\n'
-    if ask_yn(cmd + '?'):
-        run(cmd)
-
-    # show tips
-    print '\n\ntips:'
-    print ' -  comment out /etc/zshenv contents to get correct $PATH in MacVim'
-    print ' -  modify home/.gitfiles/template/hooks -- it\'s an absolute'
-    print '    symlink to /Users/narf/.gitfiles/hooks (sorry)'
 
     # tell how to switch to zsh
     shell = environ.get('SHELL')
