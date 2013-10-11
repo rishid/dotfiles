@@ -4,9 +4,9 @@
   "Setup Python style."
   (interactive)
   (local-set-key '[f4] 'pdb)
-  (setq tab-width 2)
+  (setq tab-width 4)
   (setq indent-tabs-mode nil)  ; Autoconvert tabs to spaces
-  (setq python-indent 2)
+  (setq python-indent 4)
   (setq python-continuation-offset 2)
   (setq py-smart-indentation nil)
   (my-start-scripting-mode "py" "#!/usr/bin/python"))
