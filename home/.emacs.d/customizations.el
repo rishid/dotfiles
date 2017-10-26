@@ -8,12 +8,12 @@
 	  tab-width 4
       backward-delete-char-untabify 4
       truncate-partial-width-windows nil)
-	  
+
 ;; default-fonts
 ;(set-face-attribute 'default nil :family "Inconsolata" :height 120)
 
 ;(set-default-font
-;  (cond 
+;  (cond
 ;    (djcb-win32-p
 ;      "-outline-Consolas-normal-r-normal-normal-14-97-96-96-c-*-iso8859-1")
 ;    ((and (not djcb-console-p) djcb-linux-p)
@@ -28,12 +28,11 @@
 ;;(iswitchb-mode 1)
 
 ;; completion in minibuffer
-(icomplete-mode t)                       
+(icomplete-mode t)
 (setq icomplete-prospects-height 2)      ; don't spam my minibuffer
-(partial-completion-mode t)              ; be smart with completion
 
 ;; case insensitive completion
-(setq completion-ignore-case t             
+(setq completion-ignore-case t
   read-file-name-completion-ignore-case t) ; ...filenames too
 
 ;; compilation
@@ -60,6 +59,6 @@
               (setq show-trailing-whitespace t))))
 
 
-  
+
 (provide 'customizations)
 ;; customizations.el ends here
