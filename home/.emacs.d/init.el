@@ -1,6 +1,6 @@
 ;; init.el file
 ;; Rishi Dhupar
-;; Time-stamp: <01-31-2012 19:39:33 (ubuntu)>
+;; Time-stamp: <10-26-2017 14:18:40 (rdhupar)>
 ;; This is the first thing to get loaded.
 
 ;; List of sources
@@ -21,7 +21,8 @@
 (defconst emacs-tmp-dir "~/.emacs.tmp")
 (add-to-list 'load-path emacs-dir)
 (add-to-list 'load-path (concat emacs-dir "/site-lisp"))
-(add-to-list 'load-path (concat emacs-dir "/site-lisp/themes"))
+(add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/themes/")
+;(add-to-list 'load-path (concat emacs-dir "/site-lisp/themes"))
 (setq byte-compile-warnings nil)
 
 ;; Keep emacs Custom-settings in separate file
@@ -47,9 +48,9 @@
 (require 'defuns)
 (require 'bindings)
 (require 'misc)
-(require 'init-color-theme)
 (require 'registers)
 (require 'init-c)
+(require 'init-go)
 (require 'init-python)
 (require 'eshell)
 (require 'init-perl)
@@ -58,5 +59,7 @@
 (require 'init-cmake)
 (require 'init-ibuffer)
 (require 'init-hippie-expand)
+
+(load-theme 'monokai t)
 
 (add-hook 'after-init-hook 'message-startup-time)
