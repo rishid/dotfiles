@@ -49,8 +49,8 @@
     (doxymacs-mode t)
     (doxymacs-font-lock))
 
-  ;; warn when lines are > 80 characters (in c-mode)
-  (font-lock-add-keywords 'c-mode '(("^[^\n]\\{80\\}\\(.*\\)$"
+  ;; warn when lines are > 120 characters (in c-mode)
+  (font-lock-add-keywords 'c-mode '(("^[^\n]\\{120\\}\\(.*\\)$"
                                       1 font-lock-warning-face prepend))))
 
 (add-hook 'c-mode-common-hook 'my-common-c-ish-startup)
@@ -79,8 +79,8 @@
   (local-set-key "\C-csh" 'insert-c++-section-header)
   (local-set-key "\C-csb" 'insert-c++-big-header)
 
-  ;; warn when lines are > 100 characters (in c++-mode)
-  (font-lock-add-keywords 'c++-mode  '(("^[^\n]\\{100\\}\\(.*\\)$"
+  ;; warn when lines are > 120 characters (in c++-mode)
+  (font-lock-add-keywords 'c++-mode  '(("^[^\n]\\{120\\}\\(.*\\)$"
                                          1 font-lock-warning-face prepend)))
 )
 
