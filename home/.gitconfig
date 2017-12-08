@@ -1,9 +1,112 @@
 [user]
-	name = RishiD
+	name = Rishi Dhupar
 	email = rishid@gmail.com
 
-[color]
-	ui = auto
-	diff = auto
-	status = auto
-	branch = auto
+[github]
+    user = rishid
+
+[core]
+    editor = emacs25
+    autocrlf = input
+    excludesfile = ~/.gitignore
+
+[alias]
+    aa = add --all
+    ap = add --patch
+    ci = commit -v
+    ch = checkout
+    co = checkout
+    d = diff
+    st = status
+    git = !exec git # Allow `$ git git git...`
+
+    branches = for-each-ref --sort=-committerdate --format=\"%(color:blue)%(authordate:relative)\t%(color:red)%(authorname)\t%(color:white)%(color:bold)%(refname:short)\" refs/remotes
+    discard = reset --hard HEAD
+
+    graph = log --graph --pretty=custom
+    last = log -n 10
+    whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
+    rmtag = "!sh -c 'git tag -d $1; git push origin :refs/tags/$1'"
+
+    lg = log --graph --pretty=format:'%C(yellow)%h%Creset -%Cred%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+
+    # Show word diff instead of line diff
+    wdiff = diff --word-diff=color
+
+    # Show diff of what was last stashed (via git stash)
+    stashdiff = stash show -p -w stash@{0}
+
+    unstage = reset HEAD
+
+    standup = !git log --since yesterday --pretty=short --author `git config user.email`
+
+    # Find commits by source code.
+    cc = "!f() { \
+        git log --pretty=custom --decorate --date=short -S\"$1\"; \
+}; f"
+
+   # Find commits by commit message.
+    cm = "!f() { \
+        git log --pretty=custom --decorate --date=short --grep=\"$1\"; \
+}; f"
+
+    # Remove the tag with the specified tag name if
+    # exists and tag the latest commit with that name.
+    retag = "!f() { \
+        git tag -d "$1" &> /dev/null; \
+        git tag $1; \
+}; f"
+
+[push]
+    default = simple
+    # Make `git push` automatically push relevant
+    # annotated tags when pushing branches out.
+    followTags = true
+
+#[color]
+	#ui = auto
+	#diff = auto
+	#status = auto
+	#branch = auto
+
+[color "branch"]
+    current = green bold
+    local = green
+    remote = yellow
+
+[color "diff"]
+    frag = magenta
+    meta = yellow
+    new = green
+    old = red
+
+[color "status"]
+    added = green reverse
+    changed = yellow reverse
+    untracked = red reverse
+
+[diff "bin"]
+    # Use `hexdump` to diff binary files.
+    textconv = hexdump -v -
+
+[format]
+    pretty = %Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset
+    graph = true
+
+[pretty]
+    custom = "%C(magenta)%h%C(red)%d %C(yellow)%ar %C(green)%s %C(yellow)(%an)"
+    #                     │        │            │            │             └─ author name
+    #                     │        │            │            └─ message
+    #                     │        │            └─ date (relative)
+    #                     │        └─ decorations (branch, heads or tags)
+    #                     └─ hash (abbreviated)
+
+[log]
+    abbrevCommit = true
+
+# URL shorthands
+# gh:paulmillr/dotfiles
+[url "git@github.com:"]
+  insteadOf = "gh:"
+  pushInsteadOf = "gh:"
+  pushInsteadOf = "git://github.com/"
