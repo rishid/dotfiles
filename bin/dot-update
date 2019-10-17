@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Update local dev environment using ansible-playbook.
+# Optionally pass role names.
+set -e
+
+cd "${BASH_SOURCE%/*}/.."
+
+join() {
+    IFS="$1"
+    shift
+    echo "$*"
+}
+
+if [[ $# -gt 0 ]]; then
+    tags="--tags=$(join , $@)"
+fi
+
+if [[ $# -eq 0 ]]; then
+ # Run all roles except for the ones tagged with 'bootstrap'
+  echo "Updating local dev environment..."
+  ansible-playbook -i hosts dotfiles.yml --skip-tags "bootstrap"
+else
+  echo "Updating local dev environment... (--tags $@)"
+  ansible-playbook -i hosts dotfiles.yml --skip-tags "bootstrap" --tags $@
+fi

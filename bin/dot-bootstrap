@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -e
+
+cd "${BASH_SOURCE%/*}/.."
+
+echo "Setting up local dev environment..."
+ansible-playbook -i hosts dotfiles.yml --ask-become-pass

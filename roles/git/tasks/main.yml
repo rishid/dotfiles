@@ -1,0 +1,29 @@
+
+- import_tasks: mac.yml
+  when: ansible_os_family == "Darwin"
+- import_tasks: debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: Link global gitignore file
+  file:
+    src: "{{ dotfiles_home }}/roles/git/files/gitignore.link"
+    dest: "{{ dotfiles_user_home }}/.gitignore"
+    state: link
+    force: yes
+
+- name: Check if gitconfig exists
+  stat: path="{{dotfiles_user_home}}/.gitconfig"
+  register: gitconfig_stat
+
+- name: Back up gitconfig
+  command: mv ~/.gitconfig ~/.gitconfig.bak
+  args:
+    creates: "{{dotfiles_user_home}}/.gitconfig.bak"
+  when: gitconfig_stat.stat.exists
+
+- name: Link global gitconfig file
+  file:
+    src: "{{ dotfiles_home }}/roles/git/files/gitconfig.link"
+    dest: "{{ dotfiles_user_home }}/.gitconfig"
+    state: link
+    force: yes

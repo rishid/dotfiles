@@ -1,0 +1,10 @@
+---
+
+- name: Install OpenSSH server
+  apt:
+    name: openssh-server
+    state: latest
+    install_recommends: False
+  notify:
+    - test and restart sshd
+  tags: bootstrap
