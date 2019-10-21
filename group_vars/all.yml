@@ -34,9 +34,15 @@ packages:
   - meld
   - openssh-server
   - pv
-  #- tmux
   - tree
   - wget
+
+pip_packages:
+  - httpie
+  - httpie-oauth
+  - httpie-http2
+  - httpie-ntlm
+  - httpie-jwt-auth
 
 docker_users:
   - "{{ localuser }}"

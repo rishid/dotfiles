@@ -1,0 +1,30 @@
+
+borg_bin: /usr/bin/borg
+
+# borg help compression
+borg_compression: lz4
+
+# partialy implemented
+# https://borgbackup.readthedocs.io/en/stable/usage/init.html
+# borg help init
+borg_encryption: none
+
+borgbackup_include:
+  - "/home"
+  - "/root"
+
+borgbackup_exclude:
+  - "/home/*/.cache"
+  - "/home/*/.gvfs"
+  - "/home/*/.trash"
+  - "/home/*/.thumbnails"
+  - "/home/lost+found"
+
+borgbackup_retention:
+  daily: 30
+  weekly: 52
+  yearly: 5
+
+borgbackup_cron_day: "*"
+borgbackup_cron_hour: "{{ 5|random }}"
+borgbackup_cron_minute: "{{ 59|random }}"

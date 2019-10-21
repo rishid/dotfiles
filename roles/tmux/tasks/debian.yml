@@ -1,4 +1,5 @@
 
 - name: Install tmux with apt
   apt: name=tmux state=present
-  become_method: sudo
+  tags: bootstrap
+  become: true
