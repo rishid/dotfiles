@@ -1,29 +1,86 @@
+---
 
-- import_tasks: mac.yml
+- name: install tmux
+  package:
+   name: tmux
+   state: present
+  tags: bootstrap
+  become: true
+
+- name: Install reattach-to-user-namespace
+  homebrew:
+    name: reattach-to-user-namespace
+    state: present
   when: ansible_os_family == "Darwin"
-- import_tasks: debian.yml
-  when: ansible_os_family == "Debian"
 
-- name: Configure oh-my-tmux
+- name: Install oh-my-tmux (gpakosz/.tmux)
   git:
-    repo: 'https://github.com/gpakosz/.tmux.git'
+    repo: https://github.com/gpakosz/.tmux
     dest: "{{ dotfiles_user_home }}/.tmux"
 
 - name: Install tpm
   git:
     repo: https://github.com/tmux-plugins/tpm
-    dest: "{{dotfiles_user_home}}/.tmux/plugins/tpm"
+    dest: "{{ dotfiles_user_home }}/.tmux/plugins/tpm"
 
 - name: Symlink tmux.conf
   file:
-    src: "{{ ansible_env.HOME }}/.tmux/.tmux.conf"
-    dest: "{{ ansible_env.HOME }}/.tmux.conf"
+    src: "{{ dotfiles_user_home }}/.tmux/.tmux.conf"
+    dest: "{{ dotfiles_user_home }}/.tmux.conf"
     state: link
 
 - name: Copy local configuration
   copy:
-    src: "{{ ansible_env.HOME }}/.tmux/.tmux.conf.local"
-    dest: "{{ ansible_env.HOME }}/.tmux.conf.local"
+    src: "{{ dotfiles_user_home }}/.tmux/.tmux.conf.local"
+    dest: "{{ dotfiles_user_home }}/.tmux.conf.local"
+
+- name: Add my customizations
+  lineinfile:
+    path: "{{ dotfiles_user_home }}/.tmux.conf.local"
+    insertafter: '^# this is the place to override or undo settings'
+    line: "{{ item.line }}"
+  with_items:
+    - { line: '' }
+    - { line: '' }
+    - { line: 'bind L switch-client -l' }
+    - { line: '# Switch to last session' }
+    - { line: '' }
+    - { line: "bind-key -T copy-mode M-w send-keys -X copy-pipe 'reattach-to-user-namespace pbcopy'" }
+    - { line: "# Copy to clipboard" }
+    - { line: '' }
+
+- name: Increase history limit
+  lineinfile:
+    path: "{{ dotfiles_user_home }}/.tmux.conf.local"
+    regexp: "^#set -g history-limit.*"
+    line: "set -g history-limit 100000"
+
+- name: Set left status bar
+  lineinfile:
+    path: "{{ dotfiles_user_home }}/.tmux.conf.local"
+    regexp: "^tmux_conf_theme_status_left=.*"
+    line: "tmux_conf_theme_status_left=' ❐ #S '"
+
+- name: Configure plugins
+  blockinfile:
+    path: "{{ dotfiles_user_home }}/.tmux.conf.local"
+    insertafter: EOF
+    block: |
+
+      # plugins
+      set -g @tpm_plugins '           \
+        tmux-plugins/tpm             \
+        tmux-plugins/tmux-sensible   \
+        tmux-plugins/tmux-resurrect  \
+        tmux-plugins/tmux-continuum  \
+      '
+      # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+      run '~/.tmux/plugins/tpm/tpm'
+
+      set -g @resurrect-processes '"emacs -nw"'
+      # enable continuum
+      set -g @continuum-restore 'on'
+      set -g @continuum-boot-options 'iterm,fullscreen'
 
 #- name: Symlink .tmux.conf
 #  file:
@@ -42,9 +99,9 @@
 #  when: ansible_os_family == "Darwin"
 
 - name: Check whether tmux is running
-  shell: ps aux | grep tmux | grep -v grep
+  command: pgrep tmux
   ignore_errors: yes
-  changed_when: false
+  changed_when: False
   register: tmux_status
 
 - name: Reload tmux environment so tpm is sourced
