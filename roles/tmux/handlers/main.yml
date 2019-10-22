@@ -1,0 +1,5 @@
+---
+- name: Install tmux plugins
+  command: "{{ dotfiles_user_home }}/.tmux/plugins/tpm/bin/install_plugins"
+  environment:
+    TMUX_PLUGIN_MANAGER_PATH: "{{ dotfiles_user_home }}/.tmux/plugins/"
