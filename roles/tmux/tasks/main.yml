@@ -68,19 +68,25 @@
     block: |
 
       # plugins
-      set -g @tpm_plugins '           \
-        tmux-plugins/tpm             \
-        tmux-plugins/tmux-sensible   \
-        tmux-plugins/tmux-resurrect  \
-        tmux-plugins/tmux-continuum  \
+      set -g @tpm_plugins '            \
+        tmux-plugins/tpm               \
+        tmux-plugins/tmux-sensible     \
+        tmux-plugins/tmux-resurrect    \
+        tmux-plugins/tmux-continuum    \
+        jbnicolai/tmux-fpp             \
+        tmux-plugins/tmux-pain-control \
       '
-      # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
-      run '~/.tmux/plugins/tpm/tpm'
 
       set -g @resurrect-processes '"emacs -nw"'
       # enable continuum
       set -g @continuum-restore 'on'
       set -g @continuum-boot-options 'iterm,fullscreen'
+      set -g @continuum-save-interval '5'
+      set -g @resurrect-capture-pane-contents 'on'
+
+      # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+      run '~/.tmux/plugins/tpm/tpm'
+
 
 #- name: Symlink .tmux.conf
 #  file:
