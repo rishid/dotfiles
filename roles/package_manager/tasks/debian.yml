@@ -17,3 +17,12 @@
     state: latest
   become: yes
   tags: update
+
+- name: Manage python packages
+  pip:
+    name: "{{ item.key }}"
+    state: "{{ item.value.state | default('latest') }}"
+    executable: "{{ item.value.executable | default('pip3') }}"
+  with_dict: "{{ pip_packages }}"
+  become: yes
+  tags: pip
