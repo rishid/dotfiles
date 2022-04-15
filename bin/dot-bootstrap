@@ -1,7 +1,22 @@
 #!/usr/bin/env bash
+
+# A small bash script that installs Ansible and runs the dotfiles playbook. Fully configuring a workstation requires running three commands:
+
+# $ cd ~
+# $ git clone git@github.com:rishid/dotfiles .dotfiles
+# $ .dotfiles/bin/dot-bootstap
+
 set -e
 
-cd "${BASH_SOURCE%/*}/.."
+if ! [ -x "$(command -v ansible)" ]; then
+  sudo apt install ansible
+fi
+
+# cd "${BASH_SOURCE%/*}/.."
 
 echo "Setting up local dev environment..."
-ansible-playbook -i hosts dotfiles.yml --ask-become-pass
+ansible-playbook -i ~/.dotfiles/hosts ~/.dotfiles/dotfiles.yml --ask-become-pass
+
+if command -v terminal-notifier 1>/dev/null 2>&1; then
+  terminal-notifier -title "dotfiles: Bootstrap complete" -message "Successfully set up dev environment."
+fi
