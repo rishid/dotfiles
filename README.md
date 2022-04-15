@@ -31,10 +31,6 @@ Re-apply ansible to machine
 
 `dot-update`
 
-## TODO
-
-
-
 ## Credits
 https://github.com/sloria/dotfiles
 

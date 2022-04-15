@@ -6,21 +6,23 @@
 #
 # Usage:
 #    define a Backup directory (with trailing slash!)
-#    BACKUPDIR=/media/workspace/home/$USER
+#    BACKUPDIR=[HOSTNAME:]home/$USER
 #
 #    first specify the "-n" parameter so rsync will simulate its operation. You should use this before you start:
-#    rsync -naP --exclude-from=rsync-homedir-local.txt /home/$USER/ $BACKUPDIR/
+#     rsync -naP --exclude-from=~/.dotfiles/etc/rsync-homedir-excludes.txt /home/$USER/ $BACKUPDIR/
 #
 #    check for permission denied errors in your homedir:
-#    rsync -naP --exclude-from=rsync-homedir-local.txt /home/$USER/ $BACKUPDIR/ | grep denied
+#    rsync -naP --exclude-from=~/.dotfiles/etc/rsync-homedir-excludes.txt /home/$USER/ $BACKUPDIR/ | grep denied
 #
 #    if it is all fine, actually perform your backup:
-#    rsync -aP --exclude-from=rsync-homedir-local.txt /home/$USER/ $BACKUPDIR/
+#    rsync -aP --exclude-from=~/.dotfiles/etc/rsync-homedir-excludes.txt /home/$USER/ $BACKUPDIR/
 
 ###############################################
 # user defined directories
 ###############################################
 .certs
+docker
+/.config/borg
 
 ###############################################
 # directories, probably not worth a backup    #
@@ -382,6 +384,7 @@ nohup.out
 # VS Code
 .vscode-oss/extensions/*
 .vscode/extensions/*
+.vscode-server/*
 .config/Code - OSS/logs/
 .config/Code/logs/
 .config/Code/CachedData/*
