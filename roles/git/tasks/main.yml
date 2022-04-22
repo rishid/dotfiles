@@ -23,3 +23,11 @@
     dest: git_config_path
     state: link
     force: yes
+
+# - name: Template global gitconfig file
+#   ansible.builtin.template:
+#     src: gitconfig.j2
+#     dest: git_config_path
+#     owner: "{{ whoami }}"
+#     group: "{{ whoami_group }}"
+#     mode: 0644
