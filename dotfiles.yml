@@ -33,9 +33,9 @@
       become: True
 
     - { role: dotfiles, tags: ['dotfiles'] }
-    - { role: bash,     tags: ['bash'] }
-    - { role: emacs,    tags: ['emacs'] }
-    - { role: tmux,     tags: ['tmux'] }
+    # - { role: bash,     tags: ['bash'] }
+    # - { role: emacs,    tags: ['emacs'] }
+    # - { role: tmux,     tags: ['tmux'] }
 
     #- role: borg
     #  tags: ['borg', 'bootstrap']
