@@ -30,6 +30,8 @@
 
     # remove local branch when remote is deleted
     gone = ! "git fetch -p && git for-each-ref --format '%(refname:short) %(upstream:track)' | awk '$2 == \"[gone]\" {print $1}' | xargs -r git branch -D"
+    # remove local branches that have been merged
+    delete-merged-branches = !"git branch --merged | grep -vE 'main|master|dev|\\*' | xargs -r -n 1 git branch -D"
 
     graph = log --graph --pretty=custom
     last = log -n 10
@@ -123,3 +125,8 @@
 	insteadOf = git@github.com:
 [submodule]
 	recurse = true
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
