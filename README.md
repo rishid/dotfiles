@@ -18,11 +18,7 @@ Roles look at the vars kept in group_vars for things like packages to install, a
  `sudo apt-get install git`
 2. Clone the playbook
  `git clone https://github.com/rishid/dotfiles.git ~/.dotfiles`
-3. Install ansible and any prereqs
- `~/.dotfiles/bin/init.sh`
-4. Install the required Ansible roles
- `ansible-galaxy install -f -r ~/.dotfiles/requirements.yml`
-5. Run it
+3. Install Ansible and any Ansible dependencies
  `~/.dotfiles/bin/dot-bootstrap`
 
 ### Update
