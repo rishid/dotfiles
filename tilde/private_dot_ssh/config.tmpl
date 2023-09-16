@@ -1,0 +1,32 @@
+HashKnownHosts no
+
+Include ~/.ssh/akamai
+Include ~/.ssh/linode
+
+Host github-rishid
+    Hostname github.com
+    User git
+    UpdateHostKeys yes
+    IdentityFile ~/.ssh/github_rishid
+    IdentitiesOnly yes
+
+Host 100.80.*.*
+    User root
+    StrictHostKeyChecking no
+    IdentityFile ~/.ssh/akanebula.key
+    # vtastic gateway NAT ip - clone
+    ProxyCommand ssh -oStrictHostKeyChecking=no -W %h:%p root@198.18.255.27
+
+Host linode
+    Hostname 45.79.138.115
+    User root
+    IdentityFile ~/.ssh/id_ecdsa
+
+{{- if eq .chezmoi.os "darwin" }}
+Host *
+    AddKeysToAgent yes
+    UseKeychain yes
+{{- end }}
+
+Host *
+    ServerAliveInterval 300
