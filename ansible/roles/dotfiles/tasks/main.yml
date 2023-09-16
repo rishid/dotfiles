@@ -21,7 +21,5 @@
   ansible.builtin.import_tasks: download-chezmoi.yml
 
 - name: Initialize chezmoi
-  ansible.builtin.command: "chezmoi init --guess-repo-url false --source-path {{ dotfiles_home }} --apply --verbose {{ dotfiles_repo }}"
+  ansible.builtin.command: "chezmoi --source {{ dotfiles_home }} init --guess-repo-url false --apply --verbose"
   when: dotfiles_repo
-  args:
-    creates: "~/.local/share/chezmoi"
