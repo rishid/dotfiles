@@ -1,16 +1,19 @@
-; {{ ansible_managed }}
-
+# chezmoi:template:missing-key=invalid
 [user]
-    name = {{ full_name }}
-    email = {{ github_email }}
+    name = {{ .full_name }}
+    email = {{ .github_email }}
 
-[github]
-    user = {{ github_user }}
+# includeIf was introduced in git 2.13.0
+[includeIf "gitdir:~/p/"]
+    path = ~/.gitconfig-p
 
-{% if ansible_os_family == 'Darwin' %}
+[includeIf "gitdir:~/w/"]
+    path = ~/.gitconfig-w
+
+{{ if eq .chezmoi.os "darwin" }}
 [credential]
     helper = osxkeychain
-{% endif %}
+{{ end -}}
 
 [core]
     autocrlf = input
@@ -21,26 +24,38 @@
     a = add
     aa = add --all
     ap = add --patch
-    patch = add --patch
     amend = commit --amend
+
+    ci = commit -v
+    c = checkout
+    ch = checkout
+    co = checkout
+
+    d = diff
+    # Show word diff instead of line diff
+    wdiff = diff --word-diff=color
+    # Show diff of what was last stashed (via git stash)
+    stashdiff = stash show -p -w stash@{0}
+
+    patch = add --patch
+
+    st = status
 
     br = branch
     new-branch = checkout -b
     rename-branch = branch -m
     delete-branch = branch -D
-    branches = "!git branch | ag -v '(staging|master)'"
+    branches = for-each-ref --sort=-committerdate --format=\"%(color:blue)%(authordate:relative)\t%(color:red)%(authorname)\t%(color:white)%(color:bold)%(refname:short)\" refs/remotes
     recent-branches = branch -a --sort=committerdate
+    current-branch = rev-parse --abbrev-ref HEAD
 
+    discard = reset --hard HEAD    
     prestage = diff -w
     precommit = diff -w --cached
     tags = tag
     stashes = stash list
     remotes = remote -v
 
-    c = checkout
-    co = checkout
-    move = mv
-    remove = rm
     unmerged = branch --no-merged
     unstash = stash pop
     what = show
@@ -48,21 +63,17 @@
     untrack = rm -r --cached
 
     tuck = stash save -u
-    untuck = stash pop "stash@{0}"
-
-    current-branch = rev-parse --abbrev-ref HEAD
-
-    ci = commit -v
-    d = diff
-    st = status
-
+    untuck = stash pop "stash@{0}"    
+  
     wip = commit --no-verify -am "WIP"
 
     standup = !git log --since yesterday --pretty=short --author `git config user.email`
+    last = log -n 10
+    lg = log --graph --pretty=format:'%C(yellow)%h%Creset -%Cred%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    graph = log --graph -10 --branches --remotes --tags  --format=format:'%Cgreen%h %Creset• %<(75,trunc)%s (%cN, %cr) %Cred%d' --date-order
 
-    aliases = !git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\:\\ /
-    branches = for-each-ref --sort=-committerdate --format=\"%(color:blue)%(authordate:relative)\t%(color:red)%(authorname)\t%(color:white)%(color:bold)%(refname:short)\" refs/remotes
-
+    aliases = !git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\:\\ /    
+    
     # Find commits by source code.
     cc = "!f() { \
         git log --pretty=custom --decorate --date=short -S\"$1\"; \
@@ -73,23 +84,16 @@
         git log --pretty=custom --decorate --date=short --grep=\"$1\"; \
 }; f"
 
-    last = log -n 10
+   
     whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
     rmtag = "!sh -c 'git tag -d $1; git push origin :refs/tags/$1'"
 
-    lg = log --graph --pretty=format:'%C(yellow)%h%Creset -%Cred%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
-
-    # Show word diff instead of line diff
-    wdiff = diff --word-diff=color
-
-    # Show diff of what was last stashed (via git stash)
-    stashdiff = stash show -p -w stash@{0}
-
-    # http://gggritso.com/human-git-aliases
     unstage = reset -q HEAD --
     discard = checkout --
     uncommit = reset --mixed HEAD~
     save = commit -m
+    nevermind = !git reset --hard HEAD && git clean -d -f
+    precommit = diff --cached --diff-algorithm=minimal -w
 
     # Remove the tag with the specified tag name if exists and tag the latest commit with that name.
     retag = "!f() { \
@@ -149,10 +153,13 @@
 [log]
     abbrevCommit = true
 
-{% if git_signing_key %}
+{{ if .git_signing_key }}
 [commit]
     gpgsign = true
-{% endif %}
+{{ end }}
+
+[github]
+    user = {{ .github_user }}
 
 # URL shorthands
 # gh:paulmillr/dotfiles
