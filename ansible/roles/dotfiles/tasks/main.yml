@@ -1,49 +1,27 @@
 ---
-- name: Ensure Stow installed
-  become: true
-  ansible.builtin.apt:
-    name: stow
-    cache_valid_time: 3600
+# - name: Ensure Stow installed
+#   become: true
+#   ansible.builtin.apt:
+#     name: stow
+#     cache_valid_time: 3600
 
-- name: Print return information from the previous task
-  ansible.builtin.debug:
-    var: dotfiles
+# - name: Build directories list
+#   ansible.builtin.find:
+#     paths: 
+#       - "{{ dotfiles }}"
+#     recurse: no
+#     file_type: directory
+#   register: files
 
-- name: Build directories list
-  ansible.builtin.find:
-    paths: 
-      - "{{ dotfiles }}"
-    recurse: no
-    file_type: directory
-  register: files
+# - name: Print return information from the previous task
+#   ansible.builtin.debug:
+#     var: files
 
-- name: Print return information from the previous task
-  ansible.builtin.debug:
-    var: files
+- name: Install chezmoi using a package
+  ansible.builtin.import_tasks: download-chezmoi.yml
 
-# stow --simulate -v --dotfiles --target $HOME -d .dotfiles/tilde fish
-# stow -v --dotfiles --ignore="\.override" --target ${OVERRIDE:-$HOME} -d {{ dotfiles }} {{ item.path | basename }}
-- name: Deploy dotfiles
-  become: true
-  ansible.builtin.shell: |
-    STOW_PATH={{ item.path | replace("dotfiles/", "") }}
-    OVERRIDE=$(cat ${STOW_PATH}/.override 2>/dev/null)
-    stow -v --dotfiles --ignore="\.override" --target {{ dotfiles_user_home }} -d {{ dotfiles }} {{ item.path | basename }}
+- name: Initialize chezmoi
+  ansible.builtin.command: "chezmoi init --guess-repo-url false --source-path {{ dotfiles_home }} --apply --verbose {{ dotfiles_repo }}"
+  when: dotfiles_repo
   args:
-    # chdir: ./dotfiles
-    executable: /bin/bash  
-  with_items: "{{ files.files }}"
-  loop_control:
-    label: |-
-      {% if output.stderr|length > 1 %}
-      {{ item.path }}
-      {{ output.stderr }}
-      {%- else %}
-      {{ item.path }}
-      {%- endif %}
-  register: output
-  changed_when: '"LINK" in output.stderr'
-
-- name: Print return information from the previous task
-  ansible.builtin.debug:
-    var: output
+    creates: "~/.local/share/chezmoi"

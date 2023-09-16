@@ -1,5 +1,9 @@
 # NOTE: The below 2 variables should not need to be changed if you cloned
 #       the dotfiles repo to '~/.dotfiles'
+
+dotfiles_repo: https://github.com/rishid/dotfiles
+
+
 # Home directory
 dotfiles_user_home: "{{ '~' | expanduser }}"
 # Where your dotfiles live. Probably don't need to change this.
