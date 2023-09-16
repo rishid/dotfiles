@@ -15,11 +15,6 @@
     helper = osxkeychain
 {{ end -}}
 
-[core]
-    autocrlf = input
-    editor = emacs
-    excludesfile = ~/.gitignore_global
-
 [alias]
     a = add
     aa = add --all
@@ -77,12 +72,12 @@
     # Find commits by source code.
     cc = "!f() { \
         git log --pretty=custom --decorate --date=short -S\"$1\"; \
-}; f"
+    }; f"
 
    # Find commits by commit message.
     cm = "!f() { \
         git log --pretty=custom --decorate --date=short --grep=\"$1\"; \
-}; f"
+    }; f"
 
    
     whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
@@ -99,7 +94,7 @@
     retag = "!f() { \
         git tag -d "$1" &> /dev/null; \
         git tag $1; \
-}; f"
+    }; f"
 
     # diff-so-fancy
     # https://github.com/so-fancy/diff-so-fancy/#usage
@@ -116,32 +111,41 @@
     remote-branches = "!f() { git ls-remote --heads ${1:origin} | sed 's?.*refs/heads/??'; }; f "
 
     git = !exec git # Allow `$ git git git...`
-
+[apply]
+    whitespace = nowarn
 [color]
     diff = auto
     status = auto
     branch = auto
     ui = true
-
-[apply]
-    whitespace = nowarn
-[mergetool]
-    keepBackup = false
-[difftool]
-    prompt = false
-[push]
-    default = simple
-    # Make `git push` automatically push relevant
-    # annotated tags when pushing branches out.
-    followTags = true
+{{ if .git_signing_key }}
+[commit]
+    gpgsign = true
+{{ end }}
+[core]
+    autocrlf = input
+    editor = emacs
+[diff]
+	algorithm = histogram
+	renamelimit = 8192
+	renames = copies
 [diff "bin"]
     # Use `hexdump` to diff binary files.
     textconv = hexdump -v -
-
+[difftool]
+    prompt = false
 [format]
     pretty = %Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset
     graph = true
-
+[init]
+	defaultBranch = "master"
+[log]
+    abbrevCommit = true
+[mergetool]
+    keepBackup = false
+[pager]
+	branch = false
+	grep = false
 [pretty]
     custom = "%C(magenta)%h%C(red)%d %C(yellow)%ar %C(green)%s %C(yellow)(%an)"
     #                     │        │            │            │             └─ author name
@@ -149,21 +153,19 @@
     #                     │        │            └─ date (relative)
     #                     │        └─ decorations (branch, heads or tags)
     #                     └─ hash (abbreviated)
-
-[log]
-    abbrevCommit = true
-
-{{ if .git_signing_key }}
-[commit]
-    gpgsign = true
-{{ end }}
-
-[github]
-    user = {{ .github_user }}
+[push]
+    default = simple
+    # Make `git push` automatically push relevant
+    # annotated tags when pushing branches out.
+    followTags = true
+[status]
+	submoduleSummary = true
 
 # URL shorthands
-# gh:paulmillr/dotfiles
-[url "git@github.com:"]
-  insteadOf = "gh:"
-  pushInsteadOf = "gh:"
-  pushInsteadOf = "git://github.com/"
+[url "https://github.com/"]
+    insteadOf = git://github.com/
+    insteadOf = git@github.com:
+    insteadOf = gh:
+    insteadOf = github:
+[url "https://github.com/rishid/"]
+    insteadOf = my:
