@@ -3,13 +3,6 @@
     name = {{ .full_name }}
     email = {{ .github_email }}
 
-# includeIf was introduced in git 2.13.0
-[includeIf "gitdir:~/p/"]
-    path = {{ joinPath (osDir .chezmoi.targetFile) "gitconfig-p" }}
-
-[includeIf "gitdir:~/w/"]
-    path = {{ joinPath (osDir .chezmoi.targetFile) "gitconfig-w" }}
-
 {{ if eq .chezmoi.os "darwin" }}
 [credential]
     helper = osxkeychain
@@ -169,3 +162,10 @@
     insteadOf = github:
 [url "https://github.com/rishid/"]
     insteadOf = my:
+
+# includeIf was introduced in git 2.13.0
+[includeIf "gitdir:~/p/"]
+    path = {{ joinPath (osDir .chezmoi.targetFile) "config-p" }}
+
+[includeIf "gitdir:~/w/"]
+    path = {{ joinPath (osDir .chezmoi.targetFile) "config-w" }}
