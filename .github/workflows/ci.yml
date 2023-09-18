@@ -1,0 +1,126 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  linux-desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        profile:
+          - personal
+          - work1
+          - work2
+        container:
+          - ubuntu:latest
+          - debian:latest
+
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install prerequisites
+        run: apt-get update -q && apt-get install -y -q python3 python3-pip python3-venv curl git
+
+      - name: Setup PATH
+        run: echo "${HOME}/.local/bin" >> $GITHUB_PATH
+
+      - name: Decrypt age key
+        env:
+          AGE_DECRYPT_PASS: ${{ secrets.AGE_DECRYPT_PASS }}
+        run: |
+          mkdir -p ${HOME}/.config/chezmoi
+          echo "${{ secrets.CHEZMOI_KEY }}" | base64 -d > ${HOME}/.config/chezmoi/key.txt
+
+      - name: Chezmoi init & apply
+        env:
+          DATA_profile: ${{ matrix.profile }}
+          IS_DESKTOP: "true"
+        run: |
+          git config --global --add safe.directory $(pwd)
+          ./install.sh
+
+      - name: Assert
+        run: |
+          if ! grep -q "is_desktop: true" ${HOME}/.config/chezmoi/chezmoi.yaml; then
+            echo "::error file=chezmoi.yaml::is_desktop: true not found"
+            exit 1
+          fi
+
+      - name: Remove age key
+        if: always()
+        run: |
+          rm ${HOME}/.config/chezmoi/key.txt
+
+
+  linux-server:
+    strategy:
+      fail-fast: false
+      matrix:
+        profile:
+          - personal
+          - work1
+        container:
+          - ubuntu:latest
+          - debian:latest
+
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install prerequisites
+        run: apt-get update -q && apt-get install -y -q python3 python3-pip curl
+
+      - name: Setup PATH
+        run: echo "${HOME}/.local/bin" >> $GITHUB_PATH
+
+      - name: Chezmoi init & apply
+        env:
+          DATA_profile: ${{ matrix.profile }}
+        run: |
+          ./install.sh
+
+      - name: Assert
+        run: |
+          if ! grep -q "is_server: true" ${HOME}/.config/chezmoi/chezmoi.yaml; then
+            echo "::error file=chezmoi.yaml::is_server: true not found"
+            exit 1
+          fi
+
+  windows-desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        profile:
+          - personal
+
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install prerequisites
+        shell: pwsh
+        run: |
+          # Install scoop to install winget
+          iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
+          echo "$HOME\scoop\shims" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+          # Install winget
+          scoop install winget
+
+      - name: Chezmoi init & apply
+        env:
+          DATA_profile: ${{ matrix.profile }}
+        shell: powershell
+        run: |
+          (irm -useb https://get.chezmoi.io/ps1) | powershell -c -
+          bin/chezmoi.exe init --apply --source $Env:GITHUB_WORKSPACE
