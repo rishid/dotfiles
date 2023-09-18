@@ -114,6 +114,12 @@ export BROWSER="firefox"
 export LANG=en_US.UTF-8
 export LC_ALL="en_US.UTF-8"
 
+# user-specific configuration files should be stored. If $XDG_CONFIG_HOME is either not set or empty, a default equal to $HOME/.config
+export XDG_CONFIG_HOME="${HOME}/.config"
+# user-specific data files should be stored. If $XDG_DATA_HOME is either not set or empty, a default equal to $HOME/.local/share
+export XDG_DATA_HOME="${HOME}/.data"
+# user-specific state files should be stored. If $XDG_STATE_HOME is either not set or empty, a default equal to $HOME/.local/state
+export XDG_STATE_HOME="${HOME}/.state"
 
 # colors for: console, ls, grep, less, man
 eval `dircolors -b`
