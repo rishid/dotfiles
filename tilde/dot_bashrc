@@ -1,6 +1,18 @@
 # -*- mode:shell-script; sh-shell:bash -*-
-# ~/.bashrc
-# Rishi Dhupar
+# ~/.bashrc: executed by bash(1) for non-login shells.
+
+# If not running interactively, don't do anything
+case $- in
+  *i*) ;;
+    *) return;;
+esac
+
+# user-specific configuration files should be stored. If $XDG_CONFIG_HOME is either not set or empty, a default equal to $HOME/.config
+export XDG_CONFIG_HOME="${HOME}/.config"
+# user-specific data files should be stored. If $XDG_DATA_HOME is either not set or empty, a default equal to $HOME/.local/share
+export XDG_DATA_HOME="${HOME}/.data"
+# user-specific state files should be stored. If $XDG_STATE_HOME is either not set or empty, a default equal to $HOME/.local/state
+export XDG_STATE_HOME="${HOME}/.state"
 
 #-----------
 # PATH
@@ -53,7 +65,7 @@ fi
 #-----------
 export HISTSIZE=100000
 export HISTFILESIZE=$HISTSIZE
-export HISTFILE=~/.bash_history
+export HISTFILE="${XDG_STATE_HOME}"/bash/history
 export HISTIGNORE="&:[bf]g:c:clear:history:exit:q:afk:pwd:* --help"
 
 # append to HISTFILE when command is typed
@@ -114,12 +126,6 @@ export BROWSER="firefox"
 export LANG=en_US.UTF-8
 export LC_ALL="en_US.UTF-8"
 
-# user-specific configuration files should be stored. If $XDG_CONFIG_HOME is either not set or empty, a default equal to $HOME/.config
-export XDG_CONFIG_HOME="${HOME}/.config"
-# user-specific data files should be stored. If $XDG_DATA_HOME is either not set or empty, a default equal to $HOME/.local/share
-export XDG_DATA_HOME="${HOME}/.data"
-# user-specific state files should be stored. If $XDG_STATE_HOME is either not set or empty, a default equal to $HOME/.local/state
-export XDG_STATE_HOME="${HOME}/.state"
 
 # colors for: console, ls, grep, less, man
 eval `dircolors -b`
@@ -241,3 +247,8 @@ function certnames {
     return 1
   fi
 }
+
+# direnv hook
+if command -v direnv &> /dev/null; then
+  eval "$(direnv hook bash)"
+fi

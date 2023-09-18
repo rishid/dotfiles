@@ -1,3 +1,4 @@
+# chezmoi:template:missing-key=invalid
 ---
 sourceDir: "{{ .chezmoi.sourceDir }}"
 diff:
@@ -5,7 +6,7 @@ diff:
 verbose: true
 follow: true
 format: yaml
-color: true
+color: auto
 template:
   options:
     - missingkey=zero
@@ -80,3 +81,7 @@ data:
   personal: {{ $personal }}
   osid: {{ $osID | quote }}
   work: {{ $work }}
+{{- if eq .chezmoi.os "linux" }}
+  uname:
+    machine: "{{ output "uname" "-m" | trim }}"
+{{- end }}

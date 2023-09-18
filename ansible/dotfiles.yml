@@ -22,15 +22,7 @@
         - 'ubuntu'
       become: True
 
-    - role: geerlingguy.docker
-      vars:
-        docker_users: 
-          - "{{ localuser }}"
-        docker_daemon_options:
-          data-root: "/home/docker"
-      tags: 
-        - 'docker'
-      become: True
+ 
 
     - { role: dotfiles, tags: ['dotfiles'] }
     # - { role: bash,     tags: ['bash'] }
@@ -41,22 +33,3 @@
     #  tags: ['borg', 'bootstrap']
     #  when: ansible_os_family == "Debian"
     #  become: True
-
-
-
-    #- {role: zsh, tags: ['zsh', 'bootstrap']}
-    #- {role: python, tags: ['python']}
-    #- {role: node, tags: ['node']}
-    #- {role: ruby, tags: ['ruby']}
-    #- {role: hub, tags: ['hub']}
-    #- {role: vim, tags: ['vim']}
-    #- {role: zsh-autoenv, tags: ['zsh-autoenv']}
-    #- {role: rg, tags: ['rg']}
-    # - {role: exa, tags: ['exa']}
-    # - {role: gsed, tags: ['gsed']}
-    # - {role: bat, tags: ['bat']}
-
-    # - {role: fzf, tags: ['fzf']}
-    # - {role: kubernetes, tags: ['kubernetes']}
-    # - {role: jrnl, tags: ['jrnl']}
-    # - {role: macos, tags: ['macos'], when: ansible_os_family == "Darwin"}
