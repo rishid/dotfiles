@@ -21,10 +21,12 @@ sudo apt-get -o DPkg::Lock::Timeout=60 -qq update
 
 sudo apt-get -o DPkg::Lock::Timeout=60 -q -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+# Configure Docker daemon options.
+sudo mkdir -m 0755 -p /etc/docker/
+(umask 022; sudo touch /etc/docker/daemon.json)
+echo '{ "data-root": "/home/docker" }' | sudo tee /etc/docker/daemon.json > /dev/null
 
-# sudo service docker start
-# sudo systemctl enable docker.service
-# sudo systemctl enable containerd.service
+sudo systemctl restart docker.service
 
 sudo groupadd docker
 sudo usermod $USER --append --group docker
