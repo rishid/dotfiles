@@ -1,6 +1,9 @@
-#-----------
-#  aliases
-#-----------
+#!/usr/bin/env sh
+# @file Aliases
+# @brief Houses the aliases that are included by `~/.bashrc` and `~/.zshrc`
+# @description
+#     This script is included by `~/.bashrc` and `~/.zshrc` to provide command aliases.
+
 # Always use color output for `ls`
 alias ls="ls --color=auto -h"
 # List only directories
@@ -25,12 +28,12 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias wget="wget -c"
-alias exit="clear; exit"
+# alias exit="clear; exit"
 
 # aliases: navigation
-alias ~="cd && clear"
+# alias ~="cd && clear"
 alias home="~"
-alias -- -="cd -"
+# alias -- -="cd -"
 alias cd..="cd .."
 alias ..='cd ..'
 alias ...='cd ../..'
@@ -46,7 +49,7 @@ alias bashrc="source ~/.bashrc"
 alias lastDownload='cp ~/Downloads/`ls ~/Downloads -tr | tail -n 1` .'
 
 # Pretty print the path
-alias path='printf "%b\n" "${PATH//:/\\n}"'
+# alias path='printf "%b\n" "${PATH//:/\\n}"'
 
 # Stopwatch
 alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date'
