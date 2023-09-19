@@ -1,7 +1,7 @@
-# source "$__fish_config_dir/variables.fish"
+source "$__fish_config_dir/variables.fish"
 
 # automatically loads plugins under "$fisher_path"
-# source "$__fish_config_dir/functions/fisher_path.fish"
+source "$__fish_config_dir/functions/fisher_path.fish"
 
 # Install fisher, if not exist
 if status is-interactive && ! functions --query fisher
@@ -14,3 +14,9 @@ if status is-interactive
     echo ~~~  Hello (date +%A)!  ~~~
   end
 end
+
+set -Ux EDITOR emacs
+
+# Chezmoi cached variables
+set -x CM_computer_name {{ .computer_name }}
+set -x CM_hostname {{ .hostname }}
