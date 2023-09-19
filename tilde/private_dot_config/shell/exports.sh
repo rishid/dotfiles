@@ -2,8 +2,7 @@
 # @file Environment Variables
 # @brief Houses the environment variables that are included by `~/.bashrc` and `~/.zshrc`
 # @description
-#     This script is included by `~/.bashrc` and `~/.zshrc` to provide environment variables that play harmoniously with
-#     the default Install Doctor configurations.
+#     This script is included by `~/.bashrc` and `~/.zshrc` to provide environment variables
 
 export LC_ALL="en_US.UTF-8"
 export LANG="en_US.UTF-8"
@@ -25,7 +24,6 @@ export PATH="$HOME/bin:$PATH"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 ### Ansible
-export ANSIBLE_CONFIG="$XDG_DATA_HOME/ansible/ansible.cfg"
 export ANSIBLE_HOME="$XDG_DATA_HOME/ansible"
 
 ### bat
@@ -36,7 +34,7 @@ export CARGO_HOME="$XDG_DATA_HOME/cargo"
 export PATH="$PATH:$CARGO_HOME/bin"
 
 ### Docker
-# export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
+export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
 # export MACHINE_STORAGE_PATH="$XDG_DATA_HOME/docker-machine"
 
 ### Go
@@ -62,14 +60,13 @@ export K9SCONFIG="$XDG_CONFIG_HOME/k9s"
 ### Kube
 export KUBECONFIG="$XDG_CONFIG_HOME/kube/config"
 
+### Screen
+export SCREENRC="$XDG_CONFIG_HOME"/screen/screenrc
+
 ### wget
 export WGETRC="$XDG_CONFIG_HOME/wget/wgetrc"
 
 ### History
-# append to HISTFILE when command is typed
-shopt -s histappend
-# Save all lines of a multiple-line command in the same history entry.
-shopt -s cmdhist
 export HISTCONTROL=ignoreboth
 export HISTSIZE=1000000000
 export HISTFILESIZE=$HISTSIZE
