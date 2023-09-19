@@ -63,4 +63,4 @@ alias aptr="sudo apt-get remove"
 alias apts="sudo apt-cache search"
 alias aptu="sudo apt-get update && sudo apt-get upgrade"
 
-alias wget=wget --hsts-file="$XDG_CACHE_HOME/wget-hsts"
+alias wget='wget --hsts-file="$XDG_CACHE_HOME/wget-hsts"'
