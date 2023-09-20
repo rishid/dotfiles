@@ -32,17 +32,7 @@ def main():
             if item in options.exclude:
                 continue
                     
-            if os.path.isfile(source):
-                print source, "-->", destination
-                install(source, destination)
-                    
-            if os.path.isdir(source):
-                #print source, "is directory"
-                #if not os.path.exists(destination):
-                #    os.mkdir(destination)
-                                
-                #traverse(source)
-                install(source, destination)
+            install(source, destination)
 
     def install(source, destination):
         if os.path.exists(destination):
@@ -69,8 +59,7 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-        print os.getcwd()
-        print os.path.dirname( os.path.realpath( __file__ ) )
+        print "Install complete"
     except (KeyboardInterrupt, SystemExit):
         sys.exit(1)
                                                         
