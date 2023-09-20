@@ -3,6 +3,7 @@
 # A list of files to exclude when backing up *nix home directories using rsync.
 #
 # Author: Ruben Barkow-Kuder <https://github.com/rubo77/rsync-homedir-excludes>
+# Version: 2019-11-30
 #
 # Usage:
 #    define a Backup directory (with trailing slash!)
@@ -176,6 +177,9 @@ Thumbs.db
 .pulse
 .pulse-cookie
 .esd_auth
+
+# Lock / Pid files
+.VeraCrypt-lock-*
 
 #KDE specific:
 
@@ -384,7 +388,6 @@ nohup.out
 # VS Code
 .vscode-oss/extensions/*
 .vscode/extensions/*
-.vscode-server/*
 .config/Code - OSS/logs/
 .config/Code/logs/
 .config/Code/CachedData/*
@@ -426,16 +429,20 @@ go/pkg/mod/cache
 .local/share/lbry/lbrynet
 
 # Electron Apps
-.config/*/blob_storage
-.config/*/Application Cache
-.config/*/Cache
-.config/*/CachedData
-.config/*/Code Cache
-.config/*/GPUCache
+.config/**/blob_storage
+.config/**/Application Cache
+.config/**/Cache
+.config/**/CachedData
+.config/**/Code Cache
+.config/**/GPUCache
+.config/**/Service Worker/CacheStorage
 .var/app/**/blob_storage
 .var/app/**/Application Cache
 .var/app/**/Cache
 .var/app/**/CachedData
 .var/app/**/Code Cache
 .var/app/**/GPUCache
+.var/app/**/Service Worker/CacheStorage
 
+# SC-Controller - socket file
+.config/scc/daemon.socket
