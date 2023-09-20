@@ -3,7 +3,7 @@
   // General RenovateBot configuration
   extends: [
     "github>rishid/renovate-config",
-    "github>rishid/renovate-config:automerge-github-actions",
+    "github>rishid/renovate-config:auto-merge",
   ],
   platform: "github",
   username: "rishid-bot[bot]",
