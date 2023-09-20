@@ -14,9 +14,9 @@
   ;; Load and start up filladapt
   (require 'filladapt)
   (c-setup-filladapt)
-  (filladapt-mode)
+  (filladapt-mode t)
 
-  (require 'whitespace)
+  ;;(require 'whitespace)
   (set (make-local-variable 'whitespace-style) '(lines-tail))
   (whitespace-mode t)
   
