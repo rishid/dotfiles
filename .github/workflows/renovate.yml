@@ -61,14 +61,10 @@ jobs:
           # RENOVATE_REPOSITORIES: ${{ github.repository }}
           # # Onboarding not needed for self hosted
           # RENOVATE_ONBOARDING: "false"
-          # # Username for GitHub authentication (should match GitHub App name + [bot])
-          # RENOVATE_USERNAME: "superseb-demo-renovate[bot]"
-          # # Git commit author used, must match GitHub App
-          # RENOVATE_GIT_AUTHOR: "superseb-demo-renovate <121964725+superseb-demo-renovate[bot]@users.noreply.github.com>"
           # # Use GitHub API to create commits (this allows for signed commits from GitHub App)
           # RENOVATE_PLATFORM_COMMIT: "true"     
         with:
-          configurationFile: ".github/renovate.json5"
+          configurationFile: ${{ inputs.configurationFile }}
           token: "${{ steps.generate-token.outputs.token }}"
 
     # uses: bjw-s/gh-workflows/.github/workflows/run-renovate.yaml@main
