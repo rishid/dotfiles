@@ -24,28 +24,38 @@
     url = "https://github.com/FiloSottile/age/releases/download/v{{ $ageVersion }}/age-v{{ $ageVersion }}-{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz"
     executable = true
     path = "age/age-keygen"
-{{- end }}
-
-[".go"]
-    type = "archive"
-    # renovate: datasource=github-tags packageName=golang/go
-    url = "https://go.dev/dl/go1.21.1.{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz"
-    exact = true
-    stripComponents = 1
 
 [".local/bin/bw"]
     type = "file"
     url = "https://vault.bitwarden.com/download/?app=cli&platform=linux"
     executable = true
     refreshPeriod = "168h"
+    path = "bw"
+{{- end }}
 
-    [".local/bin/bw".filter]
-        command = "zcat"
+[".local/share/go"]
+    type = "archive"
+    # renovate: datasource=github-tags packageName=golang/go
+    url = "https://go.dev/dl/go1.21.1.{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz"
+    exact = true
+    stripComponents = 1
 
 [".local/bin/kubectl"]
     type = "file"
     url = "https://dl.k8s.io/release/{{ .versions.kubectl }}/bin/linux/{{ .chezmoi.arch }}/kubectl"
     executable = true
+
+[".config/tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm"
+    refreshPeriod = "168h"
+
+[".local/bin/bat"]
+    type = "file"
+    url = "https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-unknown-linux-musl.tar.gz"
+    executable = true
+    refreshPeriod = "168h"
+    path = "bat"
 
 [".local/bin/direnv"]
     type = "file"

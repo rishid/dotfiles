@@ -1,12 +1,28 @@
 {{ if eq .chezmoi.osRelease.id "ubuntu" "debian" -}}
 #!/usr/bin/env bash
 
-sudo DEBIAN_FRONTEND=noninteractive apt-get update
-sudo DEBIAN_FRONTEND=noninteractive apt-get -y upgrade
-sudo DEBIAN_FRONTEND=noninteractive apt-get -y install 
+set -euo pipefail
+
+#
+# Debian
+# 
+
+sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=60 -qq update
+
+# sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=60 remove {{ .apt.remove | join " " }}
+
+sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=60 -y upgrade
+sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=60 -q install {{ .apt.install | join " " }}
 
 # TODO - Modify `apply_updates = yes` in /etc/dnf/automatic.conf
 ## And `systemctl enable --now dnf-automatic.timer`
-{{ end -}}
-{{- end -}}
-{{- end -}}
+
+#
+# Python
+#
+pip3 install --upgrade pip
+
+pip3 uninstall {{ .pip.remove | join " " }}
+pip3 install --upgrade {{ .pip.install | join " " }}
+
+{{ end }}

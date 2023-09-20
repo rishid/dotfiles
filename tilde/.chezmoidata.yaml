@@ -5,3 +5,59 @@ full_name: Rishi Dhupar
 # Git
 github_user: rishid
 github_email: rishid@gmail.com
+
+apt:
+  install:
+    - build-essential
+    - clang
+    - cmake
+    - coreutils
+    - default-jre
+    - dos2unix
+    - expect
+    - git
+    - graphviz
+    - htop
+    - iftop
+    - jq
+    - keychain
+    - libssl-dev
+    - meld
+    - openssh-server
+    - pv
+    - python
+    - python3-pip
+    - silversearcher-ag
+    - speedtest-cli
+    - tree
+    - wget
+  remove:
+
+pip:
+  install:
+    - pre-commit
+    - requests
+    - yq
+  remove: 
+    - pyOpenSSL
+
+plugins:
+  vscode:
+    ### code
+    - "bierner.github-markdown-preview"
+    ### tools
+    - "eamodio.gitlens"
+
+
+
+versions:
+  kubectl: v1.27.3          # renovate: datasource=github-releases depName=kubernetes/kubectl
+  kustomize: v5.1.1         # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
+  helm: v3.12.3             # renovate: datasource=github-releases depName=helm/helm
+  direnv: v2.32.3           # renovate: datasource=github-releases depName=direnv/direnv
+  starship: v1.16.0         # renovate: datasource=github-releases depName=starship/starship
+  fzf: "0.42.0"             # renovate: datasource=github-releases depName=junegunn/fzf
+  fd: v8.7.0                # renovate: datasource=github-releases depName=sharkdp/fd
+  backstage_go: v0.8.0      # renovate: datasource=github-releases depName=einride/backstage-go
+  trivy: v0.45.1            # renovate: datasource=github-releases depName=aquasecurity/trivy
+  age: v1.1.1               # renovate: datasource=github-releases depName=FiloSottile/age
