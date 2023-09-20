@@ -6,11 +6,15 @@ verbose: true
 follow: true
 format: yaml
 color: true
+template:
+  options:
+    - missingkey=zero
 git:
   autoAdd: true
   autoCommit: true
   autoPush: true
 
+# The following variables are only available within this TOML template file
 {{/* boolean feature tags */}}
 {{- $docker := false -}}{{/* true if this machine should have Docker installed */}}
 {{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
@@ -46,9 +50,9 @@ git:
 {{- end -}}
 
 {{- if not $ephemeral -}}
-{{-   if eq $hostname "bos-lpve1" -}}
+{{-   if eq $hostname "bos-lhv9i4" -}}
 {{-     $docker = true -}}
-{{-     $flarm = true -}}
+{{-     $work = true -}}
 {{-   else if eq $hostname "vault" -}}
 {{-     $headless = true -}}
 {{-     $personal = true -}}
@@ -66,6 +70,7 @@ git:
 {{-   end -}}
 {{- end -}}
 
+# Here we "export" the variables, so we can access them outside this file
 data:
   data: {{ $docker }}
   ephemeral: {{ $ephemeral }}

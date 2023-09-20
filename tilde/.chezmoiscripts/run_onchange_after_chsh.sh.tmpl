@@ -1,8 +1,8 @@
-{{- if (not .ephemeral) -}}
-#!/bin/bash
+{{ if (not .ephemeral) -}}
+#!/usr/bin/env bash
 
 set -eufo pipefail
 
 chsh -s $(which fish)
 
-{{ end -}}
+{{ end }}

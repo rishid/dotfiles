@@ -1,0 +1,10 @@
+{{ if eq .osid "linux-ubuntu" -}}
+#!/usr/bin/env bash
+
+# https://launchpad.net/~longsleep/+archive/ubuntu/golang-backports
+
+sudo add-apt-repository -y ppa:longsleep/golang-backports
+sudo apt -qq update
+sudo apt-get install -y golang
+
+{{ end -}}

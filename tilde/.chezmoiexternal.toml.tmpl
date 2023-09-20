@@ -26,21 +26,33 @@
     path = "age/age-keygen"
 {{- end }}
 
-{{- if and (not .ephemeral) (not .headless) }}
-{{-   $fontDir := "" }}
-{{-   if eq .chezmoi.os "darwin" }}
-{{-     $fontDir = "Library/Fonts" }}
-{{-   else if eq .chezmoi.os "linux" }}
-{{-     $fontDir = ".local/share/fonts" }}
-{{-   end }}
-{{-   range (list
-        "MesloLGS NF Regular.ttf"
-        "MesloLGS NF Bold.ttf"
-        "MesloLGS NF Italic.ttf"
-        "MesloLGS NF Bold Italic.ttf") }}
-["{{ $fontDir }}/{{ . }}"]
+[".go"]
+    type = "archive"
+    # renovate: datasource=github-tags packageName=golang/go
+    url = "https://go.dev/dl/go1.21.1.{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz"
+    exact = true
+    stripComponents = 1
+
+[".local/bin/bw"]
     type = "file"
-    url = "https://github.com/romkatv/powerlevel10k-media/raw/master/{{ . }}"
+    url = "https://vault.bitwarden.com/download/?app=cli&platform=linux"
+    executable = true
     refreshPeriod = "168h"
-{{-   end }}
-{{- end }}
+
+    [".local/bin/bw".filter]
+        command = "zcat"
+
+[".local/bin/kubectl"]
+    type = "file"
+    url = "https://dl.k8s.io/release/{{ .versions.kubectl }}/bin/linux/{{ .chezmoi.arch }}/kubectl"
+    executable = true
+
+[".local/bin/direnv"]
+    type = "file"
+    url = "https://github.com/direnv/direnv/releases/download/{{ .versions.direnv }}/direnv.linux-{{ .chezmoi.arch }}"
+    executable = true
+
+[".local/bin/fzf"]
+    type = "archive-file"
+    url = 'https://github.com/junegunn/fzf/releases/download/{{ .versions.fzf }}/fzf-{{ .versions.fzf }}-linux_{{ eq .chezmoi.arch "arm" | ternary (.uname.machine | trimSuffix "tel") .chezmoi.arch }}.tar.gz'
+    path = "fzf"

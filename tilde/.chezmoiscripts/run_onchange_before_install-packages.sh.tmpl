@@ -1,0 +1,12 @@
+{{ if eq .chezmoi.osRelease.id "ubuntu" "debian" -}}
+#!/usr/bin/env bash
+
+sudo DEBIAN_FRONTEND=noninteractive apt-get update
+sudo DEBIAN_FRONTEND=noninteractive apt-get -y upgrade
+sudo DEBIAN_FRONTEND=noninteractive apt-get -y install 
+
+# TODO - Modify `apply_updates = yes` in /etc/dnf/automatic.conf
+## And `systemctl enable --now dnf-automatic.timer`
+{{ end -}}
+{{- end -}}
+{{- end -}}
