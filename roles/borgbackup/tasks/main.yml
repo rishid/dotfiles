@@ -1,0 +1,29 @@
+---
+
+- name: Add repository source
+  apt_repository:
+    repo: ppa:costamagnagianfranco/borgbackup
+
+- name: Install borg
+  package: name=borgbackup state=latest
+
+# borg init -e repokey-blake2 /media/rdhupar/Backup/borg
+- name Initalize remotes
+  shell: >
+    {{ borg_bin }} info {{ item.value.path }} ||
+    {{ borg_bin }} init
+    --encryption={{ item.value.encryption }}
+    --make-parent-dirs {{ item.value.path }}
+  with_dict: "{{ borg_remotes }}"
+  register: borg_init_remote
+  changed_when: "'does not exist.' in borg_init_remote.stdout"
+
+- name: create backup cronjob
+  cron:
+    cron_file: "borg-backup"
+    user: "{{ borgbackup_client_user }}"
+    name: "borg-backup"
+    minute: "{{ borgbackup_cron_minute }}"
+    hour: "{{ borgbackup_cron_hour }}"
+    day: "{{ borgbackup_cron_day }}"
+    job: "/usr/local/bin/borg-backup backup"
