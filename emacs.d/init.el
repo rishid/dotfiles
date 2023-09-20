@@ -2,13 +2,27 @@
 ;; Rishi Dhupar
 ;; Time-stamp: <09-01-2011 16:54:53 (rkd4127)>
 
+;; This is the first thing to get loaded.
+
 ;; Check for Linux and start the server
 ;(if (string-equal system-type "gnu/linux")
 ;  (server-start)
 ;  (message "emacsserver started."))
 
+;; Turn off mouse interface early in startup to avoid momentary display
+;; You really don't need these; trust me.
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; loadpath; this will recursively add all dirs in 'elisp-path' to load-path
+(setq dotfiles-dir (file-name-directory
+                    (or (buffer-file-name) load-file-name)))
+(add-to-list 'load-path dotfiles-dir)
+(setq package-user-dir (concat dotfiles-dir "elpa"))
+(setq custom-file (concat dotfiles-dir "custom.el"))
+
 (defconst elisp-path '("~/.emacs.d")) ;; my elisp directories
 (mapcar '(lambda(p)
            (add-to-list 'load-path p)
@@ -18,30 +32,35 @@
 (defconst djcb-emacs-dir  "~/.emacs.d")
 (defconst djcb-tmp-dir    "~/.emacs.tmp")
 
-;; id-tag; 'user@machine'; used for machine-specific configuration,
-;; as part of machine-specific configuration files
-(defconst djcb-id-tag (concat (user-login-name) "@" (system-name)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; djcb-require-maybe  (http://www.emacswiki.org/cgi-bin/wiki/LocateLibrary)
-;; this is useful when this .emacs is used in an env where not all of the
-;; other stuff is available
-(defmacro djcb-require-maybe (feature &optional file)
-  "*Try to require FEATURE, but don't signal an error if `require' fails."
-  `(require ,feature ,file 'noerror))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; These should be loaded on startup rather than autoloaded on demand
+;; since they are likely to be used in every session
 
-;; load my handy functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(djcb-require-maybe 'djcb-funcs) ;; load it it can be found...
-(require 'cl) ;; some package require cl
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'cl)
+(require 'saveplace)
+(require 'ffap)
+(require 'uniquify)
+(require 'ansi-color)
+(require 'recentf)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ELPA
-;;(when (load (expand-file-name "~/.emacs.d/elpa/package.el"))
-;;  (package-initialize))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Load up starter kit customizations
+(require 'defuns)
+(require 'bindings)
+(require 'misc)
+(require 'registers)
+(require 'eshell)
+(require 'lisp)
+(require 'perl)
+(require 'js)
+
+(load custom-file 'noerror)
+
+;; require-soft  (http://www.emacswiki.org/cgi-bin/wiki/LocateLibrary)
+;; this is useful when this .emacs is used in an env where not all of the other stuff is available
+(defmacro require-soft (feature &optional file)
+      "*Try to require FEATURE, but don't signal an error if `require' fails."
+      `(require ,feature ,file 'noerror))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; system type
@@ -165,7 +184,7 @@
 ;(savehist-mode t)                      ;; do customization before activation
 
 ;; recentf
-;(when (djcb-require-maybe 'recentf)    ;; save recently used files
+;(when (require-soft 'recentf)    ;; save recently used files
 ;  (setq recentf-save-file (concat djcb-tmp-dir "/recentf") ;; keep ~/ clean
 ;    recentf-max-saved-items 100          ;; max save 100
 ;    recentf-max-menu-items 15)         ;; max 15 in menu
@@ -209,7 +228,7 @@
 
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/cursor-chg.el
 ;; change cursor for verwrite/read-only/input 
-(when (djcb-require-maybe 'cursor-chg)  ; Load this library
+(when (require-soft 'cursor-chg)  ; Load this library
   (change-cursor-mode 1) ; On for overwrite/read-only/input mode
   (toggle-cursor-type-when-idle 1)
   (setq curchg-default-cursor-color "Yellow"))
@@ -228,7 +247,7 @@
 (global-highlight-changes-mode t)
 (setq highlight-changes-visibility-initial-state nil)
 
-(when (djcb-require-maybe 'uniquify) ;; make buffer names more unique
+(when (require-soft 'uniquify) ;; make buffer names more unique
   (setq 
     uniquify-buffer-name-style 'post-forward
 ;   uniquify-separator ":"
@@ -259,13 +278,13 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; default-fonts
-(set-default-font
-  (cond 
-    (djcb-win32-p
-      "-outline-Consolas-normal-r-normal-normal-14-97-96-96-c-*-iso8859-1")
-    ((and (not djcb-console-p) djcb-linux-p)
-      (= 0 (shell-command "fc-list | grep Inconsolata"))
-      "Inconsolata-14")))
+;(set-default-font
+;  (cond 
+;    (djcb-win32-p
+;      "-outline-Consolas-normal-r-normal-normal-14-97-96-96-c-*-iso8859-1")
+;    ((and (not djcb-console-p) djcb-linux-p)
+;      (= 0 (shell-command "fc-list | grep Inconsolata"))
+;      "Inconsolata-14")))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -276,15 +295,13 @@
      (color-theme-almost-monokai)))) 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'bindings)
-
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; yasnippet 
-;(when (djcb-require-maybe 'yasnippet-bundle) ;; note: yasnippet-bundle
+;(when (require-soft 'yasnippet-bundle) ;; note: yasnippet-bundle
 ;  (setq yas/trigger-key [(super tab)])       
 ;  yas/next-field-key [(control tab)])
 ;
-;(djcb-require-maybe 'djcb-yasnippet-bundle)
+;(require-soft 'djcb-yasnippet-bundle)
 ;(defun djcb-yasnippet-compile-bundle ()
 ;  "create a bundle of my own snippets"
 ;  (interactive)
@@ -380,7 +397,7 @@
     (auto-fill-mode -1)         ; don't do auto-filling
     ;; my own texdrive, for including TeX formulae
     ;; http://www.djcbsoftware.nl/code/texdrive/
-    (when (djcb-require-maybe 'texdrive) (texdrive-mode t))))
+    (when (require-soft 'texdrive) (texdrive-mode t))))
 (setq auto-mode-alist (cons '("\\.html$" . html-helper-mode) auto-mode-alist))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -410,12 +427,12 @@
            (message "buffer evaluated")))) ; 
     
     (setq lisp-indent-offset 2) ; indent with two spaces, enough for lisp
-    (djcb-require-maybe 'folding)
+    (require-soft 'folding)
     (font-lock-add-keywords nil 
       '(("\\<\\(FIXME\\|TODO\\|XXX+\\|BUG\\)" 
           1 font-lock-warning-face prepend)))  
     (font-lock-add-keywords nil 
-      '(("\\<\\(djcb-require-maybe\\|add-hook\\|setq\\)" 
+      '(("\\<\\(require-soft\\|add-hook\\|setq\\)" 
           1 font-lock-keyword-face prepend)))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -504,14 +521,14 @@
   
   ;; guess the identation of the current file, and use
   ;; that instead of my own settings
-  (when  (djcb-require-maybe 'dtrt-indent) (dtrt-indent-mode t))
+  (when  (require-soft 'dtrt-indent) (dtrt-indent-mode t))
 
   (when (not (string-match "/usr/src/linux" 
                (expand-file-name default-directory)))
-    (when (djcb-require-maybe 'gtags) 
+    (when (require-soft 'gtags) 
       (gtags-mode t)
       (djcb-gtags-create-or-update)))  
-  (when (djcb-require-maybe 'doxymacs)
+  (when (require-soft 'doxymacs)
     (doxymacs-mode t)
     (doxymacs-font-lock))
   
