@@ -2,10 +2,12 @@
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   // General RenovateBot configuration
   extends: [
-    "github>rishid/renovate-config",
-    "github>rishid/renovate-config:automerge-github-actions",
+    "config:best-practices",
   ],
   platform: "github",
+  onboarding: false,
+  requireConfig: "optional",
+  timezone: "America/New_York",
   username: "rishid-bot[bot]",
   gitAuthor: "rishid-bot <145512657+rishid-bot[bot]@users.noreply.github.com>",
 }
