@@ -1,19 +1,8 @@
-encoding UTF-8
-defencoding UTF-8
-defutf8 on
-vbell on
-vbell_msg ""
-nethack on
-defscrollback 10000
+# trick to make ssh-agent reconnect when resuming screen
+setenv SSH_AUTH_SOCK "/tmp/ssh-agent-$USER-screen"
 startup_message off
-autodetach on
-pastefont off
-altscreen off
-hardstatus off
-hardcopy_append on
-time "%Y-%m-%d %c:%s %H%? %l%?"
-#escape "^Oo"
-
-# Remove silly bindings
-bind W
-bind ^g
+vbell on
+hardstatus alwayslastline
+hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{=kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B}%Y-%m-%d %{W}%c %{g}]'
+altscreen on
+source $HOME/.screenrc.local
