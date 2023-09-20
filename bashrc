@@ -1,37 +1,59 @@
 # ~/.bashrc
 # Rishi Dhupar
 # shamelessly stolen from http://github.com/axedcode/dotfiles/blob/master/.bashrc
- 
+
+#-----------
+# PATH
+#-----------
+USER_PATH=~/bin
+export PATH=$USER_PATH:$PATH
+
+#-----------
+# completion
+#-----------
+if [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi
+
+#-----------
+#  history
+#-----------
+HISTSIZE=10000
+SAVEHIST=$HISTSIZE
+HISTFILE=~/.history
+
+# append to HISTFILE when command is typed
+setopt -s histappend
+shopt -s cmdhist
+export HISTCONTROL="ignoreboth"
+
+#--------
+#  MOTD
+#--------
+# example: stallman (Linux), up 29 days
+#python ~/.scripts/show_machine_info.py
+
+#-------
+# prompt
+#-------
+export PS1="[\[\033[36m\]\u\[\033[37m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]]$ "
+
 # shell options
 shopt -s cdable_vars
 shopt -s cdspell
 shopt -s checkwinsize
-shopt -s cmdhist
 shopt -s dotglob
 shopt -s expand_aliases
-#shopt -s extglob
-shopt -s histappend
-shopt -s hostcomplete
-#shopt -s nocaseglob
 stty -ctlecho
 
-if [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-fi
- 
-# history
-export HISTSIZE="10000"
-export HISTFILESIZE=${HISTSIZE}
-export HISTCONTROL="ignoreboth"
- 
 # env vars
-export PS1="[\[\033[36m\]\u\[\033[37m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]]$ "
 export CDPATH=".:~/:~/dev"
 export INPUTRC="/etc/inputrc"
-export EDITOR="nano"
+export EDITOR="emacs"
 export PAGER="less"
 export BROWSER="firefox"
-export VISUAL="vim"
+export VISUAL="emacs"
+export LANG=en_US.UTF-8
  
 # colors for: console, ls, grep, less, man
 eval `dircolors -b`
@@ -50,15 +72,14 @@ if [ -n "$SSH_CONNECTION" ] && [ -z "$SCREEN_EXIST" ] && [ "$TERM" != "screen" ]
   screen -DR
 fi
  
-# aliases: program substitutions
-alias vi="vim"
-alias top="htop"
-alias links="elinks"
- 
-# aliases: program defaults
+#-----------
+#  aliases
+#-----------
 alias ls="ls --color=auto -h1"
+alias lsd='ls -ld *(-/DN)'
+alias ll="ls -l --color=auto"
 alias shred="shred -fuz"
-alias nano="nano -AOSWx"
+#alias nano="nano -AOSWx"
 alias cp="cp -rpv"
 alias mv="mv -v"
 alias rm="rm -v"
@@ -68,25 +89,19 @@ alias du="du -shc"
 alias free="free -m"
 alias grep="grep --color"
 alias wget="wget -c"
-alias lastlog="lastlog | grep -v Never"
-alias reboot="sudo reboot"
-alias shutdown="sudo shutdown -hP now"
-alias iotop="iotop -o"
 alias exit="clear; exit"
  
 # aliases: navigation
 alias ~="cd && clear"
 alias home="~"
-alias ..="cd .."
- 
-# aliases: network
-alias home="sudo netcfg home"
- 
+alias ..='cd ..'
+alias ...='..;..'
+alias cd=pushd
+
 # aliases: custom
+alias e=$EDIT
+alias h='history -i 1 | less +G'
 alias bashrc="source ~/.bashrc"
-alias reset="reset; bashrc"
-alias webmirror="wget -m -k -p -np"
-alias attach="tmux a"
  
 # make a directory then cd into it
 function mkcd() { mkdir "$1" && cd "$1"; }
@@ -99,22 +114,11 @@ function calc() { echo "$*" | bc; }
  
 # make a tar.gz
 function mktar() { tar cvzpf "${1%%/}.tar.gz" "${1%%/}/"; }
- 
 # sort a directory's used space and displays total gigabytes
 dusort() { sudo \du -x -B 1048576 $1 | sort -rn | head -n10; }
  
-# colorize pacman searches
-pacsearch () 
-{
-  echo -e "$(pacman -Ss $@ | sed \
-  -e 's#core/.*#\\033[1;31m&\\033[0;37m#g' \
-  -e 's#extra/.*#\\033[0;32m&\\033[0;37m#g' \
-  -e 's#community/.*#\\033[1;35m&\\033[0;37m#g' \
-  -e 's#^.*/.* [0-9].*#\\033[0;36m&\\033[0;37m#g' )"
-}
- 
 # extract different archives automatically
-ex () {
+extract () {
   if [ -f $1 ] ; then
     case $1 in
       *.tar.bz2)   tar xvjf $1   ;;
@@ -134,20 +138,3 @@ ex () {
     echo "'$1' is not a valid file"
   fi }
  
-# arch linux init script helpers
-start() {
-  for arg in $*; do
-    sudo /etc/rc.d/$arg start
-  done }
-stop() {
-  for arg in $*; do
-    sudo /etc/rc.d/$arg stop
-  done }
-restart() {
-  for arg in $*; do
-    sudo /etc/rc.d/$arg restart
-  done }
-reload() {
-  for arg in $*; do
-    sudo /etc/rc.d/$arg reload
-  done }
