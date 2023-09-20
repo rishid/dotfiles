@@ -26,13 +26,18 @@ go:
 
 
 packages:
+  - build-essential
+  - clang
+  - cmake
   - coreutils
   - dos2unix
   - expect
+  - git
   - htop
   - iftop
   - jq
   - keychain
+  - libssl-dev
   - meld
   - openssh-server
   - pv
