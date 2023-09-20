@@ -16,7 +16,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 # Make sure bash-completion is activated
 
 # File ignore
-export FIGNORE=CVS:\~:.o:.svn 
+export FIGNORE=CVS:.svn:.git 
 
 if [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
@@ -107,6 +107,7 @@ alias ~="cd && clear"
 alias home="~"
 alias ..='cd ..'
 alias ...='..;..'
+alias ....='..;..;..'
 
 # aliases: custom
 alias e=$EDIT
@@ -128,6 +129,7 @@ function calc() { echo "$*" | bc; }
  
 # make a tar.gz
 function mktar() { tar cvzpf "${1%%/}.tar.gz" "${1%%/}/"; }
+
 # sort a directory's used space and displays total gigabytes
 dusort() { sudo \du -x -B 1048576 $1 | sort -rn | head -n10; }
  
