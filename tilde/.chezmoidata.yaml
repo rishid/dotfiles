@@ -56,7 +56,7 @@ versions:
   fd: "v8.7.0"                # renovate: depName=sharkdp/fd
   fzf: "0.42.0"               # renovate: depName=junegunn/fzf
   helm: "v3.12.3"             # renovate: depName=helm/helm
-  kubectl: "v1.27.3"          # renovate: depName=kubernetes/kubernetes
+  kubectl: "1.28.2"          # renovate: depName=kubernetes/kubernetes
   kustomize: "v5.1.1"         # renovate: depName=kubernetes-sigs/kustomize
   starship: "v1.16.0"         # renovate: depName=starship/starship
   trivy: "v0.45.1"            # renovate: depName=aquasecurity/trivy
