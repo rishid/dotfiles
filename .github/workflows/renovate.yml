@@ -5,33 +5,33 @@ on:
   workflow_dispatch:
     inputs:
       dryRun:
-        description: "Dry-Run"
-        default: false
+        description: Dry-Run
+        default: "false"
         required: false
-        type: boolean
-      renovateLogLevel:
-        description: "Log-Level"
-        default: "debug"
+      logLevel:
+        description: Log-Level
+        default: debug
         required: false
-        type: string
-      configurationFile:
-        description: "Renovate configuration file"
-        default: ".github/renovate.json5"
-        required: false
-        type: string
   schedule:
     # Every day at 0200
     - cron: "0 2 * * *"  
   push:
     branches:
       - master
-    # paths:
-    #   - ".github/renovate.json5"
-    #   - ".github/renovate/**.json"
-    #   - ".github/renovate/**.json5"
-    #   - ".github/workflows/renovate.yaml"
+    paths:
+      - ".github/renovate.json5"
+      - ".github/renovate/**.json"
+      - ".github/renovate/**.json5"
+      - ".github/workflows/renovate.yaml"
 
 concurrency: renovate
+
+env:
+  LOG_LEVEL: debug
+  RENOVATE_DRY_RUN: false
+  RENOVATE_CONFIG_FILE: .github/renovate-bot.json5
+  RENOVATE_AUTODISCOVER: true
+  RENOVATE_AUTODISCOVER_FILTER: "${{ github.repository }}"
 
 jobs:
   renovate:
@@ -47,31 +47,15 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
-        # with:
-        #   token: "${{ steps.generate-token.outputs.token }}"
+
+      - name: Override default config from dispatch variables
+        shell: bash
+        run: |
+          echo "RENOVATE_DRY_RUN=${{ github.event.inputs.dryRun || env.RENOVATE_DRY_RUN }}" >> "${GITHUB_ENV}"
+          echo "LOG_LEVEL=${{ github.event.inputs.logLevel || env.LOG_LEVEL }}" >> "${GITHUB_ENV}"
 
       - name: Renovate
-        uses: renovatebot/github-action@v39.0.5
-        env:
-          # DRY_RUN: ${{ inputs.dryRun }}
-          LOG_LEVEL: 'debug'
-          RENOVATE_AUTODISCOVER: true
-          RENOVATE_AUTODISCOVER_FILTER: "${{ github.repository }}"
-          # # Repository taken from variable to keep configuration file generic
-          # RENOVATE_REPOSITORIES: ${{ github.repository }}
-          # # Onboarding not needed for self hosted
-          # RENOVATE_ONBOARDING: "false"
-          # # Use GitHub API to create commits (this allows for signed commits from GitHub App)
-          # RENOVATE_PLATFORM_COMMIT: "true"     
+        uses: renovatebot/github-action@v39.0.5  
         with:
           configurationFile: ${{ inputs.configurationFile }}
           token: "${{ steps.generate-token.outputs.token }}"
-
-    # uses: bjw-s/gh-workflows/.github/workflows/run-renovate.yaml@main
-    # with:
-    #   configurationFile: ".github/renovate.json5"
-    #   dryRun: ${{ inputs.dryRun || 'false' }}
-    #   renovateLogLevel: ${{ inputs.logLevel || 'debug' }}
-    # secrets:
-    #   app_id: ${{ secrets.BJWS_APP_ID }}
-    #   app_private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
