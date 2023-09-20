@@ -48,13 +48,13 @@
 [".config/tmux/plugins/tpm"]
     type = "git-repo"
     url = "https://github.com/tmux-plugins/tpm"
-    refreshPeriod = "168h"
+    refreshPeriod = "720h"
 
 [".local/bin/bat"]
-    type = "file"
-    url = "https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-unknown-linux-musl.tar.gz"
+    type = "archive-file"
+    url = "https://github.com/sharkdp/bat/releases/download/{{ .versions.bat }}/bat-{{ .versions.bat }}-{{ .uname.machine }}-unknown-linux-musl.tar.gz"
     executable = true
-    refreshPeriod = "168h"
+    stripComponents = 1
     path = "bat"
 
 [".local/bin/direnv"]
@@ -65,4 +65,5 @@
 [".local/bin/fzf"]
     type = "archive-file"
     url = 'https://github.com/junegunn/fzf/releases/download/{{ .versions.fzf }}/fzf-{{ .versions.fzf }}-linux_{{ eq .chezmoi.arch "arm" | ternary (.uname.machine | trimSuffix "tel") .chezmoi.arch }}.tar.gz'
+    executable = true
     path = "fzf"
