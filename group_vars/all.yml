@@ -28,21 +28,27 @@ go:
 packages:
   - coreutils
   - dos2unix
+  - htop
   - iftop
   - jq
   - keychain
   - meld
   - openssh-server
   - pv
+  - python
+  - python3-pip
+  - silversearcher-ag
+  - speedtest-cli
   - tree
   - wget
 
 pip_packages:
-  - httpie
-  - httpie-oauth
-  - httpie-http2
-  - httpie-ntlm
-  - httpie-jwt-auth
+  httpie:
+  httpie-oauth:
+  httpie-http2:
+  httpie-ntlm:
+  httpie-jwt-auth:
+  request:
 
 docker_users:
   - "{{ localuser }}"

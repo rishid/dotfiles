@@ -24,14 +24,17 @@
       tags: ['docker', 'bootstrap']
       become: True
 
-    - {role: dotfiles, tags: ['dotfiles']}
-    - {role: emacs, tags: ['emacs']}
-    - {role: tmux, tags: ['tmux']}
+    - { role: dotfiles, tags: ['dotfiles'] }
+    - { role: bash,     tags: ['bash'] }
+    - { role: emacs,    tags: ['emacs'] }
+    - { role: tmux,     tags: ['tmux'] }
 
     #- role: borg
     #  tags: ['borg', 'bootstrap']
     #  when: ansible_os_family == "Debian"
     #  become: True
+
+
 
     #- {role: zsh, tags: ['zsh', 'bootstrap']}
     #- {role: python, tags: ['python']}

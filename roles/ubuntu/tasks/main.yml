@@ -38,3 +38,5 @@
 - name: Set static workspaces
   command: gsettings set org.gnome.desktop.wm.preferences num-workspaces 4
   changed_when: False
+
+
