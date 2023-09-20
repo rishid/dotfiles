@@ -2,6 +2,18 @@
 ;;
 ;; Part of the Emacs Starter Kit
 
+(defalias 'perl-mode 'cperl-mode) ; cperl mode is what we want
+
+(add-hook 'cperl-mode-hook
+  (lambda()
+    (eval-when-compile (require 'cperl-mode))
+    (abbrev-mode -1)                  ; turn-off the annoying elecric crap
+    (setq 
+      cperl-hairy t                   ; parse hairy perl constructs
+      cperl-indent-level 4            ; indent with 4 positions
+      cperl-invalid-face nil          ; don't show stupid underlines
+      cperl-electric-keywords t)))    ; complete keywords
+      
 (eval-after-load 'cperl-mode
   '(progn
      (define-key cperl-mode-map (kbd "RET") 'reindent-then-newline-and-indent)

@@ -21,6 +21,23 @@
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
 (add-hook 'emacs-lisp-mode-hook 'esk-remove-elc-on-save)
 
+(add-hook 'emacs-lisp-mode-hook 
+  (lambda()
+    (local-set-key (kbd "<f7>") ;; overrides global f7 (compile) 
+      '(lambda()(interactive) 
+         (let ((debug-on-error t)) 
+           (eval-buffer)
+           (message "buffer evaluated")))) ; 
+    
+    (setq lisp-indent-offset 2) ; indent with two spaces, enough for lisp
+    (require-soft 'folding)
+    (font-lock-add-keywords nil 
+      '(("\\<\\(FIXME\\|TODO\\|XXX+\\|BUG\\)" 
+          1 font-lock-warning-face prepend)))  
+    (font-lock-add-keywords nil 
+      '(("\\<\\(require-soft\\|add-hook\\|setq\\)" 
+          1 font-lock-keyword-face prepend)))))
+          
 (defun esk-remove-elc-on-save ()
   "If you're saving an elisp file, likely the .elc is no longer valid."
   (make-local-variable 'after-save-hook)
