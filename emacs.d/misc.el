@@ -2,16 +2,8 @@
 ;;
 ;; Part of the Emacs Starter Kit
 
-;;; system type
-(defconst djcb-win32-p (eq system-type 'windows-nt) "Are we on Windows?")
-(defconst djcb-linux-p (or (eq system-type 'gnu/linux)(eq system-type 'linux))
-  "Are we running on a GNU/Linux system?")
-(defconst djcb-console-p (eq (symbol-value 'window-system) nil)
-  "Are we in a console?")
-(defconst djcb-machine (substring (shell-command-to-string "hostname") 0 -1))
-
 ;; time-stamps 
-(setq ;; when there's "Time-stamp: <>" in the first 10 lines of the file
+(setq ;; when there's "Time-stamp: <01-31-2012 19:11:59 (ubuntu)>" in the first 10 lines of the file
   time-stamp-active t        ; do enable time-stamps
   time-stamp-line-limit 10   ; check first 10 buffer lines for Time-stamp: <>
   time-stamp-format "%02m-%02d-%04y %02H:%02M:%02S (%u)") ; date format
@@ -75,11 +67,6 @@
 (defvar coding-hook nil
   "Hook that gets run on activation of any programming mode.")
 
-;; url proxy services
-(setq url-proxy-services
-       '(("http"     . "rkd4127@gw6alt.draper.com:3128")
-         ))
-         
 (defalias 'auto-revert-tail-mode 'tail-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -92,7 +79,6 @@
 (setq save-place-file
   (concat emacs-tmp-dir "/saveplace"))  ;; keep my ~/ clean
 (setq-default save-place t)            ;; activate it for all buffers
-(require 'saveplace)                   ;; get the package
 
 ;; ---------------------------------------------------------- [ diminish ]
 ;; Makes minor mode names in the modeline shorter.
@@ -126,7 +112,7 @@
   (toggle-cursor-type-when-idle 1)
   (setq curchg-default-cursor-color "Yellow"))
   
-;; higlight changes
+;; highlight changes
 (global-highlight-changes-mode t)
 (setq highlight-changes-visibility-initial-state nil)
 
@@ -250,80 +236,6 @@ This function is intended to be used as a value of `ring-bell-function'."
 (eval-after-load "browse-kill-ring"
   '(progn
      (setq browse-kill-ring-quit-action 'save-and-restore)))
-	 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;; BELOW CODE IS UNUSED ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; filecache: http://www.emacswiki.org/cgi-bin/wiki/FileNameCache
-;(eval-after-load "filecache" 
-;  '(progn (message "Loading file cache...")
-;     (file-cache-add-directory "~/")
-;     (file-cache-add-directory-list (list "~/Desktop" "~/Documents"))))
-
-;; tramp, for remote access
-;(require 'tramp)
-;(setq tramp-default-method "ssh")
-                                        
-;; yasnippet 
-;(when (require-soft 'yasnippet-bundle) ;; note: yasnippet-bundle
-;  (setq yas/trigger-key [(super tab)])       
-;  yas/next-field-key [(control tab)])
-;
-;(require-soft 'djcb-yasnippet-bundle)
-;(defun djcb-yasnippet-compile-bundle ()
-;  "create a bundle of my own snippets"
-;  (interactive)
-;  (yas/compile-bundle 
-;    "~/.emacs.d/elisp/yasnippet-0.5.9/yasnippet.el"
-;    "~/.emacs.d/elisp/djcb-yasnippet-bundle.el"
-;    '("~/.emacs.d/yasnippets/")
-;    "(yas/initialize)"))
-
-;; custom menu; http://emacs-fu.blogspot.com/2009/04/adding-custom-menus.html
-;(easy-menu-define djcb-menu global-map "MyMenu"
-;  '("djcb"
-;     ("Programs" ;; submenu
-;       ["mutt"  (djcb-term-start-or-switch "mutt" t)]
-;       ["mc"    (djcb-term-start-or-switch "mc" t)]
-;       ["htop"  (djcb-term-start-or-switch "htop" t)]
-;       ["iotop" (djcb-term-start-or-switch "iotop" t)])
-;
-;     ("Org"
-;       ["html"  (org-export-as-html 3 nil nil nil t)])
-;
-;     ("TeXDrive"  :visible (or (string= major-mode "html-helper-mode") 
-;                             (string= major-mode "html-mode"))
-;       ["Insert formula"   texdrive-insert-formula 
-;         :help "Insert some formula"]
-;       ["Generate images"  texdrive-generate-images 
-;         :help "(Re)generate the images for the formulae"])
-;     ("Twitter" ;; submenu
-;       ["View friends" twitter-get-friends-timeline]
-;       ["What are you doing?" twitter-status-edit])
-;
-;     ("Misc"  ;; submenu
-;       ["Save & exit" save-buffers-kill-emacs]
-;       ["Count words" djcb-count-words]
-;       ["Show/hide line numbers" linum]
-;       ["Toggle full-screen" djcb-fullscreen-toggle])))
-
-;;; customization for term, ansi-term
-;; disable cua and transient mark modes in term-char-mode
-;; http://www.emacswiki.org/emacs/AnsiTermHints
-;; remember: Term-mode remaps C-x to C-c
-;(defadvice term-char-mode (after term-char-mode-fixes ())
-;  (set (make-local-variable 'cua-mode) nil)
-;  (set (make-local-variable 'transient-mark-mode) nil)
-;  (set (make-local-variable 'global-hl-line-mode) nil)
-;  (ad-activate 'term-char-mode)
-;  (term-set-escape-char ?\C-x))
-
-;(add-hook 'term-mode-hook 
-;  (lambda() 
-;    (local-set-key [(tab)] nil)
-;    (local-set-key (kbd "<C-f1>") 
-;      '(lambda()(interactive)
-;         (shell-command "killall -SIGWINCH mutt slrn irssi zsh")))))  
 
 (provide 'misc)
 ;;; misc.el ends here
