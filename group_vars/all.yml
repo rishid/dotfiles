@@ -30,9 +30,11 @@ packages:
   - clang
   - cmake
   - coreutils
+  - default-jre
   - dos2unix
   - expect
   - git
+  - graphviz
   - htop
   - iftop
   - jq
