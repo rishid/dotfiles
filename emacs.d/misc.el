@@ -151,7 +151,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; saving things across sessions
 ;; bookmarks
-(setq bookmark-default-file "~/.emacs.d/bookmarks") ;; bookmarks
+(setq bookmark-default-file (concat emacs-tmp-dir "/bookmarks")) ;; bookmarks
 
 ;; saveplace: save location in file when saving files
 (setq save-place-file
@@ -166,7 +166,7 @@
 (setq djcb-backup-dir (concat emacs-tmp-dir "/backups"))
 (setq make-backup-files t ;; do make backups
   backup-by-copying t     ;; and copy them here
-  backup-directory-alist '(("." . "~/.emacs.tmp/backups")) ;; Don't clutter up directories with files~
+  backup-directory-alist `(("." . ,(expand-file-name (concat emacs-tmp-dir "/backups"))))  
   version-control t
   kept-new-versions 3
   kept-old-versions 5
