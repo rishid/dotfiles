@@ -5,6 +5,8 @@ set -e
 
 cd "${BASH_SOURCE%/*}/.."
 
+git pull origin master
+
 join() {
     IFS="$1"
     shift
