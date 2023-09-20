@@ -1,0 +1,5 @@
+---
+
+- name: Add repository source
+  apt_repository:
+    repo: ppa:fish-shell/release-3

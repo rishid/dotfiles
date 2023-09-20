@@ -1,0 +1,40 @@
+---
+
+- include_tasks: ubuntu.yml
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Install 'fish'
+  apt:
+    pkg: fish
+    force: yes
+    update_cache: yes
+    state: present
+  tags: bootstrap
+
+- name: Change user shell
+  user:
+    name: "{{ item }}"
+    shell: /usr/bin/fish
+  with_items: "{{ fish_users }}"
+  when: fish_users | length > 0
+
+- name: Install fish completions (directories)
+  file:
+    state: directory
+    dest: "~{{ item }}/.config/fish/completions"
+    owner: "{{ item }}"
+    group: "{{ item }}"
+  with_items:
+    - "{{ fish_users }}"
+  when: fish_completions | length > 0
+
+- name: Install fish completions (files)
+  get_url:
+    url: "https://github.com/fish-shell/fish-shell/raw/master/share/completions/{{ item[1] }}.fish"
+    dest: "~{{ item[0] }}/.config/fish/completions/{{ item[1] }}.fish"
+    owner: "{{ item[0] }}"
+    group: "{{ item[0] }}"
+  with_nested:
+    - "{{ fish_users }}"
+    - "{{ fish_completions }}"
+  when: fish_completions | length > 0
