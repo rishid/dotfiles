@@ -1,26 +1,117 @@
+#!/usr/bin/env bash
 # -*- mode:shell-script; sh-shell:bash -*-
 # ~/.bashrc: executed by bash(1) for non-login shells.
 
+### /etc/bashrc
+[ ! -f /etc/bashrc ] || . /etc/bashrc
+
 # If not running interactively, don't do anything
-case $- in
-  *i*) ;;
-    *) return;;
-esac
+[[ $- == *i* ]] || return 0
 
-# user-specific configuration files should be stored. If $XDG_CONFIG_HOME is either not set or empty, a default equal to $HOME/.config
-export XDG_CONFIG_HOME="${HOME}/.config"
-# user-specific data files should be stored. If $XDG_DATA_HOME is either not set or empty, a default equal to $HOME/.local/share
-export XDG_DATA_HOME="${HOME}/.data"
-# user-specific state files should be stored. If $XDG_STATE_HOME is either not set or empty, a default equal to $HOME/.local/state
-export XDG_STATE_HOME="${HOME}/.state"
+export LANG="en_US"
+export LC_ALL="en_US.UTF-8"
 
-#-----------
-# PATH
-#-----------
-USER_PATH=~/bin
-LOCAL_PATH=~/localbin
-export PATH=$LOCAL_PATH:$USER_PATH:$PATH
+### Import Common Settings
+[ ! -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/profile.sh" ] || . "${XDG_CONFIG_HOME:-$HOME/.config}/shell/profile.sh"
+
+# Bash settings
+shopt -s cdspell         # Auto-corrects cd misspellings
+shopt -s cmdhist         # Save multi-line commands in history as single line
+shopt -s dotglob         # Include dotfiles in pathname expansion
+shopt -s expand_aliases  # Expand aliases
+shopt -s extglob         # Enable extended pattern-matching features
+shopt -s histreedit      # Add failed commands to the bash history
+shopt -s histappend      # Append each session's history to $HISTFILE
+shopt -s histverify      # Edit a recalled history line before executing
+
+if [[ $DISPLAY ]]; then
+	shopt -s checkwinsize  # Update LINES and COLUMNS after each command
+fi
+
+# Load bash aliases
+source "$XDG_CONFIG_HOME/shell/aliases.sh"
+
+
+
+### XDG
+# Source: # https://wiki.archlinux.org/index.php/XDG_Base_Directory
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+
+### Exports
+export PATH="/opt/local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/bin:$PATH"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+
+### Ansible
+export ANSIBLE_CONFIG="$XDG_DATA_HOME/ansible/ansible.cfg"
+export ANSIBLE_HOME="$XDG_DATA_HOME/ansible"
+
+### bat
+export BAT_CONFIG_PATH="$XDG_CONFIG_HOME/bat/config"
+
+### Cargo
+export CARGO_HOME="$XDG_DATA_HOME/cargo"
+export PATH="$PATH:$CARGO_HOME/bin"
+
+### Docker
+# export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
+# export MACHINE_STORAGE_PATH="$XDG_DATA_HOME/docker-machine"
+
+### Go
+# export GOPATH="$XDG_DATA_HOME/go"
+# export GO111MODULE=on
+# export PATH="$PATH:${GOPATH}/bin"
+# if command -v go > /dev/null && which go | grep -q 'asdf' > /dev/null && command -v asdf > /dev/null; then
+#   GOROOT="$(asdf where golang)/go"
+#   export GOROOT
+#   export PATH="$PATH:${GOROOT}/bin"
+# elif command -v go > /dev/null && command -v brew > /dev/null; then
+#   GOROOT="$(brew --prefix go)/libexec"
+#   export GOROOT
+#   export PATH="$PATH:${GOROOT}/bin"
+# fi
+
+### HTTPie
+export HTTPIE_CONFIG_DIR="$XDG_CONFIG_HOME/httpie"
+
+### k9s
+export K9SCONFIG="$XDG_CONFIG_HOME/k9s"
+
+### Kube
+export KUBECONFIG="$XDG_CONFIG_HOME/kube/config"
+
+### wget
+export WGETRC="$XDG_CONFIG_HOME/wget/wgetrc"
+
+### History
+# append to HISTFILE when command is typed
+# shopt -s histappend
+# # Save all lines of a multiple-line command in the same history entry.
+# shopt -s cmdhist
+# export HISTCONTROL=ignoreboth
+# export HISTSIZE=1000000000
+# export HISTFILESIZE=$HISTSIZE
+# export HISTFILE="${XDG_STATE_HOME}"/bash/history
+# export HIST_STAMPS=mm/dd/yyyy
+# export HISTTIMEFORMAT="%F %T "
+# export HISTIGNORE="&:[bf]g:c:clear:history:exit:q:afk:pwd:* --help"
+# export SAVEHIST=50000
+
+### Man pages
+export LESS_TERMCAP_mb=$'\e[1;32m'
+export LESS_TERMCAP_md=$'\e[1;32m'
+export LESS_TERMCAP_me=$'\e[0m'
+export LESS_TERMCAP_se=$'\e[0m'
+export LESS_TERMCAP_so=$'\e[01;33m'
+export LESS_TERMCAP_ue=$'\e[0m'
+export LESS_TERMCAP_us=$'\e[1;4;31m'
+export LESSHISTFILE=-
+export MANPAGER="less -X"
 
 # source: http://superuser.com/a/1001014/148993
 # is $1 missing from $2 (or PATH) ?
@@ -60,20 +151,7 @@ if [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
 fi
 
-#-----------
-#  history
-#-----------
-export HISTSIZE=100000
-export HISTFILESIZE=$HISTSIZE
-export HISTFILE="${XDG_STATE_HOME}"/bash/history
-export HISTIGNORE="&:[bf]g:c:clear:history:exit:q:afk:pwd:* --help"
 
-# append to HISTFILE when command is typed
-shopt -s histappend
-# Save all lines of a multiple-line command in the same history entry.
-shopt -s cmdhist
-export HISTCONTROL="ignoreboth"
-export HISTTIMEFORMAT="%F %T "
 
 #-------
 # prompt

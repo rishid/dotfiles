@@ -17,7 +17,7 @@ end
 
 set -Ux EDITOR emacs
 
-source ~/.config/bash/aliases
+source ~/.config/shell/aliases.sh
 
 # Chezmoi cached variables
 set -x CM_computer_name {{ .computer_name }}
