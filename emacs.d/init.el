@@ -1,11 +1,11 @@
 ;; init.el file
 ;; Rishi Dhupar
-;; Time-stamp: <04-23-2010 13:38:45 (rkd4127)>
+;; Time-stamp: <04-13-2011 16:57:12 (rkd4127)>
 
 ;; Check for Linux and start the server
-(if (string-equal system-type "gnu/linux")
-  (server-start)
-  (message "emacsserver started."))
+;(if (string-equal system-type "gnu/linux")
+;  (server-start)
+;  (message "emacsserver started."))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; loadpath; this will recursively add all dirs in 'elisp-path' to load-path
@@ -500,6 +500,17 @@
       cperl-electric-keywords t)))   ; complete keywords
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+;; cmake mode
+; Add cmake listfile names to the mode list.
+(require 'cmake-mode)
+(setq auto-mode-alist
+	  (append
+	   '(("CMakeLists\\.txt\\'" . cmake-mode))
+	   '(("\\.cmake\\'" . cmake-mode))
+	   auto-mode-alist))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
 ;; gtags
@@ -535,7 +546,7 @@
     compilation-window-height 12)           ; keep it readable
 
   (setq
-    c-basic-offset 4                        ; linux kernel style
+    c-basic-offset 2                        ; linux kernel style
     c-hungry-delete-key t)                  ; eat as much as possible
   
   ;; guess the identation of the current file, and use

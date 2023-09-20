@@ -9,6 +9,7 @@
 #-----------
 USER_PATH=~/bin
 export PATH=$USER_PATH:$PATH
+
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 #-----------
@@ -29,7 +30,7 @@ fi
 export HISTSIZE=100000
 export HISTFILESIZE=$HISTSIZE
 export HISTFILE=~/.bash_history
-export HISTIGNORE="cd:ls:[bf]g"
+export HISTIGNORE="[bf]g"
 
 # append to HISTFILE when command is typed
 shopt -s histappend
@@ -47,11 +48,15 @@ export HISTTIMEFORMAT="%F %T "
 # prompt
 #-------
 export PS1="[\[\033[36m\]\u\[\033[37m\]@\[\033[32m\]\h:\[\033[34;1m\]\w\[\033[m\]]$ "
-if [ -z "$PROMPT_COMMAND" ]; then
-    export PROMPT_COMMAND="history -a";
-else
-    export PROMPT_COMMAND="$PROMPT_COMMAND;history -a";
-fi
+
+# Save and reload the history after each command finishes
+#export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+
+#if [ -z "$PROMPT_COMMAND" ]; then
+#    export PROMPT_COMMAND="history -a";
+#else
+#    export PROMPT_COMMAND="$PROMPT_COMMAND;history -a";
+#fi
 
 # shell options
 shopt -s cdable_vars
@@ -95,7 +100,7 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 alias ls="ls --color=auto -h"
 alias lsd="ls -ld *(-/DN)"
 alias ll="ls -lh --color=auto"
-alias shred="shred -fuz"
+alias shred="shred -fuvz"
 #alias nano="nano -AOSWx"
 alias cp="cp -rpv"
 alias mv="mv -v"
@@ -112,13 +117,15 @@ alias exit="clear; exit"
 alias ~="cd && clear"
 alias home="~"
 alias ..='cd ..'
-alias ...='..;..'
-alias ....='..;..;..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
 
 # aliases: custom
 alias e=$EDIT
 alias h='history -i 1 | less +G'
 alias bashrc="source ~/.bashrc"
+# copy last downloaded file from ~/Downloads directory to current directory
+alias lastDownload='cp ~/Downloads/`ls ~/Downloads -tr | tail -n 1` .'
 
 if [ -f ~/.bashrc.local ]; then
     . ~/.bashrc.local
@@ -160,3 +167,60 @@ extract () {
     echo "'$1' is not a valid file"
   fi }
  
+# packs $2-$n into $1 depending on $1's extension.  add more file types as needed
+function pack() {
+	 if [ $# -lt 2 ] ; then
+	    echo -e "\npack() usage:"
+	    echo -e "\tpack archive_file_name file1 file2 ... fileN"
+	    echo -e "\tcreates archive of files 1-N\n"
+	 else 
+	   DEST=$1
+	   shift
+
+	   case $DEST in 
+		*.tar.bz2)		tar -cvjf $DEST "$@" ;;  
+		*.tar.gz)		tar -cvzf $DEST "$@" ;;  
+		*.zip)			zip -r $DEST "$@" ;;
+		*.xpi)			zip -r $DEST "$@" ;;
+		*)				echo "Unknown file type - $DEST" ;;
+	   esac
+	 fi
+}
+
+# like sleep, but spits out a . every second
+function delay() {
+	 typeset -i NUM
+	 NUM=$1
+	 if [ $NUM -gt 0 ] ; then
+	     for i in `seq $NUM` ; do sleep 1 ; echo -n '.' ; done
+	     echo ""
+	 else
+	     echo "Invalid argument.  Please use a positive integer."
+	 fi
+}
+
+# screen attach.  if multiple, presents a menu for choosing.
+function ssx() {
+    OPTS=`screen -ls | grep "[0-9]\." | while read line ; do echo "$line" | sed -e 's/\s/_/g' ; done`
+
+    case $(echo $OPTS | wc -w) in
+	0) 
+	    echo -e "\nNo screen sessions open\n" 
+	    ;;
+	1) 
+	    SESSION=$OPTS
+	    echo -e "\nAttaching to only available screen"
+	    ;;
+	*) 
+	    echo -e "\nPick a screen session"
+	    select opt in $OPTS ; do
+		SESSION=$opt
+		break;
+	    done
+	    ;;
+    esac
+
+    screen -x $(echo $SESSION | sed -e 's/\..*//')
+
+}
+
