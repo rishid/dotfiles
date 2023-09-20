@@ -1,0 +1,5 @@
+git clone the repository to ~/.dotfiles then do
+
+cd ~/.dotfiles
+for f in * .*
+    ln -s ~/.dotfiles/$f ~/$f
