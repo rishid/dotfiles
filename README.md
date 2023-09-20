@@ -3,14 +3,13 @@ Installation
 ------------
 
 Installer creates symbolic links in your `$HOME`.  It asks whether
-to backup files that otherwise would be replaced.  Requires Python
-(2.6 ≤ version < 3) and Git.
-
+to backup files that otherwise would be replaced.  Requires Python 2.6+
+and Git
 
 ### Fresh
 
     cd ~
-    git clone https://github.com/narfdotpl/dotfiles.git
+    git clone https://github.com/rishid/dotfiles.git
     cd dotfiles
     ./install
 

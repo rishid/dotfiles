@@ -37,7 +37,7 @@ del_path () {
 # Make sure bash-completion is activated
 
 # File ignore
-export FIGNORE=CVS:.svn:.git 
+export FIGNORE=CVS:.svn:.git
 
 if [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
@@ -49,19 +49,14 @@ fi
 export HISTSIZE=100000
 export HISTFILESIZE=$HISTSIZE
 export HISTFILE=~/.bash_history
-export HISTIGNORE="[bf]g"
+export HISTIGNORE="&:[bf]g:c:clear:history:exit:q:afk:pwd:* --help"
 
 # append to HISTFILE when command is typed
 shopt -s histappend
+# Save all lines of a multiple-line command in the same history entry.
 shopt -s cmdhist
 export HISTCONTROL="ignoreboth"
 export HISTTIMEFORMAT="%F %T "
-
-#--------
-#  MOTD
-#--------
-# example: stallman (Linux), up 29 days
-#python ~/.scripts/show_machine_info.py
 
 #-------
 # prompt
@@ -77,24 +72,43 @@ export PS1="[\[\033[36m\]\u\[\033[37m\]@\[\033[32m\]\h:\[\033[34;1m\]\w\[\033[m\
 #    export PROMPT_COMMAND="$PROMPT_COMMAND;history -a";
 #fi
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # shell options
-shopt -s cdable_vars
+# https://www.gnu.org/software/bash/manual/bashref.html#The-Shopt-Builtin
+
+# Automatically prepend `cd` to directory names.
+shopt -s autocd
+# Autocorrect typos in path names when using the `cd` command.
 shopt -s cdspell
+# Check the window size after each command and, if necessary, update
+# the values of `LINES` and `COLUMNS`.
 shopt -s checkwinsize
+# Argument to cd builtin command that is not a directory is assumed to be the name
+# of a variable whose value is the directory to change to.
+shopt -s cdable_vars
+# Include filenames beginning with a "." in the filename expansion.
 shopt -s dotglob
+# Use extended pattern matching features.
+shopt -s extglob
+# Do not attempt to search the PATH for possible completions when
+# completion is attempted on an empty line.
+shopt -s no_empty_cmd_completion
+
 shopt -s expand_aliases
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
 # env vars
 #export CDPATH=".:~/:~/dev"
 export INPUTRC="/etc/inputrc"
 export EDITOR="emacs"
-export ALTERNATE_EDITOR="emacs"
 export VISUAL="emacs"
 export PAGER="less"
 export BROWSER="firefox"
-
 export LANG=en_US.UTF-8
+export LC_ALL="en_US.UTF-8"
+
 
 # colors for: console, ls, grep, less, man
 eval `dircolors -b`
@@ -108,19 +122,30 @@ export LESS_TERMCAP_se=$'\E[0m'
 export LESS_TERMCAP_so=$'\E[01;44;33m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
- 
+
+
+# Don't clear the screen after quitting a `man` page.
+export MANPAGER="less -X"
+
 # start/attach screen session after logging in via ssh
 #if [ -n "$SSH_CONNECTION" ] && [ -z "$SCREEN_EXIST" ] && [ "$TERM" != "screen" ] ; then
 #  export SCREEN_EXIST=1
 #  screen -DR
 #fi
- 
+
 #-----------
 #  aliases
 #-----------
+# Always use color output for `ls`
 alias ls="ls --color=auto -h"
-alias lsd="ls -ld *(-/DN)"
-alias ll="ls -lh --color=auto"
+# List only directories
+alias lsd="ls -lF | grep --color=never '^d'"
+# List all files colorized in long format
+alias ll="ls -lhF --color=auto"
+# List all files colorized in long format, including dot files
+alias lla="ls -lhaF --color=auto"
+
+alias ln="ln -v"
 alias shred="shred -fuvz"
 #alias nano="nano -AOSWx"
 alias cp="cp -rpv"
@@ -130,13 +155,18 @@ alias mkdir="mkdir -pv"
 alias df="df -h"
 alias du="du -hc"
 alias free="free -m"
-alias grep="grep --color"
+# Always enable colored `grep` output
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
 alias wget="wget -c"
 alias exit="clear; exit"
- 
+
 # aliases: navigation
 alias ~="cd && clear"
 alias home="~"
+alias -- -="cd -"
+alias cd..="cd .."
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
@@ -144,31 +174,47 @@ alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
 
 # aliases: custom
-alias e=$EDIT
+alias e="$EDITOR"
 alias h='history -i 1 | less +G'
 alias bashrc="source ~/.bashrc"
 # copy last downloaded file from ~/Downloads directory to current directory
 alias lastDownload='cp ~/Downloads/`ls ~/Downloads -tr | tail -n 1` .'
 
+# Pretty print the path
+alias path='printf "%b\n" "${PATH//:/\\n}"'
+
+# Stopwatch
+alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date'
+
+# Lock screen.
+alias afk="gnome-screensaver-command --lock"
+
+# Shorter commands for the `Advanced Packaging Tool`
+alias apti="sudo apt-get install"
+alias aptr="sudo apt-get remove"
+alias apts="sudo apt-cache search"
+alias aptu="sudo apt-get update && sudo apt-get upgrade"
+
+
 if [ -f ~/.bashrc.local ]; then
     . ~/.bashrc.local
-fi 
+fi
 
 # make a directory then cd into it
 function mkcd() { mkdir "$1" && cd "$1"; }
- 
+
 # recursively set ownership
 function mkmine() { sudo chown -R ${USER} ${1:-.}; }
- 
+
 # simple calculator
 function calc() { echo "$*" | bc; }
- 
+
 # make a tar.gz
 function mktar() { tar cvzpf "${1%%/}.tar.gz" "${1%%/}/"; }
 
 # sort a directory's used space and displays total gigabytes
 dusort() { sudo \du -x -B 1048576 $1 | sort -rn | head -n10; }
- 
+
 # extract different archives automatically
 extract () {
   if [ -f $1 ] ; then
@@ -189,26 +235,28 @@ extract () {
   else
     echo "'$1' is not a valid file"
   fi }
- 
+
 # packs $2-$n into $1 depending on $1's extension.  add more file types as needed
 function pack() {
 	 if [ $# -lt 2 ] ; then
 	    echo -e "\npack() usage:"
 	    echo -e "\tpack archive_file_name file1 file2 ... fileN"
 	    echo -e "\tcreates archive of files 1-N\n"
-	 else 
+	 else
 	   DEST=$1
 	   shift
 
-	   case $DEST in 
-		*.tar.bz2)		tar -cvjf $DEST "$@" ;;  
-		*.tar.gz)		tar -cvzf $DEST "$@" ;;  
+	   case $DEST in
+		*.tar.bz2)		tar -cvjf $DEST "$@" ;;
+		*.tar.gz)		tar -cvzf $DEST "$@" ;;
 		*.zip)			zip -r $DEST "$@" ;;
 		*.xpi)			zip -r $DEST "$@" ;;
 		*)				echo "Unknown file type - $DEST" ;;
 	   esac
 	 fi
 }
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # like sleep, but spits out a . every second
 function delay() {
@@ -222,19 +270,21 @@ function delay() {
 	 fi
 }
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 # screen attach.  if multiple, presents a menu for choosing.
 function ssx() {
     OPTS=`screen -ls | grep "[0-9]\." | while read line ; do echo "$line" | sed -e 's/\s/_/g' ; done`
 
     case $(echo $OPTS | wc -w) in
-	0) 
-	    echo -e "\nNo screen sessions open\n" 
+	0)
+	    echo -e "\nNo screen sessions open\n"
 	    ;;
-	1) 
+	1)
 	    SESSION=$OPTS
 	    echo -e "\nAttaching to only available screen"
 	    ;;
-	*) 
+	*)
 	    echo -e "\nPick a screen session"
 	    select opt in $OPTS ; do
 		SESSION=$opt
@@ -246,3 +296,45 @@ function ssx() {
     screen -x $(echo $SESSION | sed -e 's/\..*//')
 }
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Human readable file size
+# (because `du -h` doesn't cut it for me).
+function hrfs() {
+    printf "%s" "$1" |
+    awk '{
+            i = 1;
+            split("B KB MB GB TB PB EB ZB YB WTFB", v);
+            value = $1;
+            # confirm that the input is a number
+            if ( value + .0 == value ) {
+                while ( value >= 1024 ) {
+                    value/=1024;
+                    i++;
+                }
+                if ( value == int(value) ) {
+                    printf "%d %s", value, v[i]
+                } else {
+                    printf "%.1f %s", value, v[i]
+                }
+            }
+        }' |
+    sed -e ":l" \
+        -e "s/\([0-9]\)\([0-9]\{3\}\)/\1,\2/; t l"
+    #    └─ add thousands separator
+    #       (changes "1023.2 KB" to "1,023.2 KB")
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Search history.
+function qh() {
+    #           ┌─ enable colors for pipe
+    #           │  ("--color=auto" enables colors only if
+    #           │  the output is in the terminal)
+    grep --color=always "$*" "$HISTFILE" |       less -RX
+    # display ANSI color escape sequences in raw form ─┘│
+    #       don't clear the screen after quitting less ─┘
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
