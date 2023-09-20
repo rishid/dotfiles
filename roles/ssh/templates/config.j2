@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+
+AddKeysToAgent yes
+User {{ work_ssh_username[wedition] }}
+{% if ansible_os_family == "Darwin" %}
+UseKeychain yes
+{% endif %}
