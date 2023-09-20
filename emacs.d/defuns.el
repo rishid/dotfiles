@@ -161,11 +161,11 @@ type of version control found in that directory"
   (when (fboundp 'show-paren-mode)
 	(show-paren-mode t)
 	(setq show-paren-delay 0.0)  
-	(setq show-paren-style 'mixed)))  
+	(setq show-paren-style 'mixed))  
 	
   (font-lock-add-keywords
    nil '(("\\<\\(FIX\\|TODO\\|FIXME\\|BUG\\|HACK\\|REFACTOR\\):"
-          1 font-lock-warning-face t))))
+          1 font-lock-warning-face t)))
 		  
   (whitespace-mode t)
   
@@ -174,6 +174,7 @@ type of version control found in that directory"
   
   (setq comment-auto-fill-only-comments t)
   (auto-fill-mode t)
+)
   
 ;; ------------------------------------------- [ my-start-scripting-mode ]
 (defun my-start-scripting-mode (file-extension hash-bang)
@@ -242,7 +243,6 @@ Stolen from http://www.dotemacs.de/dotfiles/BenjaminRutt.emacs.html"
   (or (tempo-expand-if-complete)
       (insert " ")))
 	  
-  
 (defun switch-or-start (function buffer)
   "If the buffer is current, bury it, otherwise invoke the function."
   (if (equal (buffer-name (current-buffer)) buffer)
