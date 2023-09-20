@@ -17,6 +17,10 @@
 #    if it is all fine, actually perform your backup:
 #    rsync -aP --exclude-from=rsync-homedir-local.txt /home/$USER/ $BACKUPDIR/
 
+###############################################
+# user defined directories
+###############################################
+.certs
 
 ###############################################
 # directories, probably not worth a backup    #
