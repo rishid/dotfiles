@@ -20,11 +20,11 @@ def main():
  
     def traverse(path):
         for item in os.listdir(path):
-            source = os.path.join(path, item)
-            
-            #relative = os.path.relpath(source)
+            source = os.path.join(path, item)          
 
             if item.startswith('.'):
+                destination = os.path.join(options.prefix, item)
+            elif item == "bin":
                 destination = os.path.join(options.prefix, item)
             else:
                 destination = os.path.join(options.prefix, '.' + item)
@@ -56,8 +56,7 @@ def main():
         else:
             os.symlink(source, destination)
                                                 
-    traverse(os.path.dirname( os.path.realpath( __file__ ) ) )
-    #traverse(os.getcwd())
+    traverse(os.path.dirname( os.path.realpath( __file__ ) ) )    
                                                 
 if __name__ == '__main__':
     try:
