@@ -67,8 +67,61 @@ setopt hist_save_no_dups
 #  MOTD
 #--------
 
+# example: stallman (Linux), up 29 days
+python ~/.scripts/show_machine_info.py MacBook.local
 
-# aliases
+#----------
+#  prompt
+#----------
+ 
+# subject PROMPT string to parameter expansion, command substitution,
+# and arithmetic expansion
+setopt prompt_subst
+ 
+# show three trailing components of current path (replace $HOME with ~),
+# git prompt, and dollar sign
+PROMPT='%3~$(python ~/.scripts/git/prompt.py) $ '
+
+#------------
+#  bindings
+#------------
+ 
+# ctrl + a/e
+bindkey '^a' beginning-of-line
+bindkey '^e' end-of-line
+ 
+# alt + right/left arrow
+bindkey '^[f' forward-word
+bindkey '^[b' backward-word
+
+
+#-----------
+#  aliases
+#-----------
+
+# change directory
+alias .='cd ..'
+alias ..='.; .'
+alias ...='.; .; .'
+
+# clear the terminal screen
+alias cl='clear'
+ 
+# copy working directory path
+alias cpwd='pwd | tr -d "\n" | pbcopy'
+
+# go to Desktop
+alias d='cd ~/Desktop'
+ 
+# show date (example: 2009-11-07 01:16:21, Saturday)
+alias da='date "+%Y-%m-%d %H:%M:%S, %A"'
+
+# edit
+alias e=$EDIT
+
+# show shell history
+alias h='history -i 1 | less +G'
+
 alias l='ls -alhG'
 alias lsd='ls -ld *(-/DN)'
 alias pshell='phocoa shell'
