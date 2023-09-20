@@ -25,11 +25,11 @@ on:
   push:
     branches:
       - master
-    paths:
-      - ".github/renovate.json5"
-      - ".github/renovate/**.json"
-      - ".github/renovate/**.json5"
-      - ".github/workflows/renovate.yaml"
+    # paths:
+    #   - ".github/renovate.json5"
+    #   - ".github/renovate/**.json"
+    #   - ".github/renovate/**.json5"
+    #   - ".github/workflows/renovate.yaml"
 
 concurrency: renovate
 
