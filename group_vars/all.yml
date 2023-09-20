@@ -28,6 +28,7 @@ go:
 packages:
   - coreutils
   - dos2unix
+  - expect
   - htop
   - iftop
   - jq
