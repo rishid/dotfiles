@@ -14,18 +14,22 @@
     - role: package_manager
       tags: 
         - 'package_manager'
-        - 'bootstrap'
       become: True
 
     - role: ubuntu
       when: ansible_os_family == "Debian"
       tags: 
         - 'ubuntu'
-        - 'bootstrap'
       become: True
 
     - role: geerlingguy.docker
-      tags: ['docker', 'bootstrap']
+      vars:
+        docker_users: 
+          - "{{ localuser }}"
+        docker_daemon_options:
+          data-root: "/home/docker"
+      tags: 
+        - 'docker'
       become: True
 
     - { role: dotfiles, tags: ['dotfiles'] }

@@ -51,7 +51,7 @@ pip_packages:
   httpie-http2:
   httpie-ntlm:
   httpie-jwt-auth:
-  request:
+  requests:
 
 docker_users:
   - "{{ localuser }}"

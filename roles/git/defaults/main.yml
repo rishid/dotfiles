@@ -1,0 +1,2 @@
+git_config_path: "{{ dotfiles_user_home }}/.gitconfig"
+git_ignore_path: "{{ dotfiles_user_home }}/.gitignore"

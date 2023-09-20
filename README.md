@@ -21,7 +21,7 @@ Roles look at the vars kept in group_vars for things like packages to install, a
 3. Install ansible and any prereqs
  `~/.dotfiles/bin/init.sh`
 4. Install the required Ansible roles
- `ansible-galaxy install -r ~/.dotfiles/requirements.yml`
+ `ansible-galaxy install -f -r ~/.dotfiles/requirements.yml`
 5. Run it
  `~/.dotfiles/bin/dot-bootstrap`
 

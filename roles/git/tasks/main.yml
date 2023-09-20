@@ -11,19 +11,15 @@
     state: link
     force: yes
 
-- name: Check if gitconfig exists
-  stat: path="{{dotfiles_user_home}}/.gitconfig"
-  register: gitconfig_stat
-
 - name: Back up gitconfig
-  command: mv ~/.gitconfig ~/.gitconfig.bak
-  args:
-    creates: "{{dotfiles_user_home}}/.gitconfig.bak"
-  when: gitconfig_stat.stat.exists
+  copy: 
+    src: "{{ git_config_path }}"
+    dest: "{{ dotfiles_user_home }}/.gitconfig.bak"
+  when: git_config_path is file
 
 - name: Link global gitconfig file
   file:
     src: "{{ dotfiles_home }}/roles/git/files/gitconfig.link"
-    dest: "{{ dotfiles_user_home }}/.gitconfig"
+    dest: git_config_path
     state: link
     force: yes
