@@ -1,7 +1,6 @@
 ;; init.el file
 ;; Rishi Dhupar
 ;; Time-stamp: <11-09-2011 21:29:00 (Rishi)>
-
 ;; This is the first thing to get loaded.
 
 ;; List of sources
@@ -48,7 +47,6 @@
 (require 'eshell)
 (require 'perl)
 (require 'js)
-(require 'init-doxymacs)
 (require 'init-ido)
 (require 'init-cmake)
 (require 'init-ibuffer)
