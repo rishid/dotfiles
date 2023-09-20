@@ -38,7 +38,7 @@ export HISTCONTROL="ignoreboth"
 #-------
 # prompt
 #-------
-export PS1="[\[\033[36m\]\u\[\033[37m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]]$ "
+export PS1="[\[\033[36m\]\u\[\033[37m\]@\[\033[32m\]\h:\[\033[34;1m\]\w\[\033[m\]]$ "
 
 # shell options
 shopt -s cdable_vars
