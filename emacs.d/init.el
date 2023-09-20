@@ -57,6 +57,7 @@
 (require 'lisp)
 (require 'perl)
 (require 'js)
+(require 'doxymacs)
 
 (load custom-file 'noerror)
 
