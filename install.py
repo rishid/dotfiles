@@ -44,7 +44,10 @@ def main():
                 answer = raw_input(destination + ': File already exists, overwrite? [y/N]')
 
                 if answer.lower() in ('y', 'yes'):
-                    os.remove(destination)
+                    if (os.path.isfile(destination):
+                      os.remove(destination)
+                    else:
+                      shutil.rmtree(destination)
                 else:
                     return
                 
