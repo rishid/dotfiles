@@ -1,7 +1,7 @@
-{{- $ezaVersion := "0.12.0" }}
 [".local/bin/eza"]
-    type = "file"
-    url = "https://github.com/eza-community/eza/releases/download/v{{ $ezaVersion }}/x86_64-unknown-linux-gnu-eza"
+    type = "archive"
+    url = "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
+    path = "eza"
     executable = true
 {{- $gduVersion := "5.25.0" }}
 [".local/bin/gdu"]
