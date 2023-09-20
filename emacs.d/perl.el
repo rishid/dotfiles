@@ -12,8 +12,19 @@
       cperl-hairy t                   ; parse hairy perl constructs
       cperl-indent-level 4            ; indent with 4 positions
       cperl-invalid-face nil          ; don't show stupid underlines
-      cperl-electric-keywords t)))    ; complete keywords
-      
+      cperl-electric-keywords t       ; complete keywords
+      cperl-tab-always-indent t
+      cperl-indent-left-aligned-comments t
+      cperl-auto-newline nil
+      cperl-close-paren-offset -4      
+      cperl-indent-parens-as-block t
+      cperl-continued-statement-offset 4
+      cperl-indent-subs-specially nil
+      cperl-invalid-face 'underline)))    
+
+(custom-set-faces
+  '(cperl-invalid-face default))
+ 
 (eval-after-load 'cperl-mode
   '(progn
      (define-key cperl-mode-map (kbd "RET") 'reindent-then-newline-and-indent)
