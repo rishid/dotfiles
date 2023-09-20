@@ -43,6 +43,8 @@ packages:
   - tree
   - wget
 
+remove_packages:
+
 pip_packages:
   httpie:
   httpie-oauth:

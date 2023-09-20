@@ -1,4 +1,4 @@
-- name: Run roles
+- name: Set up local workstation
   hosts: local
   gather_facts: yes
   vars:
@@ -9,15 +9,19 @@
 
   roles:
     # Tag each role so that we can select individual roles to run with ansible-playbook --tags
-    - {role: git, tags: ['git']}
+    - { role: git, tags: ['git'] }
 
     - role: package_manager
-      tags: ['package_manager', 'bootstrap']
+      tags: 
+        - 'package_manager'
+        - 'bootstrap'
       become: True
 
     - role: ubuntu
-      tags: ['ubuntu', 'bootstrap']
       when: ansible_os_family == "Debian"
+      tags: 
+        - 'ubuntu'
+        - 'bootstrap'
       become: True
 
     - role: geerlingguy.docker
