@@ -8,7 +8,8 @@
 # PATH
 #-----------
 USER_PATH=~/bin
-export PATH=$USER_PATH:$PATH
+LOCAL_PATH=~/localbin
+export PATH=$LOCAL_PATH:$USER_PATH:$PATH
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
