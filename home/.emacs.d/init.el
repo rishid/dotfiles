@@ -1,6 +1,6 @@
-;; init.el file
+1;; init.el file
 ;; Rishi Dhupar
-;; Time-stamp: <10-26-2017 14:18:40 (rdhupar)>
+;; Time-stamp: <10-26-2017 15:36:23 (rdhupar)>
 ;; This is the first thing to get loaded.
 
 ;; List of sources
@@ -19,15 +19,15 @@
 ;; -----------------------------------------------------------------------
 (defconst emacs-dir     "~/.emacs.d")
 (defconst emacs-tmp-dir "~/.emacs.tmp")
-(add-to-list 'load-path emacs-dir)
+(add-to-list 'load-path (concat emacs-dir "/src"))
 (add-to-list 'load-path (concat emacs-dir "/site-lisp"))
 (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/themes/")
 ;(add-to-list 'load-path (concat emacs-dir "/site-lisp/themes"))
 (setq byte-compile-warnings nil)
 
 ;; Keep emacs Custom-settings in separate file
-(setq custom-file (expand-file-name "custom.el" emacs-dir))
-(load custom-file)
+;(setq custom-file (expand-file-name "custom.el" emacs-dir))
+;(load custom-file)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
