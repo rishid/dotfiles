@@ -34,11 +34,27 @@
 ;; Dim agenda tasks which are blocked by dependencies
 (setq org-agenda-dim-blocked-tasks t)
 
-;; Load the habits module
-(defun im-org-mode-hook ()
-    (add-to-list 'org-modules 'habits)
-)
-(add-hook 'org-mode-hook 'im-org-mode-hook)
+;; ---------------------------------------------------------- [ org-mode ]
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(define-key global-map "\C-co" 'org-jump-to-project-todo)
+
+(eval-after-load 'org
+  '(progn
+     ;; Add all org files in the org directory to the agenda
+     (mapcar
+      (lambda (file)
+          (add-to-list 'org-agenda-files file))
+      (directory-files (expand-file-name "~/org/") t "\\.org"))))
+
+(defun my-org-mode-startup ()
+  "Setup org mode so its useful."
+  (add-to-list 'org-modules 'habits) ;; Load the habits module
+  (setq org-log-done t)
+  (setq org-odd-levels-only t)
+  (setq org-hide-leading-stars t))
+
+(add-hook 'org-mode-hook 'my-org-mode-startup)
 
 (provide 'org)
 ;; org.el ends here
