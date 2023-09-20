@@ -81,11 +81,15 @@
   
 (setq require-final-newline 'visit-save)
 
+;; compilation
+(setq compilation-window-height 12)
+(setq compilation-finish-functions nil) ;; keep it open
+
 ;; mouse stuff
 (setq
  mouse-1-click-in-non-selected-windows nil
  mouse-yank-at-point t)
-(mouse-avoidance-mode 'exile)
+(mouse-avoidance-mode 'none)
 
 (setq-default indicate-empty-lines t)
 

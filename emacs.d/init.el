@@ -5,32 +5,18 @@
 ;; This is the first thing to get loaded.
 
 ;; Check for Linux and start the server
-;(if (string-equal system-type "gnu/linux")
-;  (server-start)
-;  (message "emacsserver started."))
-
-;; Turn off mouse interface early in startup to avoid momentary display
-;; You really don't need these; trust me.
-(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(if (string-equal system-type "gnu/linux")
+  (server-start)
+  (message "emacsserver started."))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; loadpath; this will recursively add all dirs in 'elisp-path' to load-path
-(setq dotfiles-dir (file-name-directory
-                    (or (buffer-file-name) load-file-name)))
-(add-to-list 'load-path dotfiles-dir)
-(setq package-user-dir (concat dotfiles-dir "elpa"))
-(setq custom-file (concat dotfiles-dir "custom.el"))
-
-(defconst elisp-path '("~/.emacs.d")) ;; my elisp directories
-(mapcar '(lambda(p)
-           (add-to-list 'load-path p)
-           (cd p) (normal-top-level-add-subdirs-to-load-path)) elisp-path)
-
-(defconst djcb-config-dir "~/.emacs.d/config/")
-(defconst djcb-emacs-dir  "~/.emacs.d")
-(defconst djcb-tmp-dir    "~/.emacs.tmp")
+;; loadpath
+(defconst emacs-dir     "~/.emacs.d")
+(defconst emacs-tmp-dir "~/.emacs.tmp")
+(add-to-list 'load-path emacs-dir)
+(add-to-list 'load-path (concat emacs-dir "/site-lisp"))
+(add-to-list 'load-path (concat emacs-dir "/site-lisp/themes"))
+(setq custom-file (concat emacs-dir "custom.el"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -61,12 +47,4 @@
 
 (load custom-file 'noerror)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; compilation
-(setq compilation-window-height 12)
-(setq compilation-finish-functions nil) ;; keep it open
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 
 (add-hook 'after-init-hook 'message-startup-time)
-                           
-;; init.el ends here
