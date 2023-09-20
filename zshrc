@@ -1,9 +1,72 @@
-# line editing and default editor
-bindkey -v
-export EDITOR=vim
+# .zshrc -- Z shell configuration file
+# Rishi Dhupar
+# based off http://github.com/narfdotpl/dotfiles/blob/master/.zshrc
 
-# ftp
-export FTP_PASSIVE=1
+#--------
+#  PATH
+#--------
+
+USER_PATH=~/bin
+PORT_PATH=/opt/local/bin:/opt/local/sbin
+POSTGRES_PATH=/Library/PostgreSQL/8.3/bin/
+PYTHON_PATH=/Library/Frameworks/Python.framework/Versions/2.6/bin
+RUBY_PATH=~/.gem/ruby/1.8/bin
+
+export PATH=$USER_PATH:$PORT_PATH:$POSTGRES_PATH:$PYTHON_PATH:$RUBY_PATH:$PATH
+
+#------------
+#  language
+#------------
+
+export LANG=en_US.UTF-8
+
+#----------
+#  editor
+#----------
+
+export EDITOR=emacs
+export VISUAL=emacs
+
+
+#--------------
+#  completion
+#--------------
+
+autoload -U compinit
+compinit
+
+# make completion lists as compact as possible
+setopt list_packed
+
+
+#-----------
+#  history
+#-----------
+
+# log 10k commands
+HISTSIZE=10000
+SAVEHIST=$HISTSIZE
+HISTFILE=~/.history
+
+# append to HISTFILE when command is typed
+setopt inc_append_history
+
+# log timestamps
+setopt extended_history
+
+# if command is preceded with a space, don't log it
+setopt hist_ignore_space
+
+# if command duplicates any older one, don't show older ones
+setopt hist_ignore_all_dups
+
+# if command duplicates the *previous* one, don't log it
+setopt hist_save_no_dups
+
+#--------
+#  MOTD
+#--------
+
 
 # aliases
 alias l='ls -alhG'
@@ -17,10 +80,6 @@ alias vipager='vim -R -'
 alias sgrep="grep --exclude '*.svn*' $*"
 alias svnupdry='svn merge --dry-run -r BASE:HEAD .'
 alias svnupdiff='svn diff -r BASE:HEAD .'
-
-# php helpers
-alias xdebug-on='export XDEBUG_CONFIG="idekey=macgdbp"'
-alias xdebug-off='unset XDEBUG_CONFIG'
 
 # Prompts: see http://aperiodic.net/phil/prompt/
 setopt prompt_subst
@@ -52,9 +111,6 @@ ${PR_LAST_EXIT}\
 }
 RPROMPT=" $USERNAME@%M:%~"     # prompt for right side of screen
 
-HISTSIZE=1000
-SAVEHIST=1000
-HISTFILE=~/.history
 
 # The following lines were added by compinstall
 
