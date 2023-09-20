@@ -77,7 +77,7 @@ export PAGER="less"
 export BROWSER="firefox"
 
 export LANG=en_US.UTF-8
- 
+
 # colors for: console, ls, grep, less, man
 eval `dircolors -b`
 # display grep matches in a color
@@ -122,6 +122,8 @@ alias home="~"
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ......='cd ../../../../..'
 
 # aliases: custom
 alias e=$EDIT
@@ -134,9 +136,7 @@ if [ -f ~/.bashrc.local ]; then
     . ~/.bashrc.local
 fi 
 
-function emacs() {
-    exec emacsclient --alternate-editor="" -c "$*";
-}
+function emacs() { emacsclient --alternate-editor="" -c "$*"; }
 
 # make a directory then cd into it
 function mkcd() { mkdir "$1" && cd "$1"; }
