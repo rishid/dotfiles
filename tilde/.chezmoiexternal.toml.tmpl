@@ -67,3 +67,9 @@
     url = 'https://github.com/junegunn/fzf/releases/download/{{ .versions.fzf }}/fzf-{{ .versions.fzf }}-linux_{{ eq .chezmoi.arch "arm" | ternary (.uname.machine | trimSuffix "tel") .chezmoi.arch }}.tar.gz'
     executable = true
     path = "fzf"
+
+[".local/bin/jq"]
+    type = "file"
+    url = "https://github.com/jqlang/jq/releases/latest/download/jq-linux-amd64"
+    executable = true
+    refreshPeriod = "720h"
