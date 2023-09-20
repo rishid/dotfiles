@@ -1,67 +1,88 @@
 #!/usr/bin/env python
- 
-import os
-import shutil
-import optparse
+# encoding: utf-8
+
+from os import environ, listdir
+from os.path import dirname, exists, expanduser, join, realpath
+from subprocess import call
 import sys
+from time import sleep
 
-def main():
-    def exclude_list(option, opt_str, value, parser):
-        parser.values.exclude = parser.values.exclude + value.split(',')
-        
-    parser = optparse.OptionParser(usage='Usage: %prog [OPTIONS]', description='Install all files and directories as dotfiles.')
-    parser.add_option('-b', '--backup', action='store_true', dest='backup', default=False, help='Backup old files')
-    parser.add_option('-c', '--copy', action='store_true', dest='copy', default=False, help='Copy files instead of hard-linking them')
-    parser.add_option('-e', '--exclude', action='callback', callback=exclude_list, type='string', dest='exclude', default=['README', 'install.py', '.git', '.gitignore'], help='Comma seperated list of files to exclude', metavar='FILES')
-    parser.add_option('-f', '--force', action='store_true', dest='force', default=False, help='Overwrite without confirmation')
-    parser.add_option('-p', '--prefix', action='store', dest='prefix', default=os.path.expanduser('~'), help='Install location [default: %default]', metavar='PATH')
- 
-    (options, args) = parser.parse_args()
- 
-    def traverse(path):
-        for item in os.listdir(path):
-            source = os.path.join(path, item)          
 
-            if item.startswith('.'):
-                destination = os.path.join(options.prefix, item)
-            elif item == "bin":
-                destination = os.path.join(options.prefix, item)
-            else:
-                destination = os.path.join(options.prefix, '.' + item)
-                    
-            if item in options.exclude:
-                continue
-                    
-            install(source, destination)
+def ask_yn(question):
+    question += ' (y/n)  '
+    answer = None
 
-    def install(source, destination):
-        if os.path.exists(destination):
-            if options.backup:
-                shutil.move(destination, destination + '.bak')
-            elif options.force:
-                os.remove(destination)
-            else:
-                answer = raw_input(destination + ': File already exists, overwrite? [y/N]')
+    while answer not in ['yes', 'y', 'no', 'n']:
+        answer = raw_input(question).lower()
 
-                if answer.lower() in ('y', 'yes'):
-                    if (os.path.isfile(destination)):
-                      os.remove(destination)
-                    else:
-                      shutil.rmtree(destination)
-                else:
-                    return
-                
-        if options.copy:
-            shutil.copy(source, destination)
-        else:
-            os.symlink(source, destination)
-                                                
-    traverse(os.path.dirname( os.path.realpath( __file__ ) ) )    
-                                                
+    return answer.startswith('y')
+
+
+def brew():
+    # get installed apps
+    cellar_dir = '/usr/local/Cellar'
+    installed = listdir(cellar_dir) if exists(cellar_dir) else []
+
+    # get desired apps
+    with open(expanduser('~/.brew')) as f:
+        desired = map(str.strip, f.readlines())
+
+    # install missing apps
+    for app in sorted(set(desired) - set(installed)):
+        print app
+        run('brew install ' + app)
+        print
+
+
+def run(command):
+    return call(command, shell=True)
+
+
+def _main():
+    # get dotfiles directory
+    dotfiles_dir = dirname(realpath(__file__))
+
+    # run installer
+    installer_path = join(dotfiles_dir, 'installer/installer.py')
+    run('python ' + installer_path)
+
+    # "install" git submodules
+    print '\n\n"installing" git submodules...'
+    sys.stdout.flush()
+    sleep(2)
+    run(' && '.join(['cd ' + dotfiles_dir,
+                     'git submodule init',
+                     'git submodule update']))
+
+    # install homebrew stuff
+    print '\n'
+    if ask_yn('install homebrew stuff?'):
+        brew()
+
+    # create tags for vim documentation
+    print '\n\ncreating tags for vim documentation...',
+    sys.stdout.flush()
+    sleep(2)
+    run('mvim -c "Helptags | quit"; sleep 1; open -a iterm')
+    print 'done'
+
+    # source ~/.osx
+    cmd = 'source ~/.osx'
+    print '\n'
+    if ask_yn(cmd + '?'):
+        run(cmd)
+
+    # show tips
+    print '\n\ntips:'
+    print ' -  comment out /etc/zshenv contents to get correct $PATH in MacVim'
+    print ' -  modify home/.gitfiles/template/hooks -- it\'s an absolute'
+    print '    symlink to /Users/narf/.gitfiles/hooks (sorry)'
+
+    # tell how to switch to zsh
+    shell = environ.get('SHELL')
+    if not shell or not shell.endswith('zsh'):
+        print ' -  run "chsh -s `which zsh` $USER" to switch to zsh ' \
+              '(you may need to relog)'
+
 if __name__ == '__main__':
-    try:
-        main()
-        print "Install complete"
-    except (KeyboardInterrupt, SystemExit):
-        sys.exit(1)
-                                                        
+    _main()
