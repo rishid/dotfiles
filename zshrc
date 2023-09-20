@@ -1,5 +1,5 @@
 # .zshrc -- Z shell configuration file
-# Rishi Dhupar
+# Rishi D
 # based off http://github.com/narfdotpl/dotfiles/blob/master/.zshrc
 
 #--------
@@ -7,37 +7,28 @@
 #--------
 
 USER_PATH=~/bin
-PORT_PATH=/opt/local/bin:/opt/local/sbin
-POSTGRES_PATH=/Library/PostgreSQL/8.3/bin/
-PYTHON_PATH=/Library/Frameworks/Python.framework/Versions/2.6/bin
-RUBY_PATH=~/.gem/ruby/1.8/bin
 
-export PATH=$USER_PATH:$PORT_PATH:$POSTGRES_PATH:$PYTHON_PATH:$RUBY_PATH:$PATH
+export PATH=$USER_PATH:$PATH
 
 #------------
 #  language
 #------------
-
 export LANG=en_US.UTF-8
 
 #----------
 #  editor
 #----------
-
 export EDITOR=emacs
 export VISUAL=emacs
-
 
 #--------------
 #  completion
 #--------------
-
 autoload -U compinit
 compinit
 
 # make completion lists as compact as possible
 setopt list_packed
-
 
 #-----------
 #  history
@@ -46,7 +37,7 @@ setopt list_packed
 # log 10k commands
 HISTSIZE=10000
 SAVEHIST=$HISTSIZE
-HISTFILE=~/.history
+HISTFILE=~/.zsh_history
 
 # append to HISTFILE when command is typed
 setopt inc_append_history
@@ -66,9 +57,8 @@ setopt hist_save_no_dups
 #--------
 #  MOTD
 #--------
-
 # example: stallman (Linux), up 29 days
-python ~/.scripts/show_machine_info.py MacBook.local
+#python ~/.scripts/show_machine_info.py MacBook.local
 
 #----------
 #  prompt
@@ -85,7 +75,6 @@ PROMPT='%3~$(python ~/.scripts/git/prompt.py) $ '
 #------------
 #  bindings
 #------------
- 
 # ctrl + a/e
 bindkey '^a' beginning-of-line
 bindkey '^e' end-of-line
@@ -94,11 +83,9 @@ bindkey '^e' end-of-line
 bindkey '^[f' forward-word
 bindkey '^[b' backward-word
 
-
 #-----------
 #  aliases
 #-----------
-
 # change directory
 alias .='cd ..'
 alias ..='.; .'
