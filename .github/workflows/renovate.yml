@@ -53,8 +53,8 @@ jobs:
       - name: Renovate
         uses: renovatebot/github-action@v39.0.5
         env:
-          DRY_RUN: ${{ inputs.dryRun }}
-          LOG_LEVEL: ${{ inputs.renovateLogLevel }}
+          # DRY_RUN: ${{ inputs.dryRun }}
+          LOG_LEVEL: 'debug'
           RENOVATE_AUTODISCOVER: true
           RENOVATE_AUTODISCOVER_FILTER: "${{ github.repository }}"
           # # Repository taken from variable to keep configuration file generic
@@ -68,7 +68,7 @@ jobs:
           # # Use GitHub API to create commits (this allows for signed commits from GitHub App)
           # RENOVATE_PLATFORM_COMMIT: "true"     
         with:
-          configurationFile: ${{ inputs.configurationFile }}
+          configurationFile: ".github/renovate.json5"
           token: "${{ steps.generate-token.outputs.token }}"
 
     # uses: bjw-s/gh-workflows/.github/workflows/run-renovate.yaml@main
