@@ -23,7 +23,7 @@ fish_add_path --global "$HOME/.local/bin/"
 
 set -Ux EDITOR emacs
 
-source ~/.config/shell/aliases.sh
+#source ~/.config/shell/aliases.sh
 
 # Chezmoi cached variables
 set -x CM_computer_name {{ .computer_name }}
