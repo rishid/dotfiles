@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
 
       - name: Install prerequisites
         run: apt-get update -q && apt-get install -y -q python3 python3-pip python3-venv curl git
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
 
       - name: Install prerequisites
         run: apt-get update -q && apt-get install -y -q python3 python3-pip curl
