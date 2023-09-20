@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
+
 # Update local dev environment using ansible-playbook.
-# Optionally pass role names.
+# Optionally pass role names to limit run
+#
+# 1. Sync any updates from git
+# 2. Runs ansible to apply any changes
+
 set -e
 
+# change to parent directory of the directory containing the currently executing bash script.
 cd "${BASH_SOURCE%/*}/.."
 
 git pull origin master
@@ -13,19 +19,23 @@ join() {
     echo "$*"
 }
 
+cd ./ansible
+
 if [[ $# -gt 0 ]]; then
     tags="--tags=$(join , $@)"
-fi
 
-if [[ $# -eq 0 ]]; then
- # Run all roles except for the ones tagged with 'bootstrap'
-  echo "Updating local dev environment..."
-  ansible-playbook -i hosts --skip-tags "bootstrap" dotfiles.yml  
+    echo "Updating local dev environment... (--tags $@)"
+    ansible-playbook \
+      --extra-vars whoami="$(whoami)" \
+      --extra-vars whoami_group="$(id -gn)" \
+      --skip-tags "bootstrap" --tags $@ \
+      --ask-become-pass \
+      dotfiles.yml  
 else
-  echo "Updating local dev environment... (--tags $@)"
-  ansible-playbook -i hosts \
-  --extra-vars whoami="$(whoami)" \
-  --extra-vars whoami_group="$(id -gn)"
-  --skip-tags "bootstrap" --tags $@
-  dotfiles.yml  
+    # Run all roles except for the ones tagged with 'bootstrap'
+    echo "Updating local dev environment..."
+    ansible-playbook \
+      --skip-tags "bootstrap" \
+      --ask-become-pass \
+      dotfiles.yml  
 fi

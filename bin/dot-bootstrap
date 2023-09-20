@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# A small bash script that installs Ansible and runs the dotfiles playbook. Fully configuring a workstation requires running three commands:
+# A small bash script that installs Ansible and runs the dotfiles playbook.
+# Fully configuring a workstation requires running three commands:
 
 # $ cd ~
 # $ git clone git@github.com:rishid/dotfiles .dotfiles
@@ -8,17 +9,37 @@
 
 set -e
 
-if ! [ -x "$(command -v ansible)" ]; then
-  sudo apt install ansible
-fi
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+PARENT_DIR=$( dirname "$SCRIPT_DIR" )
+ANSIBLE_DIR="$PARENT_DIR/ansible"
 
-# cd "${BASH_SOURCE%/*}/.."
+echo "Ask for sudo password"
+sudo -v
 
-echo "Setting up local dev environment..."
-ansible-playbook -i ~/.dotfiles/hosts ~/.dotfiles/dotfiles.yml --ask-become-pass \
-  --extra-vars whoami="$(whoami)" \
-  --extra-vars whoami_group="$(id -gn)"
+# update in case this is done on a brand new system that has not updated
+sudo apt update
 
-if command -v terminal-notifier 1>/dev/null 2>&1; then
-  terminal-notifier -title "dotfiles: Bootstrap complete" -message "Successfully set up dev environment."
-fi
+# install so additional apt repositories can be installed
+sudo apt install --yes git software-properties-common
+
+# add ansible apt repository and install newest Ansible
+sudo apt-add-repository --yes --update ppa:ansible/ansible
+sudo apt update
+sudo apt install --yes ansible
+
+(cd $ANSIBLE_DIR; ansible-galaxy collection install --upgrade --requirements-file requirements.yml)
+(cd $ANSIBLE_DIR; ansible-galaxy role install --force -r requirements.yml)
+
+# change to parent directory of the directory containing the currently executing bash script.
+# # cd "${BASH_SOURCE%/*}/.."
+
+# echo "Setting up local dev environment..."
+# ansible-playbook -i ~/.dotfiles/hosts ~/.dotfiles/dotfiles.yml --ask-become-pass \
+#   --extra-vars whoami="$(whoami)" \
+#   --extra-vars whoami_group="$(id -gn)"
+
+# if command -v terminal-notifier 1>/dev/null 2>&1; then
+#   terminal-notifier -title "dotfiles: Bootstrap complete" -message "Successfully set up dev environment."
+# fi
+
+echo $(date '+%Y-%m-%d %H:%M:%S') >> "$PARENT_DIR/bootstrap.stamp"

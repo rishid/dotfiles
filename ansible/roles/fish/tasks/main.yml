@@ -1,15 +1,7 @@
 ---
 
-- include_tasks: ubuntu.yml
-  when: ansible_distribution == 'Ubuntu'
-
-- name: Install 'fish'
-  apt:
-    pkg: fish
-    force: yes
-    update_cache: yes
-    state: present
-  tags: bootstrap
+- include_role:
+        name: buluma.fish
 
 - name: Change user shell
   user:
