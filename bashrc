@@ -70,9 +70,9 @@ shopt -s expand_aliases
 # env vars
 #export CDPATH=".:~/:~/dev"
 export INPUTRC="/etc/inputrc"
-export EDITOR="emacsclient"
+export EDITOR="emacs"
 export ALTERNATE_EDITOR="emacs"
-export VISUAL="emacsclient"
+export VISUAL="emacs"
 export PAGER="less"
 export BROWSER="firefox"
 
@@ -135,8 +135,6 @@ alias lastDownload='cp ~/Downloads/`ls ~/Downloads -tr | tail -n 1` .'
 if [ -f ~/.bashrc.local ]; then
     . ~/.bashrc.local
 fi 
-
-function emacs() { emacsclient --alternate-editor="" -c "$*"; }
 
 # make a directory then cd into it
 function mkcd() { mkdir "$1" && cd "$1"; }
