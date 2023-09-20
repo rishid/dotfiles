@@ -61,12 +61,6 @@
 
 (load custom-file 'noerror)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; compilation
-(setq compilation-window-height 12)
-(setq compilation-finish-functions nil) ;; keep it open
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 
 (add-hook 'after-init-hook 'message-startup-time)
                            
 ;; init.el ends here
