@@ -7,6 +7,14 @@
   tags: bootstrap
   become: true
 
+- name: ensure extra tmux directory
+  ansible.builtin.file:
+    path: "{{ ansible_user_dir }}/.tmux"
+    owner: "{{ whoami }}"
+    group: "{{ whoami_group }}"
+    mode: 0755
+    state: directory
+
 - name: Install reattach-to-user-namespace
   homebrew:
     name: reattach-to-user-namespace
@@ -17,15 +25,17 @@
   git:
     repo: https://github.com/gpakosz/.tmux
     dest: "{{ dotfiles_user_home }}/.tmux"
+    depth: 1
 
 - name: Install tpm
   git:
     repo: https://github.com/tmux-plugins/tpm
     dest: "{{ dotfiles_user_home }}/.tmux/plugins/tpm"
+    depth: 1
 
 - name: Symlink tmux.conf
-  file:
-    src: "{{ dotfiles_user_home }}/.tmux/.tmux.conf"
+  ansible.builtin.file: 
+    src: "{{ playbook_dir }}/roles/tmux/files/tmux.conf"
     dest: "{{ dotfiles_user_home }}/.tmux.conf"
     state: link
 

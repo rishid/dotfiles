@@ -1,2 +1,5 @@
 ---
 - geerlingguy.docker
+collections:
+  - name: community.general
+    version: 4.7.0
