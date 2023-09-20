@@ -9,13 +9,19 @@ on:
         default: false
         required: false
         type: boolean
-      logLevel:
+      renovateLogLevel:
         description: "Log-Level"
         default: "debug"
         required: false
+        type: string
+      configurationFile:
+        description: "Renovate configuration file"
+        default: ".github/renovate.json5"
+        required: false
+        type: string
   schedule:
     # Every day at 0200
-    - cron: "0 2 * * *"
+    - cron: "0 2 * * *"  
   push:
     branches:
       - master
@@ -25,14 +31,54 @@ on:
       - ".github/renovate/**.json5"
       - ".github/workflows/renovate.yaml"
 
+concurrency: renovate
+
 jobs:
   renovate:
     name: Renovate
-    uses: bjw-s/gh-workflows/.github/workflows/run-renovate.yaml@main
-    with:
-      configurationFile: ".github/renovate.json5"
-      dryRun: ${{ inputs.dryRun || 'false' }}
-      renovateLogLevel: ${{ inputs.logLevel || 'debug' }}
-    secrets:
-      app_id: ${{ secrets.BJWS_APP_ID }}
-      app_private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
+    runs-on: ubuntu-latest
+    steps:
+      # - name: Generate Token
+      #   uses: tibdex/github-app-token@v2
+      #   id: generate-token
+      #   with:
+      #     app_id: ${{ secrets.app_id }}
+      #     private_key: ${{ secrets.app_private_key }}
+          # app_id: ${{ secrets.DEMO_RENOVATE_APP_ID }}
+          # installation_id: ${{ secrets.DEMO_RENOVATE_INSTALL_ID }}
+          # private_key: ${{ secrets.DEMO_RENOVATE_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
+        with:
+          token: "${{ steps.generate-token.outputs.token }}"
+
+      - name: Renovate
+        uses: renovatebot/github-action@v39.0.5
+        env:
+          DRY_RUN: ${{ inputs.dryRun }}
+          LOG_LEVEL: ${{ inputs.renovateLogLevel }}
+          RENOVATE_AUTODISCOVER: true
+          RENOVATE_AUTODISCOVER_FILTER: "${{ github.repository }}"
+          # # Repository taken from variable to keep configuration file generic
+          # RENOVATE_REPOSITORIES: ${{ github.repository }}
+          # # Onboarding not needed for self hosted
+          # RENOVATE_ONBOARDING: "false"
+          # # Username for GitHub authentication (should match GitHub App name + [bot])
+          # RENOVATE_USERNAME: "superseb-demo-renovate[bot]"
+          # # Git commit author used, must match GitHub App
+          # RENOVATE_GIT_AUTHOR: "superseb-demo-renovate <121964725+superseb-demo-renovate[bot]@users.noreply.github.com>"
+          # # Use GitHub API to create commits (this allows for signed commits from GitHub App)
+          # RENOVATE_PLATFORM_COMMIT: "true"     
+        with:
+          configurationFile: ${{ inputs.configurationFile }}
+          token: "${{ secrets.RENOVATE_TOKEN }}"
+
+    # uses: bjw-s/gh-workflows/.github/workflows/run-renovate.yaml@main
+    # with:
+    #   configurationFile: ".github/renovate.json5"
+    #   dryRun: ${{ inputs.dryRun || 'false' }}
+    #   renovateLogLevel: ${{ inputs.logLevel || 'debug' }}
+    # secrets:
+    #   app_id: ${{ secrets.BJWS_APP_ID }}
+    #   app_private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
