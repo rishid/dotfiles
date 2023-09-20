@@ -1,22 +1,28 @@
 ;; init.el file
 ;; Rishi Dhupar
-;; Time-stamp: <09-01-2011 16:54:53 (rkd4127)>
+;; Time-stamp: <11-09-2011 21:29:00 (Rishi)>
 
 ;; This is the first thing to get loaded.
 
-;; Check for Linux and start the server
-(if (string-equal system-type "gnu/linux")
-  (server-start)
-  (message "emacsserver started."))
+;; List of sources
+;; Emacs Starter Kit
+;; http://www.elliotglaysher.org/emacs/
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; loadpath
+;; Check for Linux and start the server
+;(if (string-equal system-type "gnu/linux")
+;  (server-start)
+;  (message "emacsserver started.")
+
+
+;; -----------------------------------------------------------------------
+;; Load paths
+;; -----------------------------------------------------------------------
 (defconst emacs-dir     "~/.emacs.d")
 (defconst emacs-tmp-dir "~/.emacs.tmp")
 (add-to-list 'load-path emacs-dir)
 (add-to-list 'load-path (concat emacs-dir "/site-lisp"))
 (add-to-list 'load-path (concat emacs-dir "/site-lisp/themes"))
-(setq custom-file (concat emacs-dir "custom.el"))
+(setq byte-compile-warnings nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -30,7 +36,7 @@
 (require 'ansi-color)
 (require 'recentf)
 
-;; Load up starter kit customizations
+;; Load up personal customizations
 (require 'customizations)
 (require 'encoding)
 (require 'defuns)
@@ -40,11 +46,12 @@
 (require 'registers)
 (require 'c)
 (require 'eshell)
-(require 'lisp)
 (require 'perl)
 (require 'js)
-(require 'doxymacs)
-
-(load custom-file 'noerror)
+(require 'init-doxymacs)
+(require 'init-ido)
+(require 'init-cmake)
+(require 'init-ibuffer)
+(require 'init-hippie-expand)
 
 (add-hook 'after-init-hook 'message-startup-time)
