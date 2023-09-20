@@ -1,6 +1,4 @@
 cd ~
-git clone http://github.com/rishid/dotfiles.git .dotfiles
+git clone https://rishid@github.com/rishid/dotfiles.git
 ./.dotfiles/install.py
-
-
 
