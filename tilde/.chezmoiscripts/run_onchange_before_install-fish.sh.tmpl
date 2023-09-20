@@ -1,0 +1,8 @@
+{{ if eq .osid "linux-ubuntu" -}}
+#!/usr/bin/env bash
+
+sudo apt-add-repository -y ppa:fish-shell/release-3
+sudo apt-get -o DPkg::Lock::Timeout=60 -qq update
+sudo apt-get -o DPkg::Lock::Timeout=60 -y install fish
+
+{{ end -}}

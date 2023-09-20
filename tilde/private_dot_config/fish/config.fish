@@ -1,7 +1,7 @@
-source "$__fish_config_dir/variables.fish"
+# source "$__fish_config_dir/variables.fish"
 
 # automatically loads plugins under "$fisher_path"
-source "$__fish_config_dir/functions/fisher_path.fish"
+# source "$__fish_config_dir/functions/fisher_path.fish"
 
 # Install fisher, if not exist
 if status is-interactive && ! functions --query fisher
