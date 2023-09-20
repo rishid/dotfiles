@@ -70,12 +70,14 @@ shopt -s expand_aliases
 # env vars
 #export CDPATH=".:~/:~/dev"
 export INPUTRC="/etc/inputrc"
-export EDITOR="emacs"
+export EDITOR="emacsclient"
+export ALTERNATE_EDITOR="emacs"
+export VISUAL="emacsclient"
 export PAGER="less"
 export BROWSER="firefox"
-export VISUAL="emacs"
+
 export LANG=en_US.UTF-8
- 
+
 # colors for: console, ls, grep, less, man
 eval `dircolors -b`
 # display grep matches in a color
@@ -120,6 +122,8 @@ alias home="~"
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ......='cd ../../../../..'
 
 # aliases: custom
 alias e=$EDIT
@@ -131,7 +135,9 @@ alias lastDownload='cp ~/Downloads/`ls ~/Downloads -tr | tail -n 1` .'
 if [ -f ~/.bashrc.local ]; then
     . ~/.bashrc.local
 fi 
- 
+
+function emacs() { emacsclient --alternate-editor="" -c "$*"; }
+
 # make a directory then cd into it
 function mkcd() { mkdir "$1" && cd "$1"; }
  
@@ -222,6 +228,5 @@ function ssx() {
     esac
 
     screen -x $(echo $SESSION | sed -e 's/\..*//')
-
 }
 
