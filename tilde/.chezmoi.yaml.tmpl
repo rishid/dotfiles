@@ -39,7 +39,7 @@ git:
 {{- $hostname := .chezmoi.hostname -}}
 {{- if eq .chezmoi.os "darwin" -}}
 {{-   $computerName := output "scutil" "--get" "ComputerName" | trim -}}
-{{-   if eq $computerName "Dhupar’s MacBook Air" -}}
+{{-   if eq $computerName "Dhupar's MacBook Air" -}}
 {{-     $hostname = "dhupars-mba" -}}
 {{-   else -}}
 {{-     $hostname = $computerName -}}

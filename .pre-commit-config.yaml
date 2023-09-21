@@ -9,13 +9,10 @@ ci:
   submodules: false
 
 repos:
-  - repo: https://github.com/adrienverge/yamllint.git
+  - repo: https://github.com/adrienverge/yamllint
     rev: v1.32.0
     hooks:
       - id: yamllint
-        args:
-          - -c
-          - ".github/linters/.yamllint.yaml"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
@@ -32,11 +29,6 @@ repos:
     rev: v1.5.4
     hooks:
       - id: forbid-crlf
-
-  - repo: https://github.com/sirosen/fix-smartquotes
-    rev: 0.2.0
-    hooks:
-      - id: fix-smartquotes
 
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.18.0
