@@ -30,13 +30,12 @@
     executable = true
     refreshPeriod = "168h"
     path = "bw"
+{{- end }}
 
 [".local/bin/cloc"]
-    type = "archive-file"
-    url = "https://github.com/AlDanial/cloc/releases/download/{{ .versions.cloc }}/cloc-{{ .versions.cloc }}.tar.gz"
+    type = "file"
+    url = "https://github.com/AlDanial/cloc/releases/download/v{{ .versions.cloc }}/cloc-{{ .versions.cloc }}.pl"
     executable = true
-    path = "cloc"
-{{- end }}
 
 [".local/share/go"]
     type = "archive"
