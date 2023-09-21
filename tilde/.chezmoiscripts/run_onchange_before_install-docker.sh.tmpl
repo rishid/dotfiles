@@ -26,7 +26,7 @@ sudo mkdir -m 0755 -p /etc/docker/
 (umask 022; sudo touch /etc/docker/daemon.json)
 sudo tee /etc/docker/daemon.json <<EOF
 {
-  "experimental": true,
+  "experimental": false,
   "data-root": "/home/docker",
   "storage-driver": "overlay2",
   "default-address-pools": [
