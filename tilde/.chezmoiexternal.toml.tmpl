@@ -12,16 +12,15 @@
     path = "gdu_linux_amd64"
 
 {{- if and (eq .chezmoi.os "linux") .personal (not .ephemeral) }}
-{{- $ageVersion := "1.1.1" }}
 [".local/bin/age"]
     type = "archive-file"
-    url = "https://github.com/FiloSottile/age/releases/download/v{{ $ageVersion }}/age-v{{ $ageVersion }}-{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz"
+    url = "https://github.com/FiloSottile/age/releases/download/v{{ .versions.age }}/age-v{{ .versions.age }}-{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz"
     executable = true
     path = "age/age"
 
 [".local/bin/age-keygen"]
     type = "archive-file"
-    url = "https://github.com/FiloSottile/age/releases/download/v{{ $ageVersion }}/age-v{{ $ageVersion }}-{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz"
+    url = "https://github.com/FiloSottile/age/releases/download/v{{ .versions.age }}/age-v{{ .versions.age }}-{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz"
     executable = true
     path = "age/age-keygen"
 
@@ -31,6 +30,12 @@
     executable = true
     refreshPeriod = "168h"
     path = "bw"
+
+[".local/bin/cloc"]
+    type = "archive-file"
+    url = "https://github.com/AlDanial/cloc/releases/download/{{ .versions.cloc }}/cloc-{{ .versions.cloc }}.tar.gz"
+    executable = true
+    path = "cloc"
 {{- end }}
 
 [".local/share/go"]
