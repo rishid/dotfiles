@@ -49,14 +49,15 @@ plugins:
     - "eamodio.gitlens"
 
 versions:
-  age: "v1.1.1"               # renovate: depName=FiloSottile/age
-  backstage_go: "v0.8.0"      # renovate: depName=einride/backstage-go
-  bat: "v0.22.0"               # renovate: depName=sharkdp/bat versioning=semver-coerced
-  direnv: "v2.32.3"           # renovate: depName=direnv/direnv
-  fd: "v8.7.0"                # renovate: depName=sharkdp/fd
-  fzf: "0.42.0"               # renovate: depName=junegunn/fzf
-  helm: "v3.12.3"             # renovate: depName=helm/helm
-  kubectl: "1.28.2"          # renovate: depName=kubernetes/kubernetes
-  kustomize: "v5.1.1"         # renovate: depName=kubernetes-sigs/kustomize
-  starship: "v1.16.0"         # renovate: depName=starship/starship
-  trivy: "v0.45.1"            # renovate: depName=aquasecurity/trivy
+  age: "1.1.1" # renovate: depName=FiloSottile/age
+  cloc: "1.96.1" # renovate: depName=AlDanial/cloc
+  backstage_go: "v0.8.0" # renovate: depName=einride/backstage-go
+  bat: "v0.22.0" # renovate: depName=sharkdp/bat versioning=semver-coerced
+  direnv: "v2.32.3" # renovate: depName=direnv/direnv
+  fd: "v8.7.0" # renovate: depName=sharkdp/fd
+  fzf: "0.42.0" # renovate: depName=junegunn/fzf
+  helm: "v3.12.3" # renovate: depName=helm/helm
+  kubectl: "1.28.2" # renovate: depName=kubernetes/kubernetes
+  kustomize: "v5.1.1" # renovate: depName=kubernetes-sigs/kustomize
+  starship: "v1.16.0" # renovate: depName=starship/starship
+  trivy: "v0.45.1" # renovate: depName=aquasecurity/trivy
