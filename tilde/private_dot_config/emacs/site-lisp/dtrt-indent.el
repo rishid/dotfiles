@@ -249,7 +249,7 @@ quote, for example.")
     (sh-mode         shell         sh-basic-offset)      ; Shell Script
     (pascal-mode     pascal        pascal-indent-level)) ; Pascal
    "A mapping from hook variables to language types.")
-
+
 ;;-----------------------------------------------------------------
 ;; Customization Definitions:
 
@@ -918,7 +918,7 @@ Note: killed buffer-local value for %s, restoring to default %d"
       (when (>= dtrt-indent-verbosity 1)
         (message info))
       (kill-local-variable 'dtrt-indent-original-indent))))
-
+
 ;;-----------------------------------------------------------------
 ;; Installation
 
