@@ -116,7 +116,7 @@
 
 - name: Check whether tmux is running
   command: pgrep tmux
-  ignore_errors: yes
+  ignore_errors: true
   changed_when: False
   register: tmux_status
 
