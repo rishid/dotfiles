@@ -9,6 +9,8 @@ set --global --export XDG_CACHE_HOME "$HOME/.cache"
 set --global --export XDG_DATA_HOME "$HOME/.local/share"
 set --global --export XDG_STATE_HOME "$HOME/.local/state"
 
+source "$XDG_CONFIG_HOME/shell/exports.sh"
+
 source "$__fish_config_dir/variables.fish"
 
 # automatically loads plugins under "$fisher_path"
@@ -24,7 +26,3 @@ fish_add_path --global "$HOME/.local/bin/"
 set -Ux EDITOR emacs
 
 #source ~/.config/shell/aliases.sh
-
-# Chezmoi cached variables
-set -x CM_computer_name {{ .computer_name }}
-set -x CM_hostname {{ .hostname }}
