@@ -46,10 +46,10 @@ def main():
     args = parser.parse_args()
 
     signal.signal(signal.SIGINT, sigint_handler)
-    
+
     port = args.port if args.port else DEFAULT_PORT
     port = find_next_open_port(port)
-    
+
     ServerClass = http.server.HTTPServer
     httpd = ServerClass(("127.0.0.1", port), MyHTTPRequestHandler)
 

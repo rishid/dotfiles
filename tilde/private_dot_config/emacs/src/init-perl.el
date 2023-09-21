@@ -8,7 +8,7 @@
   (lambda()
     (eval-when-compile (require 'cperl-mode))
     (abbrev-mode -1)                  ; turn-off the annoying elecric crap
-    (setq 
+    (setq
       cperl-hairy t                   ; parse hairy perl constructs
       cperl-indent-level 4            ; indent with 4 positions
       cperl-invalid-face nil          ; don't show stupid underlines
@@ -16,16 +16,16 @@
       cperl-tab-always-indent t
       cperl-indent-left-aligned-comments t
       cperl-auto-newline nil
-      cperl-close-paren-offset -4      
+      cperl-close-paren-offset -4
       cperl-indent-parens-as-block t
       cperl-continued-statement-offset 4
       cperl-indent-subs-specially nil
       cperl-invalid-face 'underline)
-	(my-start-scripting-mode "pl" "#!/usr/bin/perl")))    
+	(my-start-scripting-mode "pl" "#!/usr/bin/perl")))
 
 (custom-set-faces
   '(cperl-invalid-face default))
- 
+
 (eval-after-load 'cperl-mode
   '(progn
      (define-key cperl-mode-map (kbd "RET") 'reindent-then-newline-and-indent)
@@ -38,7 +38,7 @@
 (add-to-list 'auto-mode-alist '("\\.tt$" . tt-mode))
 
 ;; TODO: flymake
-;; TODO: electric bugaloo 
+;; TODO: electric bugaloo
 
 (provide 'init-perl)
 ;; perl.el ends here

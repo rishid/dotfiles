@@ -1,18 +1,18 @@
 # allow ctrl + left/right to cycle windows
 bindkey "^[Od" prev  # change window with ctrl-left
 bindkey "^[Oc" next  # change window with ctrl-right
- 
+
 # allow shift + pgup/pgdn to scroll
 termcapinfo rxvt-unicode ti@:te@
- 
+
 # disable startup message
 startup_message off
- 
+
 # set up bottom statusbar
 hardstatus alwayslastline
 hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{=kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B}%Y-%m-%d %{W}%c %{g}]'
 #hardstatus alwayslastline '%{= kG} %= %{= kw}%-w%{b}%n %t%{b}%{w}%+w %= '
- 
+
 # other options
 setenv LC_CTYPE en_US.UTF-8
 defutf8 on

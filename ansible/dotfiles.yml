@@ -12,17 +12,17 @@
     - { role: git, tags: ['git'] }
 
     - role: package_manager
-      tags: 
+      tags:
         - 'package_manager'
       become: True
 
     - role: ubuntu
       when: ansible_os_family == "Debian"
-      tags: 
+      tags:
         - 'ubuntu'
       become: True
 
- 
+
 
     - { role: dotfiles, tags: ['dotfiles'] }
     # - { role: bash,     tags: ['bash'] }

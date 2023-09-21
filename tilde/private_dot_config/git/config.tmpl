@@ -37,7 +37,7 @@
     recent-branches = branch -a --sort=committerdate
     current-branch = rev-parse --abbrev-ref HEAD
 
-    discard = reset --hard HEAD    
+    discard = reset --hard HEAD
     prestage = diff -w
     precommit = diff -w --cached
     tags = tag
@@ -51,8 +51,8 @@
     untrack = rm -r --cached
 
     tuck = stash save -u
-    untuck = stash pop "stash@{0}"    
-  
+    untuck = stash pop "stash@{0}"
+
     wip = commit --no-verify -am "WIP"
 
     standup = !git log --since yesterday --pretty=short --author `git config user.email`
@@ -60,8 +60,8 @@
     lg = log --graph --pretty=format:'%C(yellow)%h%Creset -%Cred%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
     graph = log --graph -10 --branches --remotes --tags  --format=format:'%Cgreen%h %Creset• %<(75,trunc)%s (%cN, %cr) %Cred%d' --date-order
 
-    aliases = !git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\:\\ /    
-    
+    aliases = !git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\:\\ /
+
     # Find commits by source code.
     cc = "!f() { \
         git log --pretty=custom --decorate --date=short -S\"$1\"; \
@@ -72,7 +72,7 @@
         git log --pretty=custom --decorate --date=short --grep=\"$1\"; \
     }; f"
 
-   
+
     whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
     rmtag = "!sh -c 'git tag -d $1; git push origin :refs/tags/$1'"
 

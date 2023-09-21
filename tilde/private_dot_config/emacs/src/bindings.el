@@ -7,7 +7,7 @@
 (defmacro require-soft (feature &optional file)
       "*Try to require FEATURE, but don't signal an error if `require' fails."
       `(require ,feature ,file 'noerror))
-      
+
 (defmacro djcb-program-shortcut (name key &optional use-existing)
   "* macro to create a key binding KEY to start some terminal program PRG;
     if USE-EXISTING is true, try to switch to an existing buffer"

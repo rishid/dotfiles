@@ -16,7 +16,7 @@
         try-expand-list
         try-expand-dabbrev-all-buffers
         try-expand-dabbrev-from-kill))
-		
+
 ;; Hippie expand: at times perhaps too hip
 ;(delete 'try-expand-line hippie-expand-try-functions-list)
 ;(delete 'try-expand-list hippie-expand-try-functions-list)
@@ -27,5 +27,5 @@
 ;     try-expand-dabbrev-from-kill
 ;     try-complete-lisp-symbol-partially try-complete-lisp-symbol-partially
 ;     try-expand-dabbrev-all-buffers))
-		
+
 (provide 'init-hippie-expand)

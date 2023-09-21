@@ -26,11 +26,11 @@ try:
 except ImportError:
     pass
 else:
-    
+
     ##################
     # TAB COMPLETION #
     ##################
-    
+
     try:
         import rlcompleter
     except ImportError:
@@ -41,14 +41,14 @@ else:
             readline.parse_and_bind("bind ^I rl_complete")
         else:
             readline.parse_and_bind("tab: complete")
-    
+
     ######################
     # PERSISTENT HISTORY #
     ######################
-    
+
     # Use separate history files for each virtual environment.
     HISTFILE = os.path.join(HOME, '.pyhistory')
-    
+
     # Read the existing history if there is one.
     if os.path.exists(HISTFILE):
         try:
@@ -57,10 +57,10 @@ else:
             # If there was a problem reading the history file then it may have
             # become corrupted, so we just delete it.
             os.remove(HISTFILE)
-    
+
     # Set maximum number of commands written to the history file.
     readline.set_history_length(256)
-    
+
     def savehist():
         try:
             readline.write_history_file(HISTFILE)
@@ -69,7 +69,7 @@ else:
         except Exception as err:
             print("Unable to save history file due to the following error: %s"
                   % err)
-    
+
     # Register the ``savehist`` function to run when the user exits the shell.
     import atexit
     atexit.register(savehist)

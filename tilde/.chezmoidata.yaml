@@ -38,7 +38,7 @@ pip:
     - pre-commit
     - requests
     - yq
-  remove: 
+  remove:
     - pyOpenSSL
 
 plugins:

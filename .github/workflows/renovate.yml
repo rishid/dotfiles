@@ -14,7 +14,7 @@ on:
         required: false
   schedule:
     # Every day at 0200
-    - cron: "0 2 * * *"  
+    - cron: "0 2 * * *"
   push:
     branches:
       - master
@@ -55,6 +55,6 @@ jobs:
           echo "LOG_LEVEL=${{ github.event.inputs.logLevel || env.LOG_LEVEL }}" >> "${GITHUB_ENV}"
 
       - name: Renovate
-        uses: renovatebot/github-action@3cef36a9aba515d8726b491905b3bc766832e221 # v39.0.5  
+        uses: renovatebot/github-action@3cef36a9aba515d8726b491905b3bc766832e221 # v39.0.5
         with:
           token: "${{ steps.generate-token.outputs.token }}"

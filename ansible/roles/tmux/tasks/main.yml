@@ -34,7 +34,7 @@
     depth: 1
 
 - name: Symlink tmux.conf
-  ansible.builtin.file: 
+  ansible.builtin.file:
     src: "{{ playbook_dir }}/roles/tmux/files/tmux.conf"
     dest: "{{ dotfiles_user_home }}/.tmux.conf"
     state: link

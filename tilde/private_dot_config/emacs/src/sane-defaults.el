@@ -48,7 +48,7 @@
 (setq line-number-mode t)
 (setq column-number-mode t)
 ;; Display line numbers in margin. emacs 23 only.
-(global-linum-mode t)                
+(global-linum-mode t)
 
 ;; Lines should be 80 characters wide, not 72
 (setq fill-column 80)

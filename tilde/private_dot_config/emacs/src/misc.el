@@ -2,7 +2,7 @@
 ;;
 ;; Part of the Emacs Starter Kit
 
-;; time-stamps 
+;; time-stamps
 (setq ;; when there's "Time-stamp: <01-31-2012 19:11:59 (ubuntu)>" in the first 10 lines of the file
   time-stamp-active t        ; do enable time-stamps
   time-stamp-line-limit 10   ; check first 10 buffer lines for Time-stamp: <>
@@ -35,12 +35,12 @@
 (auto-compression-mode t)
 
 ;; recentf - Save a list of recent files visited.
-(when (require-soft 'recentf)    
+(when (require-soft 'recentf)
   (setq recentf-save-file (concat emacs-tmp-dir "/recentf")  ;; keep ~/ clean
         recentf-max-saved-items 100                         ;; max save 100
         recentf-max-menu-items 15)                          ;; max 15 in menu
         (recentf-mode t))                                   ;; turn it on
- 
+
  ;; scroll just one line when hitting the bottom of the window
 (setq scroll-preserve-screen-position 1)
 (setq scroll-margin 1                    ; do smooth scrolling, ...
@@ -56,14 +56,14 @@
 (when (fboundp file-name-shadow-mode)    ; emacs22+
   (file-name-shadow-mode t))             ; be smart about filenames in mbuf
 
-(add-hook 'gtags-mode-hook 
+(add-hook 'gtags-mode-hook
   (lambda()
     (local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
     (local-set-key (kbd "M-,") 'gtags-find-rtag)  ; reverse tag
     (local-set-key (kbd "s-n") 'gtags-pop-stack)
     (local-set-key (kbd "s-p") 'gtags-find-pattern)
     (local-set-key (kbd "s-g") 'gtags-find-with-grep)))
-    
+
 (defvar coding-hook nil
   "Hook that gets run on activation of any programming mode.")
 
@@ -90,7 +90,7 @@
   '(diminish 'abbrev-mode "Abv"))
 (eval-after-load "doxymacs"
   '(diminish 'doxymacs-mode "dox"))
-  
+
 ;; -------------------------------------------------------- [ backup-dir ]
 ;; Changes the location where backup files are placed. Instead of
 ;; being spread out all over the filesystem, they're now placed in one
@@ -99,19 +99,19 @@
 (setq auto-save-default        t)       ; auto saving
 (setq make-backup-files t ;; do make backups
   backup-by-copying t     ;; and copy them here
-  backup-directory-alist `(("." . ,(expand-file-name (concat emacs-tmp-dir "/backups"))))  
+  backup-directory-alist `(("." . ,(expand-file-name (concat emacs-tmp-dir "/backups"))))
   version-control t
   kept-new-versions 3
   kept-old-versions 5
-  delete-old-versions t)  
+  delete-old-versions t)
 
 ;; http://www.emacswiki.org/cgi-bin/wiki/download/cursor-chg.el
-;; change cursor for verwrite/read-only/input 
+;; change cursor for verwrite/read-only/input
 (when (require-soft 'cursor-chg)  ; Load this library
   (change-cursor-mode 1) ; On for overwrite/read-only/input mode
   (toggle-cursor-type-when-idle 1)
   (setq curchg-default-cursor-color "Yellow"))
-  
+
 ;; highlight changes
 (global-highlight-changes-mode t)
 (setq highlight-changes-visibility-initial-state nil)
@@ -122,13 +122,13 @@
   (lambda()
     (abbrev-mode t)             ; support abbrevs
     (auto-fill-mode -1)))       ; don't do auto-filling
- 
-;; nxhtml stuff 
+
+;; nxhtml stuff
 (setq mumamo-chunk-coloring 'submode-colored
       nxhtml-skip-welcome t
       indent-region-mode t
       rng-nxml-auto-validate-flag nil)
-      
+
 ;; Associate modes with file extensions
 (add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
 (add-to-list 'auto-mode-alist '("\\.css$" . css-mode))
@@ -143,7 +143,7 @@
   '(when (boundp 'grep-find-ignored-files)
     (add-to-list 'grep-find-ignored-files "target")
     (add-to-list 'grep-find-ignored-files "*.class")))
-    
+
 ;; Default to unified diffs
 (setq diff-switches "-u -w")
 
@@ -177,14 +177,14 @@
           (lambda ()
             (unless (string-match "question" oddmuse-post)
               (setq oddmuse-post (concat "uihnscuskc=1;" oddmuse-post)))))
-              
+
 ;; safe locals; we mark these as 'safe', so emacs22+ won't give us annoying
 ;; warnings
 (setq safe-local-variable-values
       (quote ((auto-recompile . t)
               (outline-minor-mode . t)
               auto-recompile outline-minor-mode)))
-			  
+
 ;; -----------------------------------------------------------------------
 ;; Prevent the bell from ringing all the time.
 ;; -----------------------------------------------------------------------

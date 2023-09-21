@@ -20,15 +20,15 @@ Symbols matching the text at point are put first in the completion list."
                              (cond
                               ((and (listp symbol) (imenu--subalist-p symbol))
                                (addsymbols symbol))
-                              
+
                               ((listp symbol)
                                (setq name (car symbol))
                                (setq position (cdr symbol)))
-                              
+
                               ((stringp symbol)
                                (setq name symbol)
                                (setq position (get-text-property 1 'org-imenu-marker symbol))))
-                             
+
                              (unless (or (null position) (null name))
                                (add-to-list 'symbol-names name)
                                (add-to-list 'name-and-pos (cons name position))))))))
@@ -49,8 +49,8 @@ Symbols matching the text at point are put first in the completion list."
       (goto-char position))))
 
 (defun turn-on-paredit ()
-  (paredit-mode t))  
- 
+  (paredit-mode t))
+
 (defun untabify-buffer ()
   (interactive)
   (untabify (point-min) (point-max)))
@@ -65,7 +65,7 @@ Symbols matching the text at point are put first in the completion list."
   (indent-buffer)
   (untabify-buffer)
   (delete-trailing-whitespace))
-  
+
 (defun goto-longest-line ()
   "Finds the longest line and puts the point there."
   (interactive)
@@ -79,7 +79,7 @@ Symbols matching the text at point are put first in the completion list."
           (setq width curwid)
           (setq pos (point)))))
     (goto-char pos)))
-	
+
 (defun goto-matching-paren ()
   "If point is sitting on a parenthetic character, jump to its match."
   (interactive)
@@ -87,7 +87,7 @@ Symbols matching the text at point are put first in the completion list."
         ((progn
            (backward-char 1)
            (looking-at "\\s\)")) (forward-char 1) (backward-list 1))))
-		   
+
 (defun beginning-or-indentation (&optional n)
     "Move cursor to beginning of this line or to its indentation.
   If at indentation position of this line, move to beginning of line.
@@ -194,16 +194,16 @@ type of version control found in that directory"
   (font-lock-add-keywords
    nil '(("\\<\\(FIX\\|TODO\\|FIXME\\|BUG\\|HACK\\|REFACTOR\\):"
           1 font-lock-warning-face t)))
-		  
+
   (whitespace-mode t)
-  
+
   (add-hook 'before-save-hook
     'delete-trailing-whitespace nil t)
-  
+
   (setq comment-auto-fill-only-comments t)
   (auto-fill-mode t)
 )
-  
+
 ;; ------------------------------------------- [ my-start-scripting-mode ]
 (defun my-start-scripting-mode (file-extension hash-bang)
   ;; All scripting languages are programming languages
@@ -225,7 +225,7 @@ type of version control found in that directory"
   (add-hook 'after-save-hook
             'executable-make-buffer-file-executable-if-script-p
             nil t))
-			
+
 ;; ----------------------------------------------- [ my-start-autoinsert ]
 (defun my-start-autoinsert ()
   "Helper function called from anything that puts in a template
@@ -236,7 +236,7 @@ from an empty file."
   (setq auto-insert-alist '())
   (setq auto-insert-query nil)
   (require 'tempo))
-  
+
 ;; ------------------------------------------------- [ intelligent-close ]
 (defun intelligent-close ()
   "quit a frame the same way no matter what kind of frame you are on.
@@ -270,7 +270,7 @@ Stolen from http://www.dotemacs.de/dotfiles/BenjaminRutt.emacs.html"
   (interactive "*")
   (or (tempo-expand-if-complete)
       (insert " ")))
-	  
+
 (defun switch-or-start (function buffer)
   "If the buffer is current, bury it, otherwise invoke the function."
   (if (equal (buffer-name (current-buffer)) buffer)
@@ -286,7 +286,7 @@ Stolen from http://www.dotemacs.de/dotfiles/BenjaminRutt.emacs.html"
 
 (autoload 'paredit-mode "paredit"
     "Minor mode for pseudo-structurally editing Lisp code." t)
-      
+
 (defun esk-paredit-nonlisp ()
   "Turn on paredit mode for non-lisps."
   (set (make-local-variable 'paredit-space-delimiter-chars)

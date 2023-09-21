@@ -6,7 +6,7 @@
 
 (require 'ido)
 (ido-mode 'both)
-(setq 
+(setq
 	ido-default-file-method 'selected-window
 	ido-default-buffer-method 'selected-window
 	ido-save-directory-list-file (concat emacs-tmp-dir "/ido.last")
