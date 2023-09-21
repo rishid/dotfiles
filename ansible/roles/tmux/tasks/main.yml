@@ -98,7 +98,7 @@
       run '~/.tmux/plugins/tpm/tpm'
 
 
-#- name: Symlink .tmux.conf
+# - name: Symlink .tmux.conf
 #  file:
 #    src: "{{ dotfiles_home }}/roles/tmux/files/tmux.conf"
 #    dest: "{{dotfiles_user_home}}/.tmux.conf"
@@ -107,7 +107,7 @@
 
 # On macOS, use the same tmux.conf, but also use
 # reattach_to_user_namespace (for clipboard support)
-#- name: Symlink .tmux.conf (macOS)
+# - name: Symlink .tmux.conf (macOS)
 #  file:
 #    src: "{{ dotfiles_home }}/roles/tmux/files/tmux-mac.conf"
 #    dest: "{{dotfiles_user_home}}/.tmux.conf"
@@ -117,7 +117,7 @@
 - name: Check whether tmux is running
   command: pgrep tmux
   ignore_errors: true
-  changed_when: False
+  changed_when: false
   register: tmux_status
 
 - name: Reload tmux environment so tpm is sourced

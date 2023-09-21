@@ -4,7 +4,7 @@
   apt:
     name: openssh-server
     state: latest
-    install_recommends: False
+    install_recommends: false
   notify:
     - test and restart sshd
   tags: bootstrap
@@ -29,14 +29,12 @@
 
 - name: Enable Workspaces span displays
   command: gsettings set org.gnome.mutter workspaces-only-on-primary false
-  changed_when: False
+  changed_when: false
 
 - name: Disable dynamic workspaces
   command: gsettings set org.gnome.mutter dynamic-workspaces false
-  changed_when: False
+  changed_when: false
 
 - name: Set static workspaces
   command: gsettings set org.gnome.desktop.wm.preferences num-workspaces 4
-  changed_when: False
-
-
+  changed_when: false

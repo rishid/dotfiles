@@ -8,7 +8,7 @@
   package: name=borgbackup state=latest
 
 # borg init -e repokey-blake2 /media/rdhupar/Backup/borg
-- name Initalize remotes
+- name: Initalize remotes
   shell: >
     {{ borg_bin }} info {{ item.value.path }} ||
     {{ borg_bin }} init

@@ -1,4 +1,3 @@
-
 borg_bin: /usr/bin/borg
 
 # borg help compression

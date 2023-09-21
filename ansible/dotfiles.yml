@@ -1,6 +1,6 @@
 - name: Set up local workstation
   hosts: local
-  gather_facts: yes
+  gather_facts: true
   vars:
     localuser: "{{ lookup('env','USER') }}"
 
@@ -14,14 +14,13 @@
     - role: package_manager
       tags:
         - 'package_manager'
-      become: True
+      become: true
 
     - role: ubuntu
       when: ansible_os_family == "Debian"
       tags:
         - 'ubuntu'
-      become: True
-
+      become: true
 
 
     - { role: dotfiles, tags: ['dotfiles'] }
@@ -29,7 +28,7 @@
     # - { role: emacs,    tags: ['emacs'] }
     # - { role: tmux,     tags: ['tmux'] }
 
-    #- role: borg
+    # - role: borg
     #  tags: ['borg', 'bootstrap']
     #  when: ansible_os_family == "Debian"
     #  become: True
