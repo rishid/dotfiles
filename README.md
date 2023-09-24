@@ -1,3 +1,4 @@
+# Cross-platform, cross-shell ~/.📂 powered by [Chezmoi](https://www.chezmoi.io/)
 
 ## Installation
 ### Fresh
