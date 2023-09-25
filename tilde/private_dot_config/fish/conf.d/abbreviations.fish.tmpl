@@ -4,29 +4,31 @@ abbr d "docker"
 abbr da "direnv allow"
 abbr dc "docker-compose"
 
-{{- $exa_params := list '--git' '--icons' '--classify' '--group-directories-first' '--time-style=long-iso' '--group' -}}
+
 
 #alias ls="eza --icons"
 #abbr ll "eza -l -g --icons --git"
 #abbr lla "eza -la -g --icons --git"
 #abbr llt "eza -1 --icons --tree --git-ignore"
 
+{{- $eza_params := list "--git" "--icons" "--classify" "--group-directories-first" "--time-style=long-iso" "--group" "--color-scale"  | join " " }}
+
 {{- if ne .chezmoi.os "windows" }}
-    alias ls='exa ${exa_params}'
-    abbr l='exa --git-ignore ${exa_params}'
-    abbr ll='exa --all --header --long ${exa_params}'
-    abbr llm='exa --all --header --long --sort=modified ${exa_params}'
-    abbr la='exa -lbhHigUmuSa'
-    abbr lx='exa -lbhHigUmuSa@'
-    abbr lt='exa --tree'
-    abbr tree='exa --tree'
+    alias ls='eza {{ $eza_params }}'
+    abbr l 'eza --git-ignore {{ $eza_params }}'
+    abbr ll 'eza --all --header --long {{ $eza_params }}'
+    abbr llm 'eza --all --header --long --sort=modified {{ $eza_params }}'
+    abbr la 'eza -lbhHigUmuSa'
+    abbr lx 'eza -lbhHigUmuSa@'
+    abbr lt 'eza --tree'
+    abbr tree 'eza --tree'
 {{- end }}
 
 {{- if eq .chezmoi.os "windows" }}
     alias ls='ls -h --color=auto'
-    abbr l='ls -l'
-    abbr la='ls -a'
-    abbr ll='ls -la'
+    abbr l 'ls -l'
+    abbr la 'ls -a'
+    abbr ll 'ls -la'
 {{- end }}
 
 alias cat='bat --paging=never'

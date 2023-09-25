@@ -1,8 +1,6 @@
 # chezmoi:template:missing-key=invalid
 ---
 sourceDir: "{{ .chezmoi.sourceDir }}"
-diff:
-  format: git
 verbose: true
 follow: true
 format: yaml
@@ -17,11 +15,20 @@ git:
 
 # The following variables are only available within this TOML template file
 {{/* boolean feature tags */}}
+
+{{- $chezmoiForce := or (has "--force" .chezmoi.args) (has "--force=true" .chezmoi.args) -}}
+{{- $interactive := and stdinIsATTY (not $chezmoiForce) -}}
+
 {{- $docker := false -}}{{/* true if this machine should have Docker installed */}}
 {{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
 {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
+{{- $headlessx := or (env "SSH_CLIENT" | not | not) (not (or (env "DISPLAY") (env "WAYLAND_DISPLAY"))) -}}
+{{- $devcontainer := or (env "REMOTE_CONTAINERS") (env "CODESPACES") (env "VSCODE_REMOTE_CONTAINERS_SESSION") (env "GITPOD_HOST") | not | not -}}
+{{- $minimum := or $devcontainer -}}
+
 {{- $personal := false -}}{{/* true if this machine should have personal secrets */}}
 {{- $work := false -}}{{/* true if this machine is work-related */}}
+
 {{- "" -}}
 
 {{- $osID := .chezmoi.os -}}
@@ -30,7 +37,7 @@ git:
 {{- end -}}
 
 {{/* detect GitHub codespaces, VSCode remote containers, Docker containers, Multipass VMs, and Vagrant boxes */}}
-{{- if or (env "CODESPACES") (env "REMOTE_CONTAINERS_IPC") (eq .chezmoi.username "root" "ubuntu" "vagrant" "vscode") -}}
+{{- if or (env "SSH_CLIENT" | not | not) (env "CODESPACES") (env "REMOTE_CONTAINERS_IPC") (eq .chezmoi.username "root" "ubuntu" "vagrant" "vscode") -}}
 {{-   $ephemeral = true -}}
 {{-   $headless = true -}}
 {{- end -}}
@@ -44,10 +51,6 @@ git:
 {{-   else -}}
 {{-     $hostname = $computerName -}}
 {{-   end -}}
-{{- end -}}
-
-{{- if eq .chezmoi.os "windows" -}}
-{{-   $ephemeral = true -}}
 {{- end -}}
 
 {{- if not $ephemeral -}}
@@ -73,15 +76,19 @@ git:
 
 # Here we "export" the variables, so we can access them outside this file
 data:
-  data: {{ $docker }}
-  ephemeral: {{ $ephemeral }}
   email: "rishid@gmail.com"
+  editor: "code --wait"
+  
+  docker: {{ $docker }}
+  ephemeral: {{ $ephemeral }}
   headless: {{ $headless }}
+
   hostname: {{ $hostname | quote }}
-  personal: {{ $personal }}
   osid: {{ $osID | quote }}
-  work: {{ $work }}
-{{- if eq .chezmoi.os "linux" }}
+  {{- if eq .chezmoi.os "linux" }}
   uname:
     machine: "{{ output "uname" "-m" | trim }}"
 {{- end }}
+
+  personal: {{ $personal }}  
+  work: {{ $work }}

@@ -28,6 +28,7 @@ apt:
     - python
     - python3-pip
     - silversearcher-ag
+    - socat
     - speedtest-cli
     - tree
     - wget
@@ -53,7 +54,7 @@ versions:
   cloc: "1.96" # renovate: depName=AlDanial/cloc
   backstage_go: "v0.8.0" # renovate: depName=einride/backstage-go
   bat: "0.23.0" # renovate: depName=sharkdp/bat versioning=semver-coerced
-  direnv: "v2.32.3" # renovate: depName=direnv/direnv
+  direnv: "2.32.3" # renovate: depName=direnv/direnv
   fd: "v8.7.0" # renovate: depName=sharkdp/fd
   fzf: "0.42.0" # renovate: depName=junegunn/fzf
   helm: "v3.12.3" # renovate: depName=helm/helm
