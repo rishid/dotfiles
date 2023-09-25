@@ -22,4 +22,11 @@ abbr dc "docker-compose"
     abbr tree='exa --tree'
 {{- end }}
 
+{{- if eq .chezmoi.os "windows" }}
+    alias ls='ls -h --color=auto'
+    abbr l='ls -l'
+    abbr la='ls -a'
+    abbr ll='ls -la'
+{{- end }}
+
 abbr tf "terraform"
