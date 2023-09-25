@@ -1,0 +1,25 @@
+abbr - "cd -"
+abbr cm "chezmoi -k"
+abbr d "docker"
+abbr da "direnv allow"
+abbr dc "docker-compose"
+
+{{- $exa_params := list '--git' '--icons' '--classify' '--group-directories-first' '--time-style=long-iso' '--group' -}}
+
+#alias ls="eza --icons"
+#abbr ll "eza -l -g --icons --git"
+#abbr lla "eza -la -g --icons --git"
+#abbr llt "eza -1 --icons --tree --git-ignore"
+
+{{- if ne .chezmoi.os "windows" }}
+    alias ls='exa ${exa_params}'
+    abbr l='exa --git-ignore ${exa_params}'
+    abbr ll='exa --all --header --long ${exa_params}'
+    abbr llm='exa --all --header --long --sort=modified ${exa_params}'
+    abbr la='exa -lbhHigUmuSa'
+    abbr lx='exa -lbhHigUmuSa@'
+    abbr lt='exa --tree'
+    abbr tree='exa --tree'
+{{- end }}
+
+abbr tf "terraform"
