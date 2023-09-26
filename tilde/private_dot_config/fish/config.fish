@@ -23,6 +23,8 @@ end
 
 fish_add_path --global "$HOME/.local/bin/"
 
-set -Ux EDITOR emacs
+set -Ux EDITOR code
+
+direnv hook fish | source
 
 #source ~/.config/shell/aliases.sh

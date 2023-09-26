@@ -1,7 +1,7 @@
 # Copyright 2022 Mitchell Kember. Subject to the MIT License.
 # https://raw.githubusercontent.com/mk12/fish-vscode/main/functions/code.fish
 
-function code --description "Open in VS Code"
+function rdcode --description "Open in VS Code"
     switch (uname -s)
         case Darwin
             if test (count $argv) = 0 || string match -q -- "-*" $argv

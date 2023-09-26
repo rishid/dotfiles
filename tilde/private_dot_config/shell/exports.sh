@@ -21,7 +21,7 @@ export XDG_STATE_HOME="$HOME/.local/state"
 export PATH="/opt/local/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/lib"
 
 ### Ansible
 export ANSIBLE_HOME="$XDG_DATA_HOME/ansible"
@@ -68,11 +68,11 @@ export WGETRC="$XDG_CONFIG_HOME/wget/wgetrc"
 
 ### History
 # TODO: move to bash specific file
-export HISTCONTROL=ignoreboth
+export HISTCONTROL="ignoreboth"
 export HISTSIZE=1000000000
-export HISTFILESIZE=$HISTSIZE
+export HISTFILESIZE="$HISTSIZE"
 export HISTFILE="$XDG_STATE_HOME"/bash/history
-export HIST_STAMPS=mm/dd/yyyy
+export HIST_STAMPS="mm/dd/yyyy"
 export HISTTIMEFORMAT="%F %T "
 export HISTIGNORE="&:[bf]g:c:clear:history:exit:q:afk:pwd:* --help"
 export SAVEHIST=50000

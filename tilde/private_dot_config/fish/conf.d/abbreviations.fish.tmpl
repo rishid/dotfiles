@@ -1,22 +1,17 @@
 abbr - "cd -"
+abbr ca "chezmoi apply -v"
 abbr cm "chezmoi -k"
 abbr d "docker"
 abbr da "direnv allow"
 abbr dc "docker-compose"
-
-
-
-#alias ls="eza --icons"
-#abbr ll "eza -l -g --icons --git"
-#abbr lla "eza -la -g --icons --git"
-#abbr llt "eza -1 --icons --tree --git-ignore"
 
 {{- $eza_params := list "--git" "--icons" "--classify" "--group-directories-first" "--time-style=long-iso" "--group" "--color-scale"  | join " " }}
 
 {{- if ne .chezmoi.os "windows" }}
     alias ls='eza {{ $eza_params }}'
     abbr l 'eza --git-ignore {{ $eza_params }}'
-    abbr ll 'eza --all --header --long {{ $eza_params }}'
+    abbr ll 'eza --header --long {{ $eza_params }}'
+    abbr lla 'eza --all --header --long {{ $eza_params }}'
     abbr llm 'eza --all --header --long --sort=modified {{ $eza_params }}'
     abbr la 'eza -lbhHigUmuSa'
     abbr lx 'eza -lbhHigUmuSa@'
