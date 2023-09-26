@@ -78,7 +78,7 @@ git:
 data:
   email: "rishid@gmail.com"
   editor: "code --wait"
-  
+
   docker: {{ $docker }}
   ephemeral: {{ $ephemeral }}
   headless: {{ $headless }}
@@ -90,5 +90,5 @@ data:
     machine: "{{ output "uname" "-m" | trim }}"
 {{- end }}
 
-  personal: {{ $personal }}  
+  personal: {{ $personal }}
   work: {{ $work }}
