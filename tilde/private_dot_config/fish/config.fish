@@ -23,7 +23,7 @@ end
 
 fish_add_path --global "$HOME/.local/bin/"
 
-set -Ux EDITOR code
+set -Ux EDITOR "code --wait"
 
 direnv hook fish | source
 
