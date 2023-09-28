@@ -13,8 +13,8 @@ on:
         default: debug
         required: false
   schedule:
-    # Every day at 0200
-    - cron: "0 2 * * *"
+    # Every day at 0600 UTC
+    - cron: "0 6 * * *"
   push:
     branches:
       - master

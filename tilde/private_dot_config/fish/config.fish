@@ -28,3 +28,7 @@ set -Ux EDITOR "code --wait"
 direnv hook fish | source
 
 #source ~/.config/shell/aliases.sh
+
+if test -f "$__fish_config_dir/config.local.fish"
+  source "$__fish_config_dir/config.local.fish"
+end

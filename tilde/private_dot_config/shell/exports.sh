@@ -28,6 +28,7 @@ export ANSIBLE_HOME="$XDG_DATA_HOME/ansible"
 
 ### bat
 export BAT_CONFIG_PATH="$XDG_CONFIG_HOME/bat/config"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 ### Cargo
 export CARGO_HOME="$XDG_DATA_HOME/cargo"

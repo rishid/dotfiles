@@ -1,8 +1,4 @@
-[".local/bin/eza"]
-    type = "archive-file"
-    url = "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
-    path = "./eza"
-    executable = true
+
 
 {{- $gduVersion := "5.25.0" }}
 [".local/bin/gdu"]
@@ -66,14 +62,38 @@
     url = "https://github.com/direnv/direnv/releases/download/v{{ .versions.direnv }}/direnv.linux-{{ .chezmoi.arch }}"
     executable = true
 
+[".local/bin/eza"]
+    type = "archive-file"
+    url = "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
+    path = "./eza"
+    executable = true
+
+[".local/bin/fd"]
+    type = "archive-file"
+    url = "https://github.com/sharkdp/fd/releases/download/v{{ .versions.fd }}/fd-v{{ .versions.fd }}-{{ .uname.machine }}-unknown-linux-musl.tar.gz"
+    executable = true
+    stripComponents = 1
+    path = "fd"
+
 [".local/bin/fzf"]
     type = "archive-file"
-    url = 'https://github.com/junegunn/fzf/releases/download/{{ .versions.fzf }}/fzf-{{ .versions.fzf }}-linux_{{ eq .chezmoi.arch "arm" | ternary (.uname.machine | trimSuffix "tel") .chezmoi.arch }}.tar.gz'
+    url = 'https://github.com/junegunn/fzf/releases/download/{{ .versions.fzf }}/fzf-{{ .versions.fzf }}-{{ .chezmoi.os }}_{{ eq .chezmoi.arch "arm" | ternary (.uname.machine | trimSuffix "tel") .chezmoi.arch }}.tar.gz'
     executable = true
     path = "fzf"
+
+[".local/bin/helm"]
+    type = "archive-file"
+    url = 'https://get.helm.sh/helm-v{{ .versions.helm }}-{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz'
+    executable = true
+    path = "{{ .chezmoi.os }}-{{ .chezmoi.arch }}/helm"
 
 [".local/bin/jq"]
     type = "file"
     url = "https://github.com/jqlang/jq/releases/latest/download/jq-linux-amd64"
     executable = true
     refreshPeriod = "720h"
+
+[".local/bin/yq"]
+    type = "file"
+    url = "https://github.com/mikefarah/yq/releases/download/v{{ .versions.yq }}/yq_linux_amd64"
+    executable = true

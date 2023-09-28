@@ -1,0 +1,13 @@
+#!/usr/bin/env fish
+
+echo -e "\033[0;32m Install Fish shell dependencies \033[0m"
+
+if ! functions --query fisher
+  curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+end
+
+# This script will run whenever I added something to .config/fish/fish_plugins
+# .config/fish/fish_plugins hash: {{ include "private_dot_config/fish/fish_plugins" | sha256sum }}
+fisher update
+
+echo -e "\033[0;32m Install Fish shell dependencies done \033[0m"
