@@ -62,5 +62,5 @@ versions:
   kubectl: "1.28.2" # renovate: depName=kubernetes/kubernetes
   kustomize: "v5.1.1" # renovate: depName=kubernetes-sigs/kustomize
   starship: "v1.16.0" # renovate: depName=starship/starship
-  trivy: "v0.45.1" # renovate: depName=aquasecurity/trivy
+  trivy: "0.46.0" # renovate: depName=aquasecurity/trivy
   yq: "4.35.2" # renovate: depName=mikefarah/yq
