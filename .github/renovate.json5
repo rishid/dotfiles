@@ -5,8 +5,14 @@
     "github>rishid/renovate-config",
   ],
   platform: "github",
-  "onboarding": false,
-  "requireConfig": "ignored",
+  packageRules: [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest", "lockFileMaintenance"],
+      "automerge": true
+    }
+  ],
+  onboarding: false,
+  requireConfig: "ignored",
   username: "rishid-bot[bot]",
   gitAuthor: "rishid-bot <145512657+rishid-bot[bot]@users.noreply.github.com>",
 }
