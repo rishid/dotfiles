@@ -93,6 +93,12 @@
     executable = true
     refreshPeriod = "720h"
 
+[".local/bin/procs"]
+    type = "archive-file"
+    url = "https://github.com/dalance/procs/releases/download/v{{ .versions.procs }}/procs-v{{ .versions.procs }}-{{ .uname.machine }}-{{ .chezmoi.os }}.zip"
+    executable = true
+    path = "procs"
+
 [".local/bin/yq"]
     type = "file"
     url = "https://github.com/mikefarah/yq/releases/download/v{{ .versions.yq }}/yq_linux_amd64"
