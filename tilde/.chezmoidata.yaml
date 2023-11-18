@@ -57,7 +57,7 @@ versions:
   bat: "0.24.0" # renovate: depName=sharkdp/bat versioning=semver-coerced
   direnv: "2.32.3" # renovate: depName=direnv/direnv
   fd: "8.7.1" # renovate: depName=sharkdp/fd
-  fzf: "0.44.0" # renovate: depName=junegunn/fzf
+  fzf: "0.44.1" # renovate: depName=junegunn/fzf
   helm: "3.13.2" # renovate: depName=helm/helm
   kubectl: "1.28.4" # renovate: depName=kubernetes/kubernetes
   kustomize: "v5.1.1" # renovate: depName=kubernetes-sigs/kustomize
