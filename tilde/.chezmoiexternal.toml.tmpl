@@ -99,6 +99,19 @@
     executable = true
     path = "procs"
 
+[".local/bin/rg"]
+    type = "archive-file"
+    url = "https://github.com/BurntSushi/ripgrep/releases/download/{{ .versions.ripgrep }}/ripgrep-{{ .versions.ripgrep }}-{{ .uname.machine }}-unknown-{{ .chezmoi.os }}-musl.tar.gz"
+    executable = true
+    stripComponents = 1
+    path = "rg"
+
+[".config/fish/completions/rg.fish"]
+    type = "archive-file"
+    url = "https://github.com/BurntSushi/ripgrep/releases/download/{{ .versions.ripgrep }}/ripgrep-{{ .versions.ripgrep }}-{{ .uname.machine }}-unknown-{{ .chezmoi.os }}-musl.tar.gz"
+    stripComponents = 1
+    path = "complete/rg.fish"
+
 [".local/bin/yq"]
     type = "file"
     url = "https://github.com/mikefarah/yq/releases/download/v{{ .versions.yq }}/yq_linux_amd64"

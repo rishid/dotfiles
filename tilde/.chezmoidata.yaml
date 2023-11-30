@@ -62,6 +62,7 @@ versions:
   kubectl: "1.28.4" # renovate: depName=kubernetes/kubernetes
   kustomize: "v5.1.1" # renovate: depName=kubernetes-sigs/kustomize
   procs: "0.14.3" # renovate: depName=dalance/procs
+  ripgrep: "14.0.0" # renovate: depName=BurntSushi/ripgrep
   starship: "v1.16.0" # renovate: depName=starship/starship
   trivy: "0.47.0" # renovate: depName=aquasecurity/trivy
   yq: "4.35.2" # renovate: depName=mikefarah/yq
