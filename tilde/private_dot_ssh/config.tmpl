@@ -1,3 +1,7 @@
+
+# Skip newer or system-specific unmatched options.
+IgnoreUnknown AddKeysToAgent,UseKeychain
+
 HashKnownHosts no
 
 Include ~/.ssh/akamai
@@ -29,4 +33,11 @@ Host *
 {{- end }}
 
 Host *
+    # Accelerate connections by reusing existing connections to the same host.
+    ControlMaster auto
+    ControlPath ~/.ssh/controlmasters/%r@%h:%p
+    ControlPersist 60m
+
+    # Keep the connection temporarily open by sending a data every few minutes.
+    ServerAliveCountMax 6
     ServerAliveInterval 300
