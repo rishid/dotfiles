@@ -55,7 +55,7 @@ versions:
   cloc: "1.96" # renovate: depName=AlDanial/cloc
   backstage_go: "v0.8.0" # renovate: depName=einride/backstage-go
   bat: "0.24.0" # renovate: depName=sharkdp/bat versioning=semver-coerced
-  direnv: "2.32.3" # renovate: depName=direnv/direnv
+  direnv: "2.33.0" # renovate: depName=direnv/direnv
   fd: "8.7.1" # renovate: depName=sharkdp/fd
   fzf: "0.44.1" # renovate: depName=junegunn/fzf
   helm: "3.13.2" # renovate: depName=helm/helm
