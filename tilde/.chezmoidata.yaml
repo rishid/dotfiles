@@ -65,4 +65,4 @@ versions:
   ripgrep: "14.0.3" # renovate: depName=BurntSushi/ripgrep
   starship: "v1.16.0" # renovate: depName=starship/starship
   trivy: "0.48.0" # renovate: depName=aquasecurity/trivy
-  yq: "4.40.4" # renovate: depName=mikefarah/yq
+  yq: "4.40.5" # renovate: depName=mikefarah/yq
