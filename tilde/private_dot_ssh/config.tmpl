@@ -14,6 +14,13 @@ Host github-rishid
     IdentityFile ~/.ssh/github_rishid
     IdentitiesOnly yes
 
+Host github-akamai
+    Hostname github.com
+    User git
+    UpdateHostKeys yes
+    IdentityFile ~/.ssh/github_akamai
+    IdentitiesOnly yes
+
 Host 100.80.*.*
     User root
     StrictHostKeyChecking no
@@ -32,7 +39,8 @@ Host *
     UseKeychain yes
 {{- end }}
 
-Host *
+# 12/6/23 Exclude github as cannot reuse socket since user, host and port are same except key
+Host !github.com
     # Accelerate connections by reusing existing connections to the same host.
     ControlMaster auto
     ControlPath ~/.ssh/controlmasters/%r@%h:%p

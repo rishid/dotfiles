@@ -1,7 +1,15 @@
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ......='cd ../../../../..'
+
 abbr -a - "cd -"
 abbr -a ca "chezmoi apply -v"
 abbr -a cm "chezmoi -k"
 abbr -a da "direnv allow"
+
+alias sshp='ssh -o PubkeyAuthentication=no '
 
 # Docker
 abbr -a d 'docker'
