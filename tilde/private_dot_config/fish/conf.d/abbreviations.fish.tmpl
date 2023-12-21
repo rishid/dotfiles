@@ -43,7 +43,7 @@ abbr -a dck 'docker-compose kill'
     abbr -a lt 'eza --tree'
     abbr -a tree 'eza --tree'
 
-    abbr reboot-to-bios 'systemctl reboot --firmware-setup'
+    abbr -a reboot-to-bios 'systemctl reboot --firmware-setup'
 {{- end }}
 
 {{- if eq .chezmoi.os "windows" }}
