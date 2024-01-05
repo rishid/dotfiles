@@ -1,5 +1,3 @@
 function _ssh-keygen
-  set name $argv[1]
-  mkdir -p "$HOME/.ssh/$name"
-  ssh-keygen -t ed25519 -f "$HOME/.ssh/$name/id_ed25519"
+  ssh-keygen -t ed25519 -a 100 -f ~/.ssh/id_ed25519 -C "$USER@$HOSTNAME"
 end
