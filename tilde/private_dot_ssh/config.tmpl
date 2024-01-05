@@ -21,6 +21,12 @@ Host github-akamai
     IdentityFile ~/.ssh/github_akamai
     IdentitiesOnly yes
 
+Host github github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+
 Host 100.80.*.*
     User root
     StrictHostKeyChecking no
