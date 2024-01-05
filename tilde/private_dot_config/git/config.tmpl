@@ -119,9 +119,9 @@
     autocrlf = input
     editor = emacs
 [diff]
-	algorithm = histogram
-	renamelimit = 8192
-	renames = copies
+    algorithm = histogram
+    renamelimit = 8192
+    renames = copies
 [diff "bin"]
     # Use `hexdump` to diff binary files.
     textconv = hexdump -v -
@@ -156,11 +156,16 @@
 
 # URL shorthands
 # Any URL that starts with an <insteadOf> value will be rewritten to start with <base>
-[url "https://github.com/"]
+#[url "https://github.com/"]
+#    insteadOf = git://github.com/
+#    insteadOf = git@github.com:
+#    insteadOf = gh:
+#    insteadOf = github:
+# Switch https to ssh
+[url "git@github:"]
+    insteadOf = https://github.com/
     insteadOf = git://github.com/
-    insteadOf = git@github.com:
-    insteadOf = gh:
-    insteadOf = github:
+
 [url "https://github.com/rishid/"]
     insteadOf = my:
 
