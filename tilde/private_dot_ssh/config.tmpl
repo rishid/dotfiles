@@ -4,8 +4,10 @@ IgnoreUnknown AddKeysToAgent,UseKeychain
 
 HashKnownHosts no
 
+{{- if .work }}
 Include ~/.ssh/akamai
 Include ~/.ssh/linode
+{{- end }}
 
 Host github-rishid
     Hostname github.com
@@ -39,18 +41,18 @@ Host linode
     User root
     IdentityFile ~/.ssh/id_ecdsa
 
-{{- if eq .chezmoi.os "darwin" }}
-Host *
-    AddKeysToAgent yes
-    UseKeychain yes
-{{- end }}
-
 # 12/6/23 Exclude github as cannot reuse socket since user, host and port are same except key
 Host !github.com
     # Accelerate connections by reusing existing connections to the same host.
     ControlMaster auto
     ControlPath ~/.ssh/controlmasters/%r@%h:%p
     ControlPersist 60m
+
+    # Allow storing passphrases in the macOS keychain.
+    AddKeysToAgent yes
+{{- if (eq .chezmoi.os "darwin") }}
+    UseKeychain yes
+{{- end }}
 
     # Keep the connection temporarily open by sending a data every few minutes.
     ServerAliveCountMax 6
