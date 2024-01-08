@@ -15,7 +15,7 @@ git:
   autoCommit: true
   autoPush: true
 
-# The following variables are only available within this TOML template file
+# The following variables are only available within this YAML template file
 {{/* boolean feature tags */}}
 
 {{- $chezmoiForce := or (has "--force" .chezmoi.args) (has "--force=true" .chezmoi.args) -}}
@@ -23,15 +23,13 @@ git:
 
 {{- $docker := false -}}{{/* true if this machine should have Docker installed */}}
 {{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
-{{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
-{{- $headlessx := or (env "SSH_CLIENT" | not | not) (not (or (env "DISPLAY") (env "WAYLAND_DISPLAY"))) -}}
+# {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
+{{- $headless := or (env "SSH_CLIENT" | not | not) (not (or (env "DISPLAY") (env "WAYLAND_DISPLAY"))) -}}
 {{- $devcontainer := or (env "REMOTE_CONTAINERS") (env "CODESPACES") (env "VSCODE_REMOTE_CONTAINERS_SESSION") (env "GITPOD_HOST") | not | not -}}
 {{- $minimum := or $devcontainer -}}
 
 {{- $personal := false -}}{{/* true if this machine should have personal secrets */}}
 {{- $work := false -}}{{/* true if this machine is work-related */}}
-
-{{- "" -}}
 
 {{- $osID := .chezmoi.os -}}
 {{- if (and (eq .chezmoi.os "linux") (hasKey .chezmoi.osRelease "id")) -}}
@@ -39,40 +37,41 @@ git:
 {{- end -}}
 
 {{/* detect GitHub codespaces, VSCode remote containers, Docker containers, Multipass VMs, and Vagrant boxes */}}
-{{- if or (env "SSH_CLIENT" | not | not) (env "CODESPACES") (env "REMOTE_CONTAINERS_IPC") (eq .chezmoi.username "root" "ubuntu" "vagrant" "vscode") -}}
-{{-   $ephemeral = true -}}
+{{- $ephemeralEnvOrUsername := or (env "CODESPACES") (env "REMOTE_CONTAINERS_IPC") (eq .chezmoi.username "root" "ubuntu" "vagrant" "vscode" "devcontainer") -}}
+{{- $ephemeralCgroup := and (stat "/proc/1/cgroup") (output "cat" "/proc/1/cgroup" | regexMatch "(docker|lxc)") -}}
+{{- if or $ephemeralEnvOrUsername $ephemeralCgroup -}}
 {{-   $headless = true -}}
+{{-   $ephemeral = true -}}
+{{-   writeToStdout "Chezmoi is running in a container.\n" -}}
 {{- end -}}
 
-{{/* work around unreliable hostname on darwin */}}
-{{- $hostname := .chezmoi.hostname -}}
-{{- if eq .chezmoi.os "darwin" -}}
-{{-   $computerName := output "scutil" "--get" "ComputerName" | trim -}}
-{{-   if eq $computerName "Dhupar's MacBook Air" -}}
-{{-     $hostname = "dhupars-mba" -}}
-{{-   else -}}
-{{-     $hostname = $computerName -}}
+{{/* detect personal vs work macOS machines */}}
+{{- if (eq .chezmoi.os "darwin") -}}
+{{-   if (contains "MDM enrollment: Yes" (output "profiles" "status" "-type" "enrollment")) -}}
+{{-     $personal = false -}}
+{{-     $work = true -}}
+{{-     writeToStdout "Chezmoi is running on a work macOS environment.\n" -}}
+{{-   else }}
+{{-     $personal = true -}}
+{{-     $work = false -}}
+{{-     writeToStdout "Chezmoi is running on a personal macOS environment.\n" -}}
 {{-   end -}}
 {{- end -}}
 
-{{- if not $ephemeral -}}
-{{-   if eq $hostname "bos-lhv9i4" -}}
-{{-     $docker = true -}}
+{{ if and (not $ephemeral) (eq $osID "linux-ubuntu") }}
+{{   $docker := true }}
+{{ end }}
+
+{{/* detect personal vs work Linux machines */}}
+{{- if eq .chezmoi.os "linux" -}}
+{{-   if (contains "akamai" .chezmoi.fqdnHostname) -}}
+{{-     $personal = false -}}
 {{-     $work = true -}}
-{{-   else if eq $hostname "vault" -}}
-{{-     $headless = true -}}
+{{-     writeToStdout "Chezmoi is running on a work Linux environment.\n" -}}
+{{-   else }}
 {{-     $personal = true -}}
-{{-   else if eq $hostname "dhupars-mba" -}}
-{{-     $personal = true -}}
-{{-   else if stdinIsATTY -}}
-{{-     $headless = promptBoolOnce . "headless" "headless" -}}
-{{-     $ephemeral = promptBoolOnce . "ephemeral" "ephemeral" -}}
-{{-     if not $ephemeral -}}
-{{-       $docker = promptBoolOnce . "docker" "docker" -}}
-{{-     end -}}
-{{-   else -}}
-{{-     $ephemeral = true -}}
-{{-     $headless = true -}}
+{{-     $work = false -}}
+{{-     writeToStdout "Chezmoi is running on a personal Linux environment.\n" -}}
 {{-   end -}}
 {{- end -}}
 
@@ -85,7 +84,6 @@ data:
   ephemeral: {{ $ephemeral }}
   headless: {{ $headless }}
 
-  hostname: {{ $hostname | quote }}
   osid: {{ $osID | quote }}
   {{- if eq .chezmoi.os "linux" }}
   uname:
