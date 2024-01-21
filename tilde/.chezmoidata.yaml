@@ -58,7 +58,7 @@ versions:
   direnv: "2.33.0" # renovate: depName=direnv/direnv
   fd: "9.0.0" # renovate: depName=sharkdp/fd
   fzf: "0.45.0" # renovate: depName=junegunn/fzf
-  helm: "3.13.3" # renovate: depName=helm/helm
+  helm: "3.14.0" # renovate: depName=helm/helm
   kubectl: "1.29.1" # renovate: depName=kubernetes/kubernetes
   kustomize: "v5.1.1" # renovate: depName=kubernetes-sigs/kustomize
   procs: "0.14.4" # renovate: depName=dalance/procs
