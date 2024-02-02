@@ -64,5 +64,5 @@ versions:
   procs: "0.14.4" # renovate: depName=dalance/procs
   ripgrep: "14.1.0" # renovate: depName=BurntSushi/ripgrep
   starship: "1.17.1" # renovate: depName=starship/starship
-  trivy: "0.48.3" # renovate: depName=aquasecurity/trivy
+  trivy: "0.49.0" # renovate: depName=aquasecurity/trivy
   yq: "4.40.5" # renovate: depName=mikefarah/yq
