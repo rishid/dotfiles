@@ -1,0 +1,20 @@
+{{ if eq .chezmoi.os "linux" -}}
+#!/usr/bin/env sh
+
+set -eou pipefail
+
+AGE="age --decrypt"
+CHEZMOISECRET="${HOME}/.config/chezmoi/key.txt"
+
+# Try external age command if available. Fallback to builtin otherwise
+if ! command -v age $> /dev/null; then
+    AGE="chezmoi age decrypt --passphrase"
+fi
+
+if [ ! -f "${CHEZMOISECRET}" ]; then
+    mkdir -p "${HOME}/.config/chezmoi"
+    $AGE --output "${CHEZMOISECRET}" "{{ .chezmoi.sourceDir }}/../key.txt.age"
+    chmod 400 "${CHEZMOISECRET}"
+fi
+
+{{ end -}}

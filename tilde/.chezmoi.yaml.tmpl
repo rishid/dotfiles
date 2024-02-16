@@ -7,6 +7,10 @@ pager: ""
 follow: true
 format: yaml
 color: auto
+encryption: age
+age:
+  identity: {{ .chezmoi.homeDir }}/.config/chezmoi/key.txt
+  recipient: age17z6sdx7ceu7xu4llsdt4gakyuzkhvqe9vr226jjvg8rr0j57ta3qd5ry67
 template:
   options:
     - missingkey=zero
