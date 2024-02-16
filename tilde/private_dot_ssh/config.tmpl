@@ -9,13 +9,6 @@ Include ~/.ssh/akamai
 Include ~/.ssh/linode
 {{- end }}
 
-Host github-rishid
-    Hostname github.com
-    User git
-    UpdateHostKeys yes
-    IdentityFile ~/.ssh/github_rishid
-    IdentitiesOnly yes
-
 Host github-akamai
     Hostname github.com
     User git
@@ -23,10 +16,10 @@ Host github-akamai
     IdentityFile ~/.ssh/github_akamai
     IdentitiesOnly yes
 
-Host github github.com
+Host github-rishid github github.com
     HostName github.com
     User git
-    IdentityFile ~/.ssh/id_ed25519
+    IdentityFile ~/.ssh/github_rishid
     IdentitiesOnly yes
 
 Host 100.80.*.*
