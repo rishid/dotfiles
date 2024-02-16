@@ -6,6 +6,7 @@ alias ......='cd ../../../../..'
 
 abbr -a - "cd -"
 abbr -a ca "chezmoi apply"
+# ce - chezmoi edit is a function
 abbr -a cm "chezmoi -k"
 abbr -a cu "chezmoi update"
 abbr -a da "direnv allow"
@@ -30,6 +31,17 @@ abbr -a dclf 'docker-compose logs -f'
 abbr -a dcpull 'docker-compose pull'
 abbr -a dcstart 'docker-compose start'
 abbr -a dck 'docker-compose kill'
+
+# Git
+abbr -a cd-gitroot 'cd (git rev-parse --show-toplevel)'
+abbr -a gc 'git commit'
+abbr -a gca 'git commit --amend'
+abbr -a gco 'git checkout'
+abbr -a gcm 'git checkout master'
+abbr -a gd 'git diff'
+abbr -a gs 'git status'
+abbr -a gsb 'git show-branch'
+abbr -a gb 'git branch'
 
 {{- $eza_params := list "--git" "--icons" "--classify" "--group-directories-first" "--time-style=long-iso" "--group" "--color-scale"  | join " " }}
 
