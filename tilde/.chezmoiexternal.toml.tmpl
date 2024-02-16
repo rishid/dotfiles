@@ -1,11 +1,4 @@
 
-
-[".local/bin/gdu"]
-    type = "archive-file"
-    url = "https://github.com/dundee/gdu/releases/download/v{{ .versions.gdu }}/gdu_{{ .chezmoi.os }}_{{ .chezmoi.arch }}.tgz"
-    executable = true
-    path = "gdu_{{ .chezmoi.os }}_{{ .chezmoi.arch }}"
-
 [".local/bin/age"]
     type = "archive-file"
     url = "https://github.com/FiloSottile/age/releases/download/v{{ .versions.age }}/age-v{{ .versions.age }}-{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz"
@@ -31,6 +24,12 @@
     type = "file"
     url = "https://github.com/AlDanial/cloc/releases/download/v{{ .versions.cloc }}/cloc-{{ .versions.cloc }}.pl"
     executable = true
+
+[".local/bin/gdu"]
+    type = "archive-file"
+    url = "https://github.com/dundee/gdu/releases/download/v{{ .versions.gdu }}/gdu_{{ .chezmoi.os }}_{{ .chezmoi.arch }}.tgz"
+    executable = true
+    path = "gdu_{{ .chezmoi.os }}_{{ .chezmoi.arch }}"
 
 [".local/share/go"]
     type = "archive"
