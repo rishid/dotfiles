@@ -9,26 +9,6 @@ Include ~/.ssh/akamai.cfg
 Include ~/.ssh/linode.cfg
 {{- end }}
 
-Host github-akamai
-    Hostname github.com
-    User git
-    UpdateHostKeys yes
-    IdentityFile ~/.ssh/github_akamai
-    IdentitiesOnly yes
-
-Host github-rishid github
-    HostName github.com
-    User git
-    IdentityFile ~/.ssh/github_rishid
-    IdentitiesOnly yes
-
-Host 100.80.*.*
-    User root
-    StrictHostKeyChecking no
-    IdentityFile ~/.ssh/akanebula.key
-    # vtastic gateway NAT ip - clone
-    ProxyCommand ssh -oStrictHostKeyChecking=no -W %h:%p root@198.18.255.27
-
 Host linode
     Hostname 45.79.138.115
     User root
