@@ -5,8 +5,8 @@ IgnoreUnknown AddKeysToAgent,UseKeychain
 HashKnownHosts no
 
 {{- if .work }}
-Include ~/.ssh/akamai
-Include ~/.ssh/linode
+Include ~/.ssh/akamai.cfg
+Include ~/.ssh/linode.cfg
 {{- end }}
 
 Host github-akamai
