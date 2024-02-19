@@ -78,6 +78,10 @@ export HISTTIMEFORMAT="%F %T "
 export HISTIGNORE="&:[bf]g:c:clear:history:exit:q:afk:pwd:* --help"
 export SAVEHIST=50000
 
+# NixOS
+export NIX_LD_LIBRARY_PATH=/run/current-system/sw/share/nix-ld/lib
+export NIX_LD=/run/current-system/sw/share/nix-ld/lib/ld.so
+
 ### Man pages
 # TODO: move to bash specific file
 # export LESS_TERMCAP_mb=$'\e[1;32m'
