@@ -9,6 +9,12 @@ Include ~/.ssh/akamai.cfg
 Include ~/.ssh/linode.cfg
 {{- end }}
 
+Host github-rishid github
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/github_rishid
+    IdentitiesOnly yes
+
 Host linode
     Hostname 45.79.138.115
     User root

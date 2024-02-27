@@ -1,0 +1,213 @@
+#############################
+# Bindings
+#############################
+# Use | and - to split a window vertically and horizontally instead of " and % respoectively
+unbind '"'
+unbind %
+bind-key | split-window -h -c "#{pane_current_path}"
+bind-key - split-window -v -c "#{pane_current_path}"
+
+# Move around panes with hjkl, as one would in vim after pressing ctrl + w
+bind-key h select-pane -L
+bind-key j select-pane -D
+bind-key k select-pane -U
+bind-key l select-pane -R
+
+# Easier and faster switching between next/prev window
+# Enhance the default prefix + p and prefix + n bindings by allowing you to hold Ctrl and
+# repeat a + p/a + n (if your prefix is C-a), which is a lot quicker.
+bind C-p previous-window
+bind C-n next-window
+
+# Source .tmux.conf as suggested in `man tmux`
+bind R source-file '~/.tmux.conf'
+
+# "Adaptable" key bindings that build upon your prefix value
+# If prefix is 'C-a'
+bind C-a send-prefix
+bind a last-window
+
+
+#############################
+# Settings
+#############################
+set -g default-terminal "tmux-256color"
+
+# Set support for reporting modifiers in `CSI u` mode
+set -g extended-keys on
+
+# Allow the tmux server to exist without any sessions!
+set exit-empty off
+
+# Escape time. https://superuser.com/a/942704/257360
+set-option -g escape-time 150
+
+# Emacs key bindings in tmux command prompt (prefix + :) are better than
+# vi keys, even for vim users
+set -g status-keys emacs
+
+# Automatically set window title
+set-window-option -g automatic-rename on
+set-option -g set-titles on
+
+# Focus events requested from terminal are passed through to application
+# Neovim wants this.
+set-option -g focus-event on
+
+# Set mouse on
+set-option -g mouse on
+
+# Super useful when using "grouped sessions" and multi-monitor setup
+setw -g aggressive-resize on
+
+# Refresh status line every 5 seconds - Good for when music is playing / update time etc
+set-option -g status-interval 5
+
+# Start window and pane indices at 1.
+set-option -g base-index 1
+set-option -g pane-base-index 0
+
+# Length of tmux status line
+set-option -g status-left-length 30
+set-option -g status-right-length 150
+
+set-option -g status "on"
+
+# Set 256 colours support for all terminal `$TERM` types.
+set-option -g terminal-features ',*:RGB'
+
+# Default statusbar color
+set-option -g status-style bg=colour237,fg=colour223 # bg=bg1, fg=fg1
+
+# Default window title colors
+set-window-option -g window-status-style bg=colour214,fg=colour237 # bg=yellow, fg=bg1
+
+# Default window with an activity alert
+set-window-option -g window-status-activity-style bg=colour237,fg=colour248 # bg=bg1, fg=fg3
+
+# Active window title colors
+set-window-option -g window-status-current-style bg=red,fg=colour237 # fg=bg1
+
+# Set pane border style
+set-option -g pane-border-lines heavy
+
+# Set active pane border color
+set-option -g pane-active-border-style fg=colour214
+
+# Set inactive pane border color
+set-option -g pane-border-style fg=colour239
+
+# Message info
+set-option -g message-style bg=colour239,fg=colour223 # bg=bg2, fg=fg1
+
+# Writing commands inactive
+set-option -g message-command-style bg=colour239,fg=colour223 # bg=fg3, fg=bg1
+
+# Pane number display
+set-option -g display-panes-active-colour colour1 #fg2
+set-option -g display-panes-colour colour237 #bg1
+
+# Clock
+set-window-option -g clock-mode-colour colour109 #blue
+
+# Bell
+set-window-option -g window-status-bell-style bg=colour167,fg=colour235 # bg=red, fg=bg
+
+# Set the history limit so we get lots of scrollback.
+setw -g history-limit 50000000
+
+# Increase tmux messages display duration from 750ms to 4s
+set -g display-time 4000
+
+# Copy-Paste mode into
+# set-option -g default-command "reattach-to-user-namespace -l zsh"
+
+##############################
+# Appearance and Statusbar
+##############################
+
+
+
+#############################
+# Tmux Vars
+#############################
+# $(echo $USER) - shows the current username
+# %a --> Day of week (Mon)
+# %A --> Day of week Expanded (Monday)
+
+# %b --> Month (Jan)
+# %d --> Day (31)
+# %Y --> Year (2017)
+
+# %D --> Month/Day/Year (12/31/2017)
+# %v --> Day-Month-Year (31-Dec-2017)
+
+# %r --> Hour:Min:Sec AM/PM (12:30:27 PM)
+# %T --> 24 Hour:Min:Sec (16:30:27)
+# %X --> Hour:Min:Sec (12:30:27)
+# %R --> 24 Hour:Min (16:30)
+# %H --> 24 Hour (16)
+# %l --> Hour (12)
+# %M --> Mins (30)
+# %S --> Seconds (09)
+# %p --> AM/PM (AM)
+
+# For a more complete list view: https://linux.die.net/man/3/strftime
+
+#colour0 (black)
+#colour1 (red)
+#colour2 (green)
+#colour3 (yellow)
+#colour4 (blue)
+#colour7 (white)
+#colour5 colour6 colour7 colour8 colour9 colour10 colour11 colour12 colour13 colour14 colour15 colour16 colour17
+
+#D ()
+#F ()
+#H (hostname)
+#I (window index)
+#P ()
+#S (session index)
+#T (pane title)
+#W (current task like vim if editing a file in vim or zsh if running zsh)
+
+##############################
+# Nesting Local and Remote Sessions
+##############################
+# Session is considered to be remote when we SSH into host
+if-shell 'test -n "$SSH_CONNECTION"' \
+    'source-file ~/.config/tmux/tmux-remote.conf'
+
+##############################
+# Plugins Settings
+##############################
+{{- if ne .chezmoi.osRelease.id "nixos" }}
+source-file '~/.config/tmux/tmux-plugin-resurrect.conf'
+source-file '~/.config/tmux/tmux-plugin-continuum.conf'
+{{- end}}
+
+##############################
+# Plugins Settings
+##############################
+{{- if ne .chezmoi.osRelease.id "nixos" }}
+source-file '~/.config/tmux/plugin-resurrect.conf'
+source-file '~/.config/tmux/plugin-continuum.conf'
+{{- end}}
+
+##############################
+# Plugins
+##############################
+{{- if ne .chezmoi.osRelease.id "nixos" }}
+# On NixOS we do not auto install plugins they are managed in
+# the NixOS config and loaded in `/etc/tmux.conf`.
+run '~/.config/tmux/scripts/install-tpm.sh'
+
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @plugin 'tmux-plugins/tmux-continuum'
+set -g @plugin 'tmux-plugins/tmux-cpu'
+set -g @plugin 'jimeh/tmuxifier'
+
+# Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+run '~/.config/tmux/plugins/tpm/tpm'
+{{- end }}
