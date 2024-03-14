@@ -59,7 +59,7 @@ versions:
   gdu: "5.27.0" # renovate: depName=dundee/gdu
   fd: "9.0.0" # renovate: depName=sharkdp/fd
   fzf: "0.47.0" # renovate: depName=junegunn/fzf
-  helm: "3.14.2" # renovate: depName=helm/helm
+  helm: "3.14.3" # renovate: depName=helm/helm
   kubectl: "1.29.2" # renovate: depName=kubernetes/kubernetes
   kustomize: "v5.1.1" # renovate: depName=kubernetes-sigs/kustomize
   procs: "0.14.5" # renovate: depName=dalance/procs
