@@ -56,7 +56,7 @@ versions:
   backstage_go: "v0.8.0" # renovate: depName=einride/backstage-go
   bat: "0.24.0" # renovate: depName=sharkdp/bat versioning=semver-coerced
   direnv: "2.34.0" # renovate: depName=direnv/direnv
-  gdu: "5.27.0" # renovate: depName=dundee/gdu
+  gdu: "5.28.0" # renovate: depName=dundee/gdu
   fd: "9.0.0" # renovate: depName=sharkdp/fd
   fzf: "0.50.0" # renovate: depName=junegunn/fzf
   helm: "3.14.4" # renovate: depName=helm/helm
