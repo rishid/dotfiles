@@ -79,6 +79,14 @@
     executable = true
     path = "fzf"
 
+[".local/bin/gh"]
+	type = "archive-file"
+    url = "https://github.com/cli/cli/releases/download/v{{ .versions.github_cli }}/gh_{{ .versions.github_cli }}_{{ .chezmoi.os }}_{{ .chezmoi.arch }}.tar.gz"
+    executable = true
+    refreshPeriod = "720h"
+    stripComponents = 1
+    path = "bin/gh"
+
 [".local/bin/helm"]
     type = "archive-file"
     url = 'https://get.helm.sh/helm-v{{ .versions.helm }}-{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz'

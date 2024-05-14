@@ -52,11 +52,12 @@ plugins:
 
 versions:
   age: "1.1.1" # renovate: depName=FiloSottile/age
-  cloc: "1.96" # renovate: depName=AlDanial/cloc
   backstage_go: "v0.8.0" # renovate: depName=einride/backstage-go
   bat: "0.24.0" # renovate: depName=sharkdp/bat versioning=semver-coerced
+  cloc: "1.96" # renovate: depName=AlDanial/cloc
   direnv: "2.34.0" # renovate: depName=direnv/direnv
   gdu: "5.28.0" # renovate: depName=dundee/gdu
+  github_cli: "2.44.1" # renovate: depName=cli/cli
   fd: "10.1.0" # renovate: depName=sharkdp/fd
   fzf: "0.52.1" # renovate: depName=junegunn/fzf
   helm: "3.14.4" # renovate: depName=helm/helm
