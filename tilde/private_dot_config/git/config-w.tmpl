@@ -2,6 +2,8 @@
     name = {{ .full_name }}
     email = rdhupar@akamai.com
 
+# any URL starting with git@github.com:AkamaiAPG/ will be replaced with git@github-akamai:AkamaiAPG/
+# this exists so `github-akamai` SSH host config is used which specifies a certain key
 [url "git@github-akamai:AkamaiAPG/"]
     insteadOf = git@github.com:AkamaiAPG/
 
