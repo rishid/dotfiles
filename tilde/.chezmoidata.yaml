@@ -57,7 +57,7 @@ versions:
   cloc: "1.96" # renovate: depName=AlDanial/cloc
   direnv: "2.34.0" # renovate: depName=direnv/direnv
   gdu: "5.28.0" # renovate: depName=dundee/gdu
-  github_cli: "2.50.0" # renovate: depName=cli/cli
+  github_cli: "2.51.0" # renovate: depName=cli/cli
   fd: "10.1.0" # renovate: depName=sharkdp/fd
   fzf: "0.53.0" # renovate: depName=junegunn/fzf
   helm: "3.15.2" # renovate: depName=helm/helm
