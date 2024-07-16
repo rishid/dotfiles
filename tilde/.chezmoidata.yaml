@@ -52,7 +52,7 @@ plugins:
 
 versions:
   age: "1.2.0" # renovate: depName=FiloSottile/age
-  backstage_go: "v0.8.0" # renovate: depName=einride/backstage-go
+  backstage_go: "0.9.0" # renovate: depName=einride/backstage-go
   bat: "0.24.0" # renovate: depName=sharkdp/bat versioning=semver-coerced
   cloc: "1.96" # renovate: depName=AlDanial/cloc
   direnv: "2.34.0" # renovate: depName=direnv/direnv
