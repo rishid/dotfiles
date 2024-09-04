@@ -25,7 +25,7 @@ apt:
     - meld
     - openssh-server
     - pv
-    - python
+    - python3
     - python3-pip
     - silversearcher-ag
     - socat
@@ -36,6 +36,7 @@ apt:
 
 pip:
   install:
+    - pandas
     - pre-commit
     - requests
     - yq
