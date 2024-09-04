@@ -75,7 +75,7 @@
 
 [".local/bin/fzf"]
     type = "archive-file"
-    url = 'https://github.com/junegunn/fzf/releases/download/{{ .versions.fzf }}/fzf-{{ .versions.fzf }}-{{ .chezmoi.os }}_{{ eq .chezmoi.arch "arm" | ternary (.uname.machine | trimSuffix "tel") .chezmoi.arch }}.tar.gz'
+    url = 'https://github.com/junegunn/fzf/releases/download/v{{ .versions.fzf }}/fzf-{{ .versions.fzf }}-{{ .chezmoi.os }}_{{ eq .chezmoi.arch "arm" | ternary (.uname.machine | trimSuffix "tel") .chezmoi.arch }}.tar.gz'
     executable = true
     path = "fzf"
 
