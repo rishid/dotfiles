@@ -61,7 +61,7 @@ versions:
   github_cli: "2.56.0" # renovate: depName=cli/cli
   fd: "10.2.0" # renovate: depName=sharkdp/fd
   fzf: "0.55.0" # renovate: depName=junegunn/fzf
-  helm: "3.15.4" # renovate: depName=helm/helm
+  helm: "3.16.0" # renovate: depName=helm/helm
   kubectl: "1.31.1" # renovate: depName=kubernetes/kubernetes
   kustomize: "v5.1.1" # renovate: depName=kubernetes-sigs/kustomize
   procs: "0.14.6" # renovate: depName=dalance/procs
