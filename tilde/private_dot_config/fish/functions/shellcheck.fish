@@ -6,6 +6,7 @@ function shellcheck -d "Runs shellcheck through the system or docker depending o
     else if command -q docker
         docker run \
             --rm \
+            -v \
             --tty \
             --volume="$PWD:/mnt" \
             docker.io/koalaman/shellcheck:latest \

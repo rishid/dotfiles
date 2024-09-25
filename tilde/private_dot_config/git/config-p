@@ -1,0 +1,5 @@
+
+# any URL starting with git@github.com:AkamaiAPG/ will be replaced with git@github-akamai:AkamaiAPG/
+# this exists so `github-akamai` SSH host config is used which specifies a certain key
+[url "git@github-rishid:rishid/"]
+    insteadOf = git@github.com:rishid/
