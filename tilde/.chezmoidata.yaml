@@ -60,7 +60,7 @@ versions:
   gdu: "5.29.0" # renovate: depName=dundee/gdu
   github_cli: "2.61.0" # renovate: depName=cli/cli
   fd: "10.2.0" # renovate: depName=sharkdp/fd
-  fzf: "0.56.2" # renovate: depName=junegunn/fzf
+  fzf: "0.56.3" # renovate: depName=junegunn/fzf
   helm: "3.16.3" # renovate: depName=helm/helm
   kubectl: "1.31.2" # renovate: depName=kubernetes/kubernetes
   kustomize: "v5.1.1" # renovate: depName=kubernetes-sigs/kustomize
