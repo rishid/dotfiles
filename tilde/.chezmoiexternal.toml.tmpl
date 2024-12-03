@@ -60,6 +60,12 @@
     url = "https://github.com/direnv/direnv/releases/download/v{{ .versions.direnv }}/direnv.linux-{{ .chezmoi.arch }}"
     executable = true
 
+[".local/bin/dnspyre"]
+    type = "archive-file"
+    url = "https://github.com/Tantalor93/dnspyre/releases/download/v{{ .versions.dnspyre }}/dnspyre_linux_{{ .chezmoi.arch }}.tar.gz"
+    executable = true
+    path = "dnspyre"
+
 [".local/bin/eza"]
     type = "archive-file"
     url = "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"

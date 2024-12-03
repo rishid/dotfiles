@@ -1,0 +1,31 @@
+{
+    // Editor settings
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.formatOnSaveMode": "file",
+
+    // Diff settings
+    "diffEditor.hideUnchangedRegions.enabled": true,
+
+    // Files settings
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+
+    // Workbenck settings
+    "telemetry.telemetryLevel": "off",
+
+    // Security settings
+    "security.workspace.trust.untrustedFiles": "open",
+
+
+    // Extensions Options
+    // Toml
+    "evenBetterToml.formatter.arrayAutoCollapse": false,
+    "evenBetterToml.formatter.arrayAutoExpand": true,
+    "evenBetterToml.formatter.allowedBlankLines": 1,
+    "evenBetterToml.formatter.arrayTrailingComma": true,
+    "evenBetterToml.formatter.indentEntries": true,
+    "evenBetterToml.formatter.indentTables": true,
+    "evenBetterToml.formatter.reorderKeys": true,
+}
