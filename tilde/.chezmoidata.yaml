@@ -63,7 +63,7 @@ versions:
   fd: "10.2.0" # renovate: depName=sharkdp/fd
   fzf: "0.56.3" # renovate: depName=junegunn/fzf
   helm: "3.16.3" # renovate: depName=helm/helm
-  kubectl: "1.31.4" # renovate: depName=kubernetes/kubernetes
+  kubectl: "1.32.0" # renovate: depName=kubernetes/kubernetes
   kustomize: "v5.1.1" # renovate: depName=kubernetes-sigs/kustomize
   procs: "0.14.8" # renovate: depName=dalance/procs
   ripgrep: "14.1.1" # renovate: depName=BurntSushi/ripgrep
