@@ -1,0 +1,22 @@
+# -*-mode:gitignore-*- vim:ft=gotmpl.gitignore
+
+# ~/.local/share/chezmoi/.chezmoiignore
+# =============================================================================
+# Read by chezmoi when choosing repository files to copy to home directory.
+#
+# This list defines globs to ignore, and supports Go's text/template language.
+# See https://www.chezmoi.io/docs/reference/#chezmoiignore
+
+# Shell
+.config/fish/fish_variables
+.config/fish/fish_history
+
+# History
+.lesshst
+.wget-hsts
+.*_history
+
+# macOS flies
+**/.DS_Store
+.CFUserTextEncoding
+.Trash
