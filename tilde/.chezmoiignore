@@ -16,7 +16,10 @@
 .wget-hsts
 .*_history
 
+{{ if ne .chezmoi.os "darwin" -}}
 # macOS flies
 **/.DS_Store
 .CFUserTextEncoding
 .Trash
+Library/Application Support
+{{ end -}}
