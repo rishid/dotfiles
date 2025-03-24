@@ -1,4 +1,10 @@
 
+
+[".config/tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm"
+    refreshPeriod = "168h"
+
 [".local/bin/age"]
     type = "archive-file"
     url = "https://github.com/FiloSottile/age/releases/download/v{{ .versions.age }}/age-v{{ .versions.age }}-{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz"
@@ -11,9 +17,16 @@
     executable = true
     path = "age/age-keygen"
 
+[".local/bin/bat"]
+    type = "archive-file"
+    url = "https://github.com/sharkdp/bat/releases/download/v{{ .versions.bat }}/bat-v{{ .versions.bat }}-{{ .uname.machine }}-unknown-linux-musl.tar.gz"
+    executable = true
+    stripComponents = 1
+    path = "bat"
+
 {{- if and (eq .chezmoi.os "linux") (not .ephemeral) }}
 [".local/bin/bw"]
-    type = "file"
+    type = "archive-file"
     url = "https://vault.bitwarden.com/download/?app=cli&platform=linux"
     executable = true
     refreshPeriod = "168h"
@@ -24,36 +37,6 @@
     type = "file"
     url = "https://github.com/AlDanial/cloc/releases/download/v{{ .versions.cloc }}/cloc-{{ .versions.cloc }}.pl"
     executable = true
-
-[".local/bin/gdu"]
-    type = "archive-file"
-    url = "https://github.com/dundee/gdu/releases/download/v{{ .versions.gdu }}/gdu_{{ .chezmoi.os }}_{{ .chezmoi.arch }}.tgz"
-    executable = true
-    path = "gdu_{{ .chezmoi.os }}_{{ .chezmoi.arch }}"
-
-[".local/share/go"]
-    type = "archive"
-    # renovate: datasource=github-tags packageName=golang/go
-    url = "https://go.dev/dl/go1.21.1.{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz"
-    exact = true
-    stripComponents = 1
-
-[".local/bin/kubectl"]
-    type = "file"
-    url = "https://dl.k8s.io/release/v{{ .versions.kubectl }}/bin/linux/{{ .chezmoi.arch }}/kubectl"
-    executable = true
-
-[".config/tmux/plugins/tpm"]
-    type = "git-repo"
-    url = "https://github.com/tmux-plugins/tpm"
-    refreshPeriod = "168h"
-
-[".local/bin/bat"]
-    type = "archive-file"
-    url = "https://github.com/sharkdp/bat/releases/download/v{{ .versions.bat }}/bat-v{{ .versions.bat }}-{{ .uname.machine }}-unknown-linux-musl.tar.gz"
-    executable = true
-    stripComponents = 1
-    path = "bat"
 
 [".local/bin/direnv"]
     type = "file"
@@ -85,6 +68,12 @@
     executable = true
     path = "fzf"
 
+[".local/bin/gdu"]
+    type = "archive-file"
+    url = "https://github.com/dundee/gdu/releases/download/v{{ .versions.gdu }}/gdu_{{ .chezmoi.os }}_{{ .chezmoi.arch }}.tgz"
+    executable = true
+    path = "gdu_{{ .chezmoi.os }}_{{ .chezmoi.arch }}"
+
 [".local/bin/gh"]
 	type = "archive-file"
     url = "https://github.com/cli/cli/releases/download/v{{ .versions.github_cli }}/gh_{{ .versions.github_cli }}_{{ .chezmoi.os }}_{{ .chezmoi.arch }}.tar.gz"
@@ -93,17 +82,49 @@
     stripComponents = 1
     path = "bin/gh"
 
+[".local/share/go"]
+    type = "archive"
+    url = "https://go.dev/dl/go{{ .versions.go }}.{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz"
+    exact = true
+    stripComponents = 1
+
 [".local/bin/helm"]
     type = "archive-file"
     url = 'https://get.helm.sh/helm-v{{ .versions.helm }}-{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz'
     executable = true
     path = "{{ .chezmoi.os }}-{{ .chezmoi.arch }}/helm"
 
+[".local/bin/hexyl"]
+    type = "archive-file"
+    url = "https://github.com/sharkdp/hexyl/releases/download/v{{ .versions.hexyl }}/hexyl-v{{ .versions.hexyl }}-{{ .uname.machine }}-unknown-linux-musl.tar.gz"
+    executable = true
+    stripComponents = 1
+    path = "hexyl"
+
+[".local/bin/hyperfine"]
+    type = "archive-file"
+    url = "https://github.com/sharkdp/hyperfine/releases/download/v{{ .versions.hyperfine }}/hyperfine-v{{ .versions.hyperfine }}-{{ .uname.machine }}-unknown-linux-musl.tar.gz"
+    executable = true
+    stripComponents = 1
+    path = "hyperfine"
+
 [".local/bin/jq"]
     type = "file"
     url = "https://github.com/jqlang/jq/releases/latest/download/jq-linux-amd64"
     executable = true
     refreshPeriod = "720h"
+
+[".local/bin/kubectl"]
+    type = "file"
+    url = "https://dl.k8s.io/release/v{{ .versions.kubectl }}/bin/linux/{{ .chezmoi.arch }}/kubectl"
+    executable = true
+
+[".local/bin/numbat"]
+    type = "archive-file"
+    url = "https://github.com/sharkdp/numbat/releases/download/v{{ .versions.numbat }}/numbat-v{{ .versions.numbat }}-{{ .uname.machine }}-unknown-linux-musl.tar.gz"
+    executable = true
+    stripComponents = 1
+    path = "numbat"
 
 [".local/bin/procs"]
     type = "archive-file"
