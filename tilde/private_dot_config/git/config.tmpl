@@ -143,10 +143,29 @@
 [difftool]
     prompt = false
 
+[push]
+    default = simple       # Push only the current branch to its upstream counterpart
+    autoSetupRemote = true # Automatically set the remote tracking branch when pushing a new branch
+    followTags = true      # Push annotated tags that are reachable from the pushed commits
+
+[pull]                     # https://git-scm.com/docs/git-config#Documentation/git-config.txt-pullrebase
+    rebase = merges        # Use rebase instead of merge when pulling, preserving local merges
+    # rebase = interactive # Uncomment to enable interactive rebase on pull
+
+[rebase]
+    stat = true            # Show a summary of changes (diffstat) before rebasing
+    autoStash = true       # Stash changes before rebasing, then apply them back after rebase
+    missingCommitsCheck = warn  # Warn if commits are dropped during interactive rebase
+
+
+[rerere]
+    enabled = true         # Enable reuse of recorded conflict resolutions
+    autoupdate = true      # Automatically stage resolved conflicts in the index
+
 [fetch]
-    prune = true
-    pruneTags = true
-    all = true
+    prune = true           # Remove local branches that no longer exist on the remote
+    pruneTags = true       # Remove local tags that have been deleted on the remote
+    all = true             # Fetch all remotes by default
 
 [format]
     pretty = %Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset
@@ -176,12 +195,7 @@
     #                     │        └─ decorations (branch, heads or tags)
     #                     └─ hash (abbreviated)
 
-[push]
-    default = simple
-    autoSetupRemote = true
-    # Make `git push` automatically push relevant
-    # annotated tags when pushing branches out.
-    followTags = true
+
 
 [status]
 	submoduleSummary = true
