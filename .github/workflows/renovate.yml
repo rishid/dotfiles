@@ -38,6 +38,13 @@ jobs:
     name: Renovate
     runs-on: ubuntu-latest
     steps:
+      - name: Generate Token
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2
+        id: generate-token
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
@@ -50,5 +57,4 @@ jobs:
       - name: Renovate
         uses: renovatebot/github-action@c21017a4a2fc9f42953bcc907e375a5a544557ec # v41.0.18
         with:
-          token: ${{ secrets.RENOVATE_TOKEN }}
-          configurationFile: .github/renovate.json5
+          token: "${{ steps.generate-token.outputs.token }}"
