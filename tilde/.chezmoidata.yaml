@@ -73,3 +73,4 @@ versions:
   starship: "1.22.1" # renovate: depName=starship/starship
   trivy: "0.61.0" # renovate: depName=aquasecurity/trivy
   yq: "4.45.1" # renovate: depName=mikefarah/yq
+  zoxide: "0.9.7" # renovate: depName=ajeetdsouza/zoxide

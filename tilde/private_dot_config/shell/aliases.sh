@@ -46,7 +46,7 @@ alias e="$EDITOR"
 alias h='history -i 1 | less +G'
 alias bashrc="source ~/.bashrc"
 # copy last downloaded file from ~/Downloads directory to current directory
-alias lastDownload='cp ~/Downloads/`ls ~/Downloads -tr | tail -n 1` .'
+alias lastDownload='cp "$(ls -t ~/Downloads | head -n 1)" .'
 
 # Pretty print the path
 # alias path='printf "%b\n" "${PATH//:/\\n}"'

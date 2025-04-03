@@ -149,3 +149,9 @@
     type = "file"
     url = "https://github.com/mikefarah/yq/releases/download/v{{ .versions.yq }}/yq_linux_amd64"
     executable = true
+
+[".local/bin/zoxide"]
+    type = "archive-file"
+    url = "https://github.com/ajeetdsouza/zoxide/releases/download/v{{ .versions.zoxide }}/zoxide-{{ .versions.zoxide }}-{{ .uname.machine }}-unknown-{{ .chezmoi.os }}-musl.tar.gz"
+    executable = true
+    path = "zoxide"

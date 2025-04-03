@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
-# @file Environment Variables
-# @brief Houses the environment variables that are included by `~/.bashrc` and `~/.zshrc`
-# @description
-#     This script is included by `~/.bashrc` and `~/.zshrc` to provide environment variables
+
+# This file is meant to compatible with multiple shells, including:
+# bash, zsh, and fish. For this reason, use this syntax:
+#    export VARNAME=value
 
 export LC_ALL="en_US.UTF-8"
 export LANG="en_US.UTF-8"
@@ -22,6 +22,15 @@ export PATH="/opt/local/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/lib"
+
+###
+### General
+###
+export DOTFILES="$HOME/.dotfiles"
+
+###
+### Application Specific
+###
 
 ### Ansible
 export ANSIBLE_HOME="$XDG_DATA_HOME/ansible"

@@ -1,14 +1,6 @@
 
-
-### Globals
-set --global --export LC_ALL "en_US.UTF-8"
-set --global --export LANG "$LC_ALL"
-
-set --global --export XDG_CONFIG_HOME "$HOME/.config"
-set --global --export XDG_CACHE_HOME "$HOME/.cache"
-set --global --export XDG_DATA_HOME "$HOME/.local/share"
-set --global --export XDG_STATE_HOME "$HOME/.local/state"
-
+# Shared environment variables file
+# This file is sourced by fish and bash
 source "$XDG_CONFIG_HOME/shell/exports.sh"
 
 source "$__fish_config_dir/variables.fish"
