@@ -145,6 +145,13 @@
     stripComponents = 1
     path = "complete/rg.fish"
 
+[".local/bin/task"]
+    type = "archive-file"
+    url = "https://github.com/go-task/task/releases/download/v{{ .versions.task }}/task_{{.chezmoi.os}}_{{.chezmoi.arch}}.tar.gz"
+    path = "task"
+    exact = true
+    executable = true
+
 [".local/bin/yq"]
     type = "file"
     url = "https://github.com/mikefarah/yq/releases/download/v{{ .versions.yq }}/yq_linux_amd64"
