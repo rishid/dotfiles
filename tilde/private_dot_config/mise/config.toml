@@ -25,8 +25,5 @@ yq = "4.45.1"
 zoxide = "0.9.7"
 
 # pipx tools (Python CLI tools via isolated envs)
-pipx:pandas = "latest"
-pipx:pre-commit = "latest"
-pipx:requests = "latest"
-pipx:yq = "latest"
-pipx:chepy = "latest"
+"pipx:yamllint" = "1.35.0"
+"pipx:psf/black" = "24.4.1"
