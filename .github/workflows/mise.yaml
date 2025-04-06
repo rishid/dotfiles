@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 0 * * 0" # once a week
+    
 jobs:
   mise:
     name: upgrade-tools
@@ -25,26 +26,46 @@ jobs:
       - name: Upgrade dependencies
         run: mise upgrade --bump
 
-      - name: Get diff of .mise.toml
+      - name: Check if .mise.toml changed
+        id: changes
         run: |
-          git diff > diff.patch
+          git diff --quiet .mise.toml || echo "changed=true" >> "$GITHUB_OUTPUT"
 
-      - name: Generate Diff
-        id: diff
+      - name: Generate PR Body
+        if: ${{ steps.changes.outputs.changed == 'true' }}
+        id: prdiff
         run: |
-          cat diff.patch;
           {
-              echo 'diff<<EOF'
-              cat diff.patch
-              echo EOF
-          } >> "$GITHUB_OUTPUT";
-          {
-              echo "### Diff"
-              echo '```diff'
-              cat diff.patch
-              echo '```'
-          } >> "$GITHUB_STEP_SUMMARY";
-          rm diff.patch
+            echo 'body<<EOF'
+            echo 'Upgraded dependencies found in `.mise.toml`:'
+            echo
+            echo '```diff'
+            git diff .mise.toml
+            echo '```'
+            echo
+            echo '> [!TIP]'
+            echo '> Merge this pull request and then run `mise upgrade --bump` on your workstation.'
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create Pull Request
+        if: ${{ steps.changes.outputs.changed == 'true' }}
+        uses: peter-evans/create-pull-request@v7.0.8
+        with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          title: "chore(mise): upgrade dependencies"
+          commit-message: "chore(mise): upgrade dependencies"
+          branch: "mise-upgrade/${{ github.run_id }}"
+          body: |
+            Upgraded dependencies found in `.mise.toml`:
+            
+            ```diff
+            "${{ steps.prdiff.outputs.body }}"
+            ```
+
+            > [!TIP]
+            > Merge this pull request and then run `mise upgrade --bump` on your workstation.
+
 
       - if: ${{ steps.diff.outputs.diff != '' }}
         name: Create Pull Request
