@@ -1,0 +1,3 @@
+[tools]
+# specify single or multiple versions
+terraform = '1.0.0'
