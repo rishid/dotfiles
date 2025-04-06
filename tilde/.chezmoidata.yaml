@@ -64,7 +64,7 @@ versions:
   fd: "10.2.0" # renovate: depName=sharkdp/fd
   fzf: "0.61.0" # renovate: depName=junegunn/fzf
   helm: "3.17.2" # renovate: depName=helm/helm
-  hexyl: "0.16.0" # renovate: depName=sharkdp/hexl
+  hexyl: "0.16.0" # renovate: depName=sharkdp/hexyl
   hyperfine: "1.19.0" # renovate: depName=sharkdp/hyperfine
   numbat: "1.16.0" # renovate: depName=sharkdp/numbat
   kubectl: "1.32.3" # renovate: depName=kubernetes/kubernetes
