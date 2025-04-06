@@ -64,7 +64,3 @@ jobs:
             ```diff
             "${{ steps.prdiff.outputs.body }}"
             ```
-
-            > [!TIP]
-            > Merge this pull request and then run `mise upgrade --bump` on your workstation.
-
