@@ -8,7 +8,7 @@ direnv = "2.35.0"
 dnspyre = "3.5.0"             
 gdu = "5.30.1"
 gh = "2.69.0"                 # github CLI
-go = "1.17.2"
+go = "1.24.2"
 fd = "10.2.0"
 fzf = "0.61.1"
 helm = "3.17.2"
@@ -25,5 +25,5 @@ yq = "4.45.1"
 zoxide = "0.9.7"
 
 # pipx tools (Python CLI tools via isolated envs)
-"pipx:yamllint" = "1.35.0"
-"pipx:psf/black" = "24.4.1"
+"pipx:yamllint" = "1.37.0"
+"pipx:psf/black" = "25.1.0"
