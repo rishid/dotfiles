@@ -71,7 +71,7 @@ versions:
   procs: "0.14.10" # renovate: depName=dalance/procs
   ripgrep: "14.1.1" # renovate: depName=BurntSushi/ripgrep
   starship: "1.22.1" # renovate: depName=starship/starship
-  task: "3.42.1" # renovate: depName=go-task/task
+  task: "3.43.2" # renovate: depName=go-task/task
   trivy: "0.61.1" # renovate: depName=aquasecurity/trivy
   yq: "4.45.1" # renovate: depName=mikefarah/yq
   zoxide: "0.9.7" # renovate: depName=ajeetdsouza/zoxide
