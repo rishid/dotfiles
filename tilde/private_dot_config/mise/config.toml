@@ -21,7 +21,7 @@ rg = "14.1.1"                 # ripgrep
 starship = "1.22.1"
 task = "3.42.1"
 trivy = "0.62.1"
-yq = "4.45.3"
+yq = "4.45.4"
 zoxide = "0.9.7"
 
 # pipx tools (Python CLI tools via isolated envs)
