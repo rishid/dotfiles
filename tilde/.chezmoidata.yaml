@@ -74,4 +74,4 @@ versions:
   task: "3.43.3" # renovate: depName=go-task/task
   trivy: "0.62.1" # renovate: depName=aquasecurity/trivy
   yq: "4.45.4" # renovate: depName=mikefarah/yq
-  zoxide: "0.9.7" # renovate: depName=ajeetdsouza/zoxide
+  zoxide: "0.9.8" # renovate: depName=ajeetdsouza/zoxide
