@@ -72,6 +72,6 @@ versions:
   ripgrep: "14.1.1" # renovate: depName=BurntSushi/ripgrep
   starship: "1.23.0" # renovate: depName=starship/starship
   task: "3.43.3" # renovate: depName=go-task/task
-  trivy: "0.62.1" # renovate: depName=aquasecurity/trivy
+  trivy: "0.63.0" # renovate: depName=aquasecurity/trivy
   yq: "4.45.4" # renovate: depName=mikefarah/yq
   zoxide: "0.9.8" # renovate: depName=ajeetdsouza/zoxide
