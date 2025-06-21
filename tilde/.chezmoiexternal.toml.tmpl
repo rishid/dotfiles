@@ -1,3 +1,9 @@
+{{- /* Determine architecture tag for downloads */ -}}
+{{- if eq .chezmoi.os "darwin" -}}
+  {{- $arch := ternary "aarch64" "x86_64" (eq .chezmoi.arch "arm64") }}
+{{- else -}}
+  {{- $arch := .chezmoi.arch }}
+{{- end }}
 
 
 [".config/tmux/plugins/tpm"]
