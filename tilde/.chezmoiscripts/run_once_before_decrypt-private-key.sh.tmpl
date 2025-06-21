@@ -9,7 +9,7 @@ ENCRYPTED_FILE="{{ .chezmoi.sourceDir }}/../key.txt.age"
 
 # Try external age command if available. Fallback to builtin otherwise
 if ! command -v age >/dev/null 2>&1; then
-    AGE="chezmoi age decrypt --passphrase"
+    AGE="~/bin/chezmoi age decrypt --passphrase"
 fi
 
 # Decrypt if not already present
