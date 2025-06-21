@@ -89,10 +89,8 @@ data:
   headless: {{ $headless }}
 
   osid: {{ $osID | quote }}
-  {{- if eq .chezmoi.os "linux" }}
   uname:
     machine: "{{ output "uname" "-m" | trim }}"
-{{- end }}
 
   personal: {{ $personal }}
   work: {{ $work }}
