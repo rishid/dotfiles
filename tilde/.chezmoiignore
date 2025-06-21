@@ -23,3 +23,7 @@
 .Trash
 Library/Application Support
 {{ end -}}
+
+{{ if eq .chezmoi.os "darwin" -}}
+.chezmoiscripts/install-fisher.fish
+{{- end }}
