@@ -1,20 +1,22 @@
-{{ if eq .chezmoi.os "linux" -}}
+{{ if ne .chezmoi.os "windows" -}}
 #!/usr/bin/env sh
 
-set -eou pipefail
+set -euo pipefail
 
 AGE="age --decrypt"
 CHEZMOISECRET="${HOME}/.config/chezmoi/key.txt"
+ENCRYPTED_FILE="{{ .chezmoi.sourceDir }}/../key.txt.age"
 
 # Try external age command if available. Fallback to builtin otherwise
-if ! command -v age $> /dev/null; then
+if ! command -v age >/dev/null 2>&1; then
     AGE="chezmoi age decrypt --passphrase"
 fi
 
+# Decrypt if not already present
 if [ ! -f "${CHEZMOISECRET}" ]; then
-    mkdir -p "${HOME}/.config/chezmoi"
-    $AGE --output "${CHEZMOISECRET}" "{{ .chezmoi.sourceDir }}/../key.txt.age"
+    echo "Decrypting age key..."
+    mkdir -p "$(dirname "${CHEZMOISECRET}")"
+    ${AGE} --output "${CHEZMOISECRET}" "${ENCRYPTED_FILE}"
     chmod 400 "${CHEZMOISECRET}"
 fi
-
 {{ end -}}
