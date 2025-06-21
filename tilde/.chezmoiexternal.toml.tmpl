@@ -5,6 +5,7 @@
   {{- $arch := .chezmoi.arch }}
 {{- end }}
 
+{{- if eq .chezmoi.os "linux" }}
 
 [".config/tmux/plugins/tpm"]
     type = "git-repo"
@@ -168,3 +169,5 @@
     url = "https://github.com/ajeetdsouza/zoxide/releases/download/v{{ .versions.zoxide }}/zoxide-{{ .versions.zoxide }}-{{ .uname.machine }}-unknown-{{ .chezmoi.os }}-musl.tar.gz"
     executable = true
     path = "zoxide"
+
+{{- end }}
