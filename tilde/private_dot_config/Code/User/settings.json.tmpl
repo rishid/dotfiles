@@ -1,3 +1,72 @@
 {
-    "git.confirmSync": false
+  // UI / Editor experience
+  "editor.fontSize": 14,
+  "editor.fontFamily": "Fira Code, Menlo, monospace",
+  "editor.fontLigatures": true,
+  "editor.formatOnSave": true,
+  "editor.tabSize": 4,
+  "editor.detectIndentation": false,
+  "editor.wordWrap": "on",
+  "editor.minimap.enabled": false,
+  "editor.rulers": [80, 120],
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/*.pyo": true
+  },
+  "workbench.colorTheme": "Default Dark Modern",
+  "workbench.iconTheme": "vscode-icons",
+  "workbench.startupEditor": "none",
+  "workbench.editor.enablePreview": false,
+
+  // Terminal
+  "terminal.integrated.fontFamily": "Menlo, monospace",
+  "terminal.integrated.cursorBlinking": true,
+{{- if eq .chezmoi.os "linux" }}
+  "terminal.integrated.defaultProfile.linux": "zsh",
+{{- else if eq .chezmoi.os "darwin" }}
+  "terminal.integrated.defaultProfile.osx": "zsh",
+{{- end }}
+
+  // Python
+  "python.pythonPath": "python3",
+  "python.formatting.provider": "black",
+  "python.linting.enabled": true,
+  "python.linting.flake8Enabled": true,
+  "python.linting.mypyEnabled": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "python.envFile": "${workspaceFolder}/.env",
+
+  // Go
+  "go.useLanguageServer": true,
+  "go.formatTool": "gopls",
+  "gopls": {
+    "staticcheck": true,
+    "completeUnimported": true,
+    "analyses": {
+      "unusedparams": true,
+      "shadow": true
+    }
+  },
+  "go.lintTool": "golangci-lint",
+  "go.testOnSave": true,
+  "go.coverOnSave": false,
+  "go.buildOnSave": "package",
+  "go.vetOnSave": "package",
+
+  // Auto-save
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+
+  // Git
+  "git.confirmSync": false,
+
+  // Platform compatibility
+  "files.eol": "\n",
+
+  // Misc
+  "explorer.confirmDelete": false,
+  "breadcrumbs.enabled": true
 }
