@@ -1,9 +1,8 @@
 [tools]
 # Language/tool versions
 age = "1.2.1"
-backstage_go = "0.9.0"
 bat = "0.25.0"
-cloc = "1.96"
+# cloc = "1.96"
 direnv = "2.37.0"          
 gdu = "5.31.0"
 gh = "2.75.0"
@@ -15,7 +14,7 @@ hexyl = "0.16.0"
 hyperfine = "1.19.0"
 numbat = "1.16.0"
 kubectl = "1.33.3"
-procs = "0.14.10"
+# procs = "0.14.10"
 rg = "14.1.1"                 # ripgrep
 starship = "1.23.0"
 task = "3.44.0"
