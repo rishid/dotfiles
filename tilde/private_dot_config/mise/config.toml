@@ -23,6 +23,7 @@ yq = "4.46.1"
 zoxide = "0.9.8"
 
 "npm:@anthropic-ai/claude-code" = "latest"
+"npm:@openai/codex" = "latest"
 
 # pipx tools (Python CLI tools via isolated envs)
 "pipx:yamllint" = "1.37.1"
