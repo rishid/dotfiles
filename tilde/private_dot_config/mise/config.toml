@@ -22,6 +22,8 @@ trivy = "0.64.1"
 yq = "4.46.1"
 zoxide = "0.9.8"
 
+"npm:anthropic-ai/claude-code" = "latest"
+
 # pipx tools (Python CLI tools via isolated envs)
 "pipx:yamllint" = "1.37.1"
 "pipx:psf/black" = "25.1.0"
