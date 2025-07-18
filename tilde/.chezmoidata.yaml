@@ -59,7 +59,7 @@ versions:
   direnv: "2.37.0" # renovate: depName=direnv/direnv
   dnspyre: "3.6.0" # renovate: depName=Tantalor93/dnspyre
   gdu: "5.31.0" # renovate: depName=dundee/gdu
-  github_cli: "2.75.1" # renovate: depName=cli/cli
+  github_cli: "2.76.0" # renovate: depName=cli/cli
   go: "1.17.2" # renovate: depName=golang/go
   fd: "10.2.0" # renovate: depName=sharkdp/fd
   fzf: "0.64.0" # renovate: depName=junegunn/fzf
