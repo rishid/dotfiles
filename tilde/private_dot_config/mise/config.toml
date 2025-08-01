@@ -19,7 +19,7 @@ kubectl = "1.33.3"
 rg = "14.1.1"                 # ripgrep
 starship = "1.23.0"
 task = "3.44.0"
-trivy = "0.64.1"
+trivy = "0.65.0"
 yq = "4.47.1"
 zoxide = "0.9.8"
 
