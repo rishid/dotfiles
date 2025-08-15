@@ -67,7 +67,7 @@ versions:
   hexyl: "0.16.0" # renovate: depName=sharkdp/hexyl
   hyperfine: "1.19.0" # renovate: depName=sharkdp/hyperfine
   numbat: "1.16.0" # renovate: depName=sharkdp/numbat
-  kubectl: "1.33.3" # renovate: depName=kubernetes/kubernetes
+  kubectl: "1.33.4" # renovate: depName=kubernetes/kubernetes
   procs: "0.14.10" # renovate: depName=dalance/procs
   ripgrep: "14.1.1" # renovate: depName=BurntSushi/ripgrep
   starship: "1.23.0" # renovate: depName=starship/starship
