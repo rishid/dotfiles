@@ -63,7 +63,7 @@ versions:
   go: "1.17.2" # renovate: depName=golang/go
   fd: "10.2.0" # renovate: depName=sharkdp/fd
   fzf: "0.65.1" # renovate: depName=junegunn/fzf
-  helm: "3.18.5" # renovate: depName=helm/helm
+  helm: "3.18.6" # renovate: depName=helm/helm
   hexyl: "0.16.0" # renovate: depName=sharkdp/hexyl
   hyperfine: "1.19.0" # renovate: depName=sharkdp/hyperfine
   numbat: "1.16.0" # renovate: depName=sharkdp/numbat
