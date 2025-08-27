@@ -61,7 +61,7 @@ versions:
   gdu: "5.31.0" # renovate: depName=dundee/gdu
   github_cli: "2.78.0" # renovate: depName=cli/cli
   go: "1.17.2" # renovate: depName=golang/go
-  fd: "10.2.0" # renovate: depName=sharkdp/fd
+  fd: "10.3.0" # renovate: depName=sharkdp/fd
   fzf: "0.65.1" # renovate: depName=junegunn/fzf
   helm: "3.18.6" # renovate: depName=helm/helm
   hexyl: "0.16.0" # renovate: depName=sharkdp/hexyl
