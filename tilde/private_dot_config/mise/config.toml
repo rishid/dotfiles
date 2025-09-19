@@ -28,4 +28,4 @@ zoxide = "0.9.8"
 
 # pipx tools (Python CLI tools via isolated envs)
 "pipx:yamllint" = "1.37.1"
-"pipx:psf/black" = "25.1.0"
+"pipx:psf/black" = "25.9.0"
