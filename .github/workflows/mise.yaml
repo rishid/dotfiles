@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 0 * * 0" # once a week
-    
+
 jobs:
   mise:
     name: upgrade-tools
@@ -60,7 +60,7 @@ jobs:
           branch: "mise-upgrade/${{ github.run_id }}"
           body: |
             Upgraded dependencies found in `.mise.toml`:
-            
+
             ```diff
             "${{ steps.prdiff.outputs.body }}"
             ```
