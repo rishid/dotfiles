@@ -79,10 +79,39 @@ exec fish
 ```
 
 ### For VS Code Remote SSH issues:
-The systemd approach should resolve most remote SSH issues because:
-- The agent runs as a proper service, not tied to shell sessions
-- SSH_AUTH_SOCK is set in the systemd user environment, accessible to all processes
-- The socket persists even when shells are closed/reopened
+The systemd approach should resolve most remote SSH issues, but if you're still getting passphrase prompts:
+
+1. **Run the debug script:**
+   ```bash
+   ssh-agent-debug
+   ```
+
+2. **Check SSH config has agent forwarding:**
+   ```bash
+   # Your ~/.ssh/config should have:
+   Host *
+       ForwardAgent yes
+       AddKeysToAgent yes
+   ```
+
+3. **Test SSH connection manually:**
+   ```bash
+   ssh -T git@github.com  # Should not ask for passphrase
+   ```
+
+4. **VS Code specific fixes:**
+   - Restart VS Code completely (not just reload window)
+   - In VS Code settings, ensure "Remote.SSH: Use Local Server" is enabled
+   - Try connecting to remote host via terminal first, then VS Code
+
+5. **If still failing, check:**
+   - SSH_AUTH_SOCK is available in non-interactive shells: `ssh remotehost 'echo $SSH_AUTH_SOCK'`
+   - Keys are loaded: `ssh remotehost 'ssh-add -l'`
+
+### Common Issues:
+- **"Agent admitted failure to sign"**: Key not loaded or wrong key permissions
+- **"Could not open a connection to your authentication agent"**: SSH_AUTH_SOCK not set
+- **VS Code asks for passphrase despite working terminal**: SSH agent not forwarded properly
 
 ## Migration from keychain
 

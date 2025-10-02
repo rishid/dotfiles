@@ -1,22 +1,23 @@
 # SSH Agent setup using systemd user service
+# This ensures SSH_AUTH_SOCK is available for both interactive and non-interactive sessions
 
+# Always import SSH_AUTH_SOCK from systemd user environment (for VS Code Remote SSH)
+if test -z "$SSH_AUTH_SOCK"
+    set -x SSH_AUTH_SOCK (systemctl --user show-environment 2>/dev/null | grep SSH_AUTH_SOCK | cut -d= -f2)
+end
+
+# If SSH_AUTH_SOCK is still not set, try the runtime directory path
+if test -z "$SSH_AUTH_SOCK"
+    set -x SSH_AUTH_SOCK "$XDG_RUNTIME_DIR/ssh-agent.socket"
+end
+
+# Ensure the ssh-agent service is running
+if not systemctl --user is-active --quiet ssh-agent.service 2>/dev/null
+    systemctl --user start ssh-agent.service 2>/dev/null
+end
+
+# Auto-load SSH keys from ~/.ssh/autoload (only in interactive sessions)
 if status is-interactive
-    # Import SSH_AUTH_SOCK from systemd user environment
-    if test -z "$SSH_AUTH_SOCK"
-        set -x SSH_AUTH_SOCK (systemctl --user show-environment | grep SSH_AUTH_SOCK | cut -d= -f2)
-    end
-
-    # If SSH_AUTH_SOCK is still not set, try the runtime directory path
-    if test -z "$SSH_AUTH_SOCK"
-        set -x SSH_AUTH_SOCK "$XDG_RUNTIME_DIR/ssh-agent.socket"
-    end
-
-    # Ensure the ssh-agent service is running
-    if not systemctl --user is-active --quiet ssh-agent.service
-        systemctl --user start ssh-agent.service
-    end
-
-    # Auto-load SSH keys from ~/.ssh/autoload (single source of truth)
     if test -f ~/.ssh/autoload
         while read -l key_path
             # Skip empty lines and comments

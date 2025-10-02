@@ -1,6 +1,6 @@
 
 # Skip newer or system-specific unmatched options.
-IgnoreUnknown AddKeysToAgent,UseKeychain
+IgnoreUnknown AddKeysToAgent,UseKeychain,ForwardAgent
 
 HashKnownHosts no
 
@@ -27,6 +27,8 @@ Host !github.com
     ControlPath ~/.ssh/controlmasters/%r@%h:%p
     ControlPersist 60m
 
+    # Forward SSH agent to remote hosts (for VS Code Remote SSH)
+    ForwardAgent yes
     # Allow storing passphrases in the macOS keychain.
     AddKeysToAgent yes
 {{- if (eq .chezmoi.os "darwin") }}

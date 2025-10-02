@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+# SSH Agent Debug Script
+# This helps diagnose SSH agent issues with VS Code Remote SSH
+
+echo "=== SSH Agent Debug Information ==="
+echo "Date: $(date)"
+echo "User: $(whoami)"
+echo "Shell: $SHELL"
+echo "Interactive: $-"
+echo
+
+echo "=== Environment Variables ==="
+echo "SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
+echo "SSH_AGENT_PID: $SSH_AGENT_PID"
+echo "XDG_RUNTIME_DIR: $XDG_RUNTIME_DIR"
+echo
+
+echo "=== systemd ssh-agent Service ==="
+if command -v systemctl >/dev/null 2>&1; then
+    echo "Service status:"
+    systemctl --user status ssh-agent.service --no-pager -l
+    echo
+    echo "systemd user environment:"
+    systemctl --user show-environment | grep SSH_AUTH_SOCK || echo "SSH_AUTH_SOCK not in systemd environment"
+else
+    echo "systemctl not available"
+fi
+echo
+
+echo "=== SSH Agent Socket ==="
+if [ -n "$SSH_AUTH_SOCK" ]; then
+    echo "Socket path: $SSH_AUTH_SOCK"
+    if [ -S "$SSH_AUTH_SOCK" ]; then
+        echo "Socket exists: YES"
+        echo "Socket permissions: $(ls -la "$SSH_AUTH_SOCK")"
+    else
+        echo "Socket exists: NO"
+    fi
+else
+    echo "SSH_AUTH_SOCK not set"
+fi
+echo
+
+echo "=== SSH Agent Keys ==="
+if ssh-add -l 2>/dev/null; then
+    echo "Keys loaded successfully"
+else
+    case $? in
+        1) echo "No keys loaded in agent" ;;
+        2) echo "Cannot connect to SSH agent" ;;
+        *) echo "Unknown ssh-add error" ;;
+    esac
+fi
+echo
+
+echo "=== ~/.ssh/autoload Configuration ==="
+if [ -f ~/.ssh/autoload ]; then
+    echo "~/.ssh/autoload exists:"
+    grep -v '^#' ~/.ssh/autoload | grep -v '^$' | while read -r key; do
+        expanded_key=$(eval echo "$key")
+        if [ -f "$expanded_key" ]; then
+            echo "  ✓ $key -> $expanded_key"
+        else
+            echo "  ✗ $key -> $expanded_key (not found)"
+        fi
+    done
+else
+    echo "~/.ssh/autoload does not exist"
+fi
+echo
+
+echo "=== SSH Config Test ==="
+echo "Testing SSH configuration parsing:"
+ssh -F ~/.ssh/config -o BatchMode=yes -o ConnectTimeout=1 -T git@github.com 2>&1 | head -3
+echo
+
+echo "=== Recommendations ==="
+if [ -z "$SSH_AUTH_SOCK" ]; then
+    echo "❌ SSH_AUTH_SOCK not set - agent not accessible"
+    echo "   Fix: Restart shell or run: source ~/.config/shell/ssh-agent.sh"
+elif [ ! -S "$SSH_AUTH_SOCK" ]; then
+    echo "❌ SSH_AUTH_SOCK points to non-existent socket"
+    echo "   Fix: Restart ssh-agent service: systemctl --user restart ssh-agent.service"
+elif ! ssh-add -l >/dev/null 2>&1; then
+    echo "❌ Cannot connect to SSH agent"
+    echo "   Fix: Check service status and restart if needed"
+elif [ "$(ssh-add -l 2>/dev/null | wc -l)" -eq 0 ]; then
+    echo "⚠️  SSH agent running but no keys loaded"
+    echo "   Fix: Run ssh-key-add <keypath> or check ~/.ssh/autoload"
+else
+    echo "✅ SSH agent appears to be working correctly"
+    echo "   If VS Code still asks for passphrase, check ForwardAgent in SSH config"
+fi

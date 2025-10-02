@@ -15,6 +15,9 @@
 # XDG dirs
 # source "$HOME/.config/shell/exports.sh"
 
+# SSH Agent setup (for systemd ssh-agent compatibility with VS Code Remote SSH)
+[ ! -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/ssh-agent.sh" ] || . "${XDG_CONFIG_HOME:-$HOME/.config}/shell/ssh-agent.sh"
+
 # Aliases / Functions / Exports
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 [ ! -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/exports.sh" ] || . "${XDG_CONFIG_HOME:-$HOME/.config}/shell/exports.sh"
