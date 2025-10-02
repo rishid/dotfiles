@@ -1,0 +1,18 @@
+function ssh-key-help
+    echo "SSH Key Management Commands:"
+    echo "  ssh-key-add <path>     - Add a key to the agent and optionally to ~/.ssh/autoload"
+    echo "  ssh-key-remove <path>  - Remove a key from the agent and optionally from ~/.ssh/autoload"
+    echo "  ssh-key-list           - List loaded keys and auto-load configuration"
+    echo "  ssh-agent-status       - Show ssh-agent service status and loaded keys"
+    echo "  ssh-agent-restart      - Restart the ssh-agent service and reload keys"
+    echo "  ssh-key-help           - Show this help message"
+    echo ""
+    echo "Configuration methods:"
+    echo "  1. Standard keys: ~/.ssh/id_ed25519, ~/.ssh/id_rsa, etc. (auto-discovered)"
+    echo "  2. Custom file: ~/.ssh/autoload (one key path per line)"
+    echo ""
+    echo "Examples:"
+    echo "  ssh-key-add ~/.ssh/id_rsa"
+    echo "  ssh-key-add ~/.ssh/github_akamai"
+    echo "  echo '~/.ssh/work_key' >> ~/.ssh/autoload"
+end
