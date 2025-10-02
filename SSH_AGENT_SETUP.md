@@ -30,22 +30,20 @@ ssh-key-add ~/.ssh/id_rsa
 ssh-key-add ~/.ssh/github_akamai
 ```
 
-### Method 2: Standard SSH Keys (Automatic)
-Place your keys with standard names in `~/.ssh/`:
-- `~/.ssh/id_ed25519` (recommended)
-- `~/.ssh/id_rsa`
-- `~/.ssh/id_ecdsa`
-- `~/.ssh/id_dsa`
-
-These will be automatically discovered and loaded.
-
-### Method 3: Configuration File
-Create `~/.ssh/autoload` with one key path per line:
+### Method 2: Manual Configuration
+Create or edit `~/.ssh/autoload` with one key path per line:
 ```
 # SSH Keys to auto-load
 ~/.ssh/id_ed25519
+~/.ssh/id_rsa
 ~/.ssh/github_akamai
 ~/.ssh/work_key
+```
+
+Lines starting with `#` are ignored (comments), so you can temporarily disable keys:
+```
+# ~/.ssh/old_key    # temporarily disabled
+~/.ssh/current_key
 ```
 
 ## Management Commands
@@ -60,9 +58,9 @@ Create `~/.ssh/autoload` with one key path per line:
 
 1. **Persistent across sessions:** The systemd service runs independently of shell sessions
 2. **Works with remote SSH:** The SSH_AUTH_SOCK is properly set in the systemd environment
-3. **Auto-loading:** Standard keys and keys in ~/.ssh/autoload are automatically loaded
+3. **Single source of truth:** Only `~/.ssh/autoload` controls which keys are loaded
 4. **Reliable:** systemd manages the service lifecycle with automatic restart on failure
-5. **Clean and simple:** No environment variables to manage
+5. **Simple and explicit:** No magic auto-discovery, you control exactly which keys are loaded
 
 ## Troubleshooting
 

@@ -16,21 +16,7 @@ if status is-interactive
         systemctl --user start ssh-agent.service
     end
 
-    # Auto-load SSH keys using two strategies
-
-    # Strategy 1: Auto-discover standard SSH keys
-    set -l standard_keys ~/.ssh/id_rsa ~/.ssh/id_ed25519 ~/.ssh/id_ecdsa ~/.ssh/id_dsa
-
-    for key in $standard_keys
-        if test -f "$key"
-            # Check if key is already loaded
-            if not ssh-add -l 2>/dev/null | grep -q (ssh-keygen -lf "$key" 2>/dev/null | awk '{print $2}')
-                ssh-add "$key" 2>/dev/null
-            end
-        end
-    end
-
-    # Strategy 2: Load keys listed in ~/.ssh/autoload (if it exists)
+    # Auto-load SSH keys from ~/.ssh/autoload (single source of truth)
     if test -f ~/.ssh/autoload
         while read -l key_path
             # Skip empty lines and comments
