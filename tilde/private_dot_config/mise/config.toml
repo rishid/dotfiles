@@ -31,7 +31,7 @@ trivy = "0.67.0"                 # Security scanner
 zoxide = "0.9.8"                 # Better cd
 
 # === Build & CI Tools ===
-"pipx:pre-commit" = "3.8.0"      # Git hook framework
+"pipx:pre-commit" = "4.3.0"      # Git hook framework
 "pipx:yamllint" = "1.37.1"       # YAML linter
 "pipx:black" = "25.9.0"          # Python formatter
 
