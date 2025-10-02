@@ -5,7 +5,7 @@
 # === Programming Languages & Runtimes ===
 go = "1.25.1"
 node = "latest"
-python = "3.12"
+python = "3.13.7"
 java = "openjdk-21"
 
 # === Development Tools ===
