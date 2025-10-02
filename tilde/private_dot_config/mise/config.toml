@@ -6,6 +6,7 @@
 go = "1.25.1"
 node = "latest"
 python = "3.13.7"
+uv = "latest"                     # Modern Python package management
 
 # === Development Tools ===
 gh = "2.81.0"                    # GitHub CLI

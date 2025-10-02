@@ -8,7 +8,7 @@ github_email: rishid@gmail.com
 
 apt:
   install:
-    # Essential system packages only
+    # Minimal essential system packages only
     - git                 # Required for chezmoi and version control
     - curl                # Required for downloads and scripts
     - wget                # Basic download utility
@@ -17,16 +17,12 @@ apt:
     - tree                # Directory listing utility
     - htop                # System monitoring
     - jq                  # JSON processor (used in many scripts)
-    - keychain            # SSH key management (system integration)
 
-    # Optional system utilities
+    # Basic utilities
     - dos2unix            # Text file conversion
     - socat               # Network utility
     - pv                  # Progress viewer
-    - meld                # GUI diff tool
-    - speedtest-cli       # Network testing
 
-  remove: []
 
 plugins:
   vscode:

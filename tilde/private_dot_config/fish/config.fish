@@ -18,8 +18,19 @@ fish_add_path --global "$HOME/.local/bin/"
 set -Ux EDITOR "code --wait"
 
 # Activate mise (must come before direnv and other tool usage)
+# Use a more reliable mise activation method
 if command -v mise >/dev/null 2>&1
+    # Use mise's built-in fish activation
     mise activate fish | source
+
+    # Verify activation worked by checking if MISE_SHELL is set
+    if test -z "$MISE_SHELL"
+        # Fallback: try direct eval
+        eval (mise activate fish)
+    end
+else if test -x "$HOME/.local/bin/mise"
+    # Fallback to explicit path
+    eval ($HOME/.local/bin/mise activate fish)
 end
 
 # Now direnv should be available via mise

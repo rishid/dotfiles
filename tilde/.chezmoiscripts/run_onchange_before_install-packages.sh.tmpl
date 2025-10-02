@@ -4,14 +4,23 @@
 set -euo pipefail
 
 #
-# Debian
+# Debian package management
 #
 
 sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=60 -qq update
 
-# sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=60 remove {{ .apt.remove | join " " }}
+# Fix any broken packages first
+sudo DEBIAN_FRONTEND=noninteractive apt-get -f install
 
-sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=60 -y upgrade
+# Remove conflicting packages that are now managed by mise/uv
+{{ if .apt.remove -}}
+sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=60 remove -y {{ .apt.remove | join " " }} || true
+{{ end -}}
+
+# Install essential system packages only (skip problematic upgrade)
 sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=60 -q install {{ .apt.install | join " " }}
+
+# Clean up
+sudo apt autoremove -y
 
 {{ end }}
