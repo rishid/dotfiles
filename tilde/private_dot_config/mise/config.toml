@@ -40,7 +40,7 @@ zoxide = "0.9.8"                 # Better cd
 "npm:@openai/codex" = "latest"
 
 # === Optional/Project-specific (can be per-directory) ===
-terraform = "1.9.0"
+terraform = "1.13.3"
 
 [settings]
 # Auto-install tools when entering directories with .tool-versions
