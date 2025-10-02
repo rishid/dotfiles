@@ -23,7 +23,7 @@ fd = "10.3.0"                    # Better find
 fzf = "0.65.2"                   # Fuzzy finder
 gdu = "5.31.0"                   # Disk usage analyzer
 hexyl = "0.16.0"                 # Hex viewer
-hyperfine = "1.19.0"             # Benchmarking tool
+hyperfine = "1.19.0"              # Benchmarking tool
 numbat = "1.16.0"                # Calculator
 ripgrep = "14.1.1"               # Better grep
 starship = "1.23.0"              # Shell prompt
@@ -41,8 +41,6 @@ zoxide = "0.9.8"                 # Better cd
 
 # === Optional/Project-specific (can be per-directory) ===
 terraform = "1.9.0"
-docker-compose = "2.29.0"
-redis = "7.4.0"
 
 [settings]
 # Auto-install tools when entering directories with .tool-versions
