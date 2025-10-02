@@ -28,15 +28,6 @@ apt:
 
   remove: []
 
-pip:
-  install:
-    # Only Python packages that aren't available via pipx/mise
-    - pandas              # Data analysis (heavy dependency)
-    - requests            # Basic HTTP library
-    - chepy               # CTF utility
-  remove:
-    - pyOpenSSL          # Cleanup old packages
-
 plugins:
   vscode:
     ### code

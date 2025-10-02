@@ -17,7 +17,15 @@ fish_add_path --global "$HOME/.local/bin/"
 
 set -Ux EDITOR "code --wait"
 
-direnv hook fish | source
+# Activate mise (must come before direnv and other tool usage)
+if command -v mise >/dev/null 2>&1
+    mise activate fish | source
+end
+
+# Now direnv should be available via mise
+if command -v direnv >/dev/null 2>&1
+    direnv hook fish | source
+end
 
 #source ~/.config/shell/aliases.sh
 
