@@ -1,31 +1,54 @@
-[tools]
-# Language/tool versions
-age = "1.2.1"
-bat = "0.25.0"
-# cloc = "1.96"
-direnv = "2.37.1"          
-gdu = "5.31.0"
-gh = "2.80.0"
-go = "1.25.1"
-fd = "10.3.0"
-fzf = "0.65.2"
-helm = "3.19.0"
-hexyl = "0.16.0"
-hyperfine = "1.19.0"
-node = "latest"
-numbat = "1.16.0"
-kubectl = "1.34.1"
-# procs = "0.14.10"
-rg = "14.1.1"                 # ripgrep
-starship = "1.23.0"
-task = "3.45.4"
-trivy = "0.67.0"
-yq = "4.47.2"
-zoxide = "0.9.8"
+# mise configuration - development tools and CLI utilities
+# This replaces the binary downloads from chezmoi external
 
+[tools]
+# === Programming Languages & Runtimes ===
+go = "1.25.1"
+node = "latest"
+python = "3.12"
+java = "openjdk-21"
+
+# === Development Tools ===
+gh = "2.81.0"                    # GitHub CLI
+helm = "3.19.0"                  # Kubernetes package manager
+kubectl = "1.34.1"               # Kubernetes CLI
+task = "3.45.4"                  # Task runner
+yq = "4.47.2"                    # YAML processor
+direnv = "2.37.1"                # Environment variable management
+
+# === CLI Utilities ===
+age = "1.2.1"                    # File encryption
+bat = "0.25.0"                   # Better cat
+fd = "10.3.0"                    # Better find
+fzf = "0.65.2"                   # Fuzzy finder
+gdu = "5.31.0"                   # Disk usage analyzer
+hexyl = "0.16.0"                 # Hex viewer
+hyperfine = "1.19.0"             # Benchmarking tool
+numbat = "1.16.0"                # Calculator
+ripgrep = "14.1.1"               # Better grep
+starship = "1.23.0"              # Shell prompt
+trivy = "0.67.0"                 # Security scanner
+zoxide = "0.9.8"                 # Better cd
+
+# === Build & CI Tools ===
+"pipx:pre-commit" = "3.8.0"      # Git hook framework
+"pipx:yamllint" = "1.37.1"       # YAML linter
+"pipx:black" = "25.9.0"          # Python formatter
+
+# === NPM Global Tools ===
 "npm:@anthropic-ai/claude-code" = "latest"
 "npm:@openai/codex" = "latest"
 
-# pipx tools (Python CLI tools via isolated envs)
-"pipx:yamllint" = "1.37.1"
-"pipx:psf/black" = "25.9.0"
+# === Optional/Project-specific (can be per-directory) ===
+terraform = "1.9.0"
+docker-compose = "2.29.0"
+redis = "7.4.0"
+
+[settings]
+# Auto-install tools when entering directories with .tool-versions
+always_keep_download = true
+paranoid = false
+
+# Use specific plugin repositories if needed
+[plugins]
+# Custom plugins can be specified here
