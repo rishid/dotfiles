@@ -24,6 +24,9 @@
   // Terminal
   "terminal.integrated.fontFamily": "Menlo, monospace",
   "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.scrollback": 10000,
+  "terminal.integrated.copyOnSelection": true,
+  "terminal.integrated.rightClickBehavior": "paste",
 {{- if eq .chezmoi.os "linux" }}
   "terminal.integrated.defaultProfile.linux": "zsh",
 {{- else if eq .chezmoi.os "darwin" }}
