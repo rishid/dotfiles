@@ -21,10 +21,6 @@
 **/.DS_Store
 .CFUserTextEncoding
 .Trash
-Library/Application Support
-{{ end -}}
-
-{{ if ne .chezmoi.os "darwin" }}
 Library/
 tilde/private_Library/
 {{ end }}
