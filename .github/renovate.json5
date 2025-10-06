@@ -17,6 +17,7 @@
     },
   ],
   customManagers: [
+    // Workaround to support github backend in mise config.toml
     {
       customType: 'regex',
       managerFilePatterns: [
