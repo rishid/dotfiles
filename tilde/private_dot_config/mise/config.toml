@@ -29,7 +29,7 @@ numbat = "1.16.0"                # Calculator
 "aqua:BurntSushi/ripgrep" = "14.1.1"               # Better grep
 starship = "1.23.0"              # Shell prompt
 trivy = "0.67.0"                 # Security scanner
-"ubi:ajeetdsouza/zoxide" = "0.9.4"                 # Better cd
+"ubi:ajeetdsouza/zoxide" = "0.9.8"                 # Better cd
 
 # === Build & CI Tools ===
 "pipx:pre-commit" = "4.3.0"      # Git hook framework
