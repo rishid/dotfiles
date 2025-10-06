@@ -11,6 +11,14 @@
       "automerge": true
     }
   ],
+  "regexManagers": [
+    {
+      "fileMatch": ["config\\.toml$"],
+      "matchStrings": ["(?m)^\"github:(?<packageName>[^\"]+)\"\\s*=\\s*\"(?<currentValue>[0-9.]+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "{{{packageName}}}"
+    }
+  ],
   onboarding: false,
   requireConfig: "ignored",
 }
