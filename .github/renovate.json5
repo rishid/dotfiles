@@ -12,6 +12,7 @@
     }
   ],
   "regexManagers": [
+    // Workaround to support github backend in mise config.toml
     {
       "fileMatch": ["config\\.toml$"],
       "matchStrings": ["(?m)^\"github:(?<packageName>[^\"]+)\"\\s*=\\s*\"(?<currentValue>[0-9.]+)\""],
