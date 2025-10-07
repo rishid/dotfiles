@@ -12,7 +12,7 @@ uv = "0.8.24"                     # Modern Python package management
 gh = "2.81.0"                    # GitHub CLI
 helm = "3.19.0"                  # Kubernetes package manager
 kubectl = "1.34.1"               # Kubernetes CLI
-task = "3.45.4"                  # Task runner
+"github:go-task/task" = "3.45.2"                  # Task runner
 yq = "4.47.2"                    # YAML processor
 direnv = "2.37.1"                # Environment variable management
 
