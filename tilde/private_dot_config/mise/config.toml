@@ -16,20 +16,20 @@ task = "3.45.4"                  # Task runner
 yq = "4.47.2"                    # YAML processor
 direnv = "2.37.1"                # Environment variable management
 
-# === CLI Utilities ===
-age = "1.2.1"                    # File encryption
-bat = "0.25.0"                   # Better cat
-eza = "0.23.0"                   # Better ls
-fd = "10.3.0"                    # Better find
-fzf = "0.65.2"                   # Fuzzy finder
-gdu = "5.31.0"                   # Disk usage analyzer
-hexyl = "0.16.0"                 # Hex viewer
-hyperfine = "1.19.0"              # Benchmarking tool
-"github:sharkdp/numbat" = "1.16.0"                # Calculator
-"aqua:BurntSushi/ripgrep" = "14.1.1"               # Better grep
-starship = "1.23.0"              # Shell prompt
-trivy = "0.67.0"                 # Security scanner
-"ubi:ajeetdsouza/zoxide" = "0.9.8"                 # Better cd
+# === CLI Utilities (explicit GitHub backends for Renovate) ===
+"github:FiloSottile/age" = "1.2.1"                 # File encryption
+"github:sharkdp/bat" = "0.25.0"                    # Better cat
+"github:eza-community/eza" = "0.23.0"              # Better ls
+"github:sharkdp/fd" = "10.3.0"                     # Better find
+"github:jhawthorn/fzf" = "0.65.2"                  # Fuzzy finder (junegunn originally, now mirrors exist)
+"github:dundee/gdu" = "5.31.0"                     # Disk usage analyzer
+"github:sharkdp/hexyl" = "0.16.0"                  # Hex viewer
+"github:sharkdp/hyperfine" = "1.19.0"              # Benchmarking tool
+"github:sharkdp/numbat" = "1.16.0"                 # Calculator
+"github:BurntSushi/ripgrep" = "14.1.1"             # Better grep
+"github:starship/starship" = "1.23.0"              # Shell prompt
+"github:aquasecurity/trivy" = "0.67.0"             # Security scanner
+"github:ajeetdsouza/zoxide" = "0.9.8"              # Better cd
 
 # === Build & CI Tools ===
 "pipx:pre-commit" = "4.3.0"      # Git hook framework
