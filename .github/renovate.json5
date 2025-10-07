@@ -24,7 +24,7 @@
         '/config\\.toml$/',
       ],
       matchStrings: [
-        '(?m)^"github:(?<depName>[^"]+)"\\s*=\\s*"(?<currentValue>[0-9.]+)"',
+        '(?m)^\s*"github:(?<depName>[^"]+)"\s*=\s*"v?(?<currentValue>[0-9.]+)"',
       ],
       datasourceTemplate: 'github-releases',
       versioningTemplate: 'semver-coerced',
