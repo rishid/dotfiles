@@ -5,7 +5,7 @@
 # === Programming Languages & Runtimes ===
 go = "1.25.1"
 node = "24.8.0"
-python = "3.13.7"
+python = "3.14.0"
 uv = "0.8.24"                     # Modern Python package management
 
 # === Development Tools ===
