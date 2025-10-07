@@ -27,7 +27,6 @@
         '(?m)^"github:(?<depName>[^"]+)"\\s*=\\s*"(?<currentValue>[0-9.]+)"',
       ],
       datasourceTemplate: 'github-releases',
-      depNameTemplate: '{{{packageName}}}',
       versioningTemplate: 'semver-coerced',
       prCreation: 'immediate',
     },
