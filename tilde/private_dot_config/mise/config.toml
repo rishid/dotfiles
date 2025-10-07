@@ -9,10 +9,10 @@ python = "3.14.0"
 uv = "0.8.24"                     # Modern Python package management
 
 # === Development Tools ===
-gh = "2.81.0"                    # GitHub CLI
-helm = "3.19.0"                  # Kubernetes package manager
-kubectl = "1.34.1"               # Kubernetes CLI
-"github:go-task/task" = "3.45.2"                  # Task runner
+github-cli = "2.81.0"
+helm = "3.19.0"
+kubectl = "1.34.1"
+"github:go-task/task" = "3.45.2"
 yq = "4.47.2"                    # YAML processor
 direnv = "2.37.1"                # Environment variable management
 
