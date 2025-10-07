@@ -4,7 +4,7 @@
 [tools]
 # === Programming Languages & Runtimes ===
 go = "1.25.1"
-node = "24.8.0"
+node = "24.9.0"
 python = "3.14.0"
 uv = "0.8.24"                     # Modern Python package management
 
