@@ -1,4 +1,4 @@
-# mise configuration - development tools and CLI utilities
+e# mise configuration - development tools and CLI utilities
 # This replaces the binary downloads from chezmoi external
 
 [tools]
@@ -31,10 +31,6 @@ direnv = "2.37.1"                # Environment variable management
 "github:aquasecurity/trivy" = "0.67.0"             # Security scanner
 "github:ajeetdsouza/zoxide" = "0.9.8"              # Better cd
 
-# === Build & CI Tools ===
-"pipx:pre-commit" = "4.3.0"      # Git hook framework
-"pipx:yamllint" = "1.37.1"       # YAML linter
-"pipx:black" = "25.9.0"          # Python formatter
 # === Build & CI Tools ===
 "pipx:pre-commit" = "4.3.0"      # Git hook framework
 "pipx:yamllint" = "1.37.1"       # YAML linter
