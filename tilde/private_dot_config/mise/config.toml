@@ -1,4 +1,4 @@
-e# mise configuration - development tools and CLI utilities
+# mise configuration - development tools and CLI utilities
 # This replaces the binary downloads from chezmoi external
 
 [tools]
