@@ -1,16 +1,51 @@
-# Useful `.gitignore` templates:
+# ============================================================
+# Global Git Ignore
+# Managed by chezmoi
+# System-wide ignores for macOS and Linux
 # https://github.com/github/gitignore
+# ============================================================
 
-### Linux
-*~
-
-### macOS
+### OS-generated files
+# macOS
 .DS_Store
 .AppleDouble
 .LSOverride
 Icon
-
-# Thumbnails
 ._*
 
+# Linux
+*~
+
+# Thumbnails & metadata
+Thumbs.db
+ehthumbs.db
+
+# Common backup files
+*.swp
+*.swo
+*.bak
+*.tmp
+*.orig
+*~
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# Logs
+*.log
+logs/
+
+# Configs or local overrides
+**/.claude/settings.local.json
 .cfg
+
+# Systemd editor backups
+*.service~
+*.timer~
+
+# Python bytecode (common if editing system scripts)
+__pycache__/
+*.py[cod]
