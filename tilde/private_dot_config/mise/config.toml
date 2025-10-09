@@ -4,7 +4,7 @@
 [tools]
 # === Programming Languages & Runtimes ===
 go = "1.25.2"
-node = "24.9.0"
+node = "24.10.0"
 python = "3.14.0"
 uv = "0.9.0"
 
