@@ -6,7 +6,7 @@
 go = "1.25.2"
 node = "24.9.0"
 python = "3.14.0"
-uv = "0.9.1"
+uv = "0.9.2"
 
 # === Development Tools ===
 github-cli = "2.81.0"
