@@ -29,7 +29,7 @@ direnv = "2.37.1"                # Environment variable management
 "aqua:sharkdp/numbat" = "1.16.0"                 # Calculator
 "aqua:BurntSushi/ripgrep" = "14.1.1"             # Better grep
 "aqua:starship/starship" = "1.23.0"              # Shell prompt
-"aqua:aquasecurity/trivy" = "0.67.0"             # Security scanner
+"aqua:aquasecurity/trivy" = "0.67.2"             # Security scanner
 "aqua:ajeetdsouza/zoxide" = "0.9.8"              # Better cd
 
 # === Build & CI Tools ===
