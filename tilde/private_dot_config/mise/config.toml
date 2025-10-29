@@ -45,10 +45,8 @@ direnv = "2.37.1"                # Environment variable management
 terraform = "1.13.4"
 
 [settings]
-# Auto-install tools when entering directories with .tool-versions
 always_keep_download = true
 paranoid = false
-pipx_uvx = true
 
 # Use specific plugin repositories if needed
 [plugins]
