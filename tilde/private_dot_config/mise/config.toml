@@ -3,7 +3,7 @@
 
 [tools]
 # === Programming Languages & Runtimes ===
-go = "1.25.3"
+go = "1.25.4"
 node = "24.11.0"
 python = "3.14.0"
 uv = "0.9.7"
