@@ -34,7 +34,7 @@ direnv = "2.37.1"                # Environment variable management
 "pipx:httpie" = "3.2.4"  # Better curl
 
 # === Build & CI Tools ===
-"pipx:pre-commit" = "4.3.0"      # Git hook framework
+"pipx:pre-commit" = "4.4.0"      # Git hook framework
 "pipx:yamllint" = "1.37.1"       # YAML linter
 "pipx:black" = "25.9.0"          # Python formatter
 
