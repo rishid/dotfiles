@@ -36,7 +36,7 @@ direnv = "2.37.1"                # Environment variable management
 # === Build & CI Tools ===
 "pipx:pre-commit" = "4.3.0"      # Git hook framework
 "pipx:yamllint" = "1.37.1"       # YAML linter
-"pipx:black" = "25.9.0"          # Python formatter
+"pipx:black" = "25.11.0"          # Python formatter
 
 # === NPM Global Tools ===
 "npm:@anthropic-ai/claude-code" = "latest"
