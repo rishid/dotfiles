@@ -33,10 +33,10 @@ Host *
 # Work-specific includes
 # ---------------------------------------------------------------------------
 {{- if .work }}
-    {{- if (stat "~/.ssh/akamai.cfg").Exists }}
+    {{- if (stat (joinPath .chezmoi.homeDir ".ssh/akamai.cfg")) }}
 Include ~/.ssh/akamai.cfg
     {{- end }}
-    {{- if (stat "~/.ssh/linode.cfg").Exists }}
+    {{- if (stat (joinPath .chezmoi.homeDir ".ssh/linode.cfg")) }}
 Include ~/.ssh/linode.cfg
     {{- end }}
 {{- end }}
