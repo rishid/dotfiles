@@ -1,49 +1,67 @@
+# ---------------------------------------------------------------------------
+# Global SSH Configuration (chezmoi-managed)
+# ---------------------------------------------------------------------------
 
-# Skip newer or system-specific unmatched options.
+# Skip unknown options on older or newer OpenSSH versions.
 IgnoreUnknown AddKeysToAgent,UseKeychain,ForwardAgent
 
+# Disable host name hashing for easier host readability.
 HashKnownHosts no
 
-{{- if .work }}
-Include ~/.ssh/akamai.cfg
-Include ~/.ssh/linode.cfg
-{{- end }}
-
-Host github-rishid github
-    HostName github.com
-    User git
-    IdentityFile ~/.ssh/github_rishid
-    IdentitiesOnly yes
-
-# Defaults for all hosts
+# ---------------------------------------------------------------------------
+# Global defaults
+# ---------------------------------------------------------------------------
 Host *
-    ControlMaster auto
-    ControlPath ~/.ssh/controlmasters/%r@%h:%p
-    ControlPersist 60m
-    AddKeysToAgent yes
-     UseKeychain yes
--    ServerAliveInterval 6
-    AddKeysToAgent yes
-     UseKeychain yes
--    ServerAliveInterval 60
--    ServerAliveCountMax 30
--    ServerAliveCountMax 3
-
-# 12/6/23 Exclude github as cannot reuse socket since user, host and port are same except key
-Host !github.com
-    # Accelerate connections by reusing existing connections to the same host.
+    # Connection multiplexing (reuse SSH sessions)
     ControlMaster auto
     ControlPath ~/.ssh/controlmasters/%r@%h:%p
     ControlPersist 60m
 
-    # Forward SSH agent to remote hosts (for VS Code Remote SSH)
-    ForwardAgent yes
-    # Allow storing passphrases in the macOS keychain.
+    # Key management
     AddKeysToAgent yes
 {{- if (eq .chezmoi.os "darwin") }}
     UseKeychain yes
 {{- end }}
+    ForwardAgent yes
+    IdentitiesOnly yes
 
-    # Keep the connection temporarily open by sending a data every few minutes.
-    ServerAliveCountMax 6
-    ServerAliveInterval 300
+    # Keep-alive and reliability
+    ServerAliveInterval 60
+    ServerAliveCountMax 30
+
+# ---------------------------------------------------------------------------
+# Work-specific includes
+# ---------------------------------------------------------------------------
+{{- if .work }}
+    {{- if (stat "~/.ssh/akamai.cfg" | notNil) }}
+Include ~/.ssh/akamai.cfg
+    {{- end }}
+    {{- if (stat "~/.ssh/linode.cfg" | notNil) }}
+Include ~/.ssh/linode.cfg
+    {{- end }}
+{{- end }}
+
+# ---------------------------------------------------------------------------
+# Personal and host-specific configurations
+# ---------------------------------------------------------------------------
+
+Host scot-syno
+    HostName 146.115.24.74
+    Port 8988
+    User rishid
+
+Host github github.com github-rishid
+    HostName github.com
+    User git
+    ControlMaster no
+    IdentitiesOnly yes
+    IdentityFile ~/.ssh/github_rishid
+
+# ---------------------------------------------------------------------------
+# Notes:
+#   • Ensure ~/.ssh/controlmasters directory exists:
+#       mkdir -p ~/.ssh/controlmasters && chmod 700 ~/.ssh/controlmasters
+#   • Ensure correct file permissions:
+#       chmod 600 ~/.ssh/config
+#   • chezmoi OS detection via .chezmoi.os -> "darwin", "linux", etc.
+# ---------------------------------------------------------------------------
