@@ -6,6 +6,7 @@
 go = "1.25.4"
 node = "24.11.0"
 python = "3.14.0"
+rust = "1.90.0"                   # Required for Cargo-based tools
 uv = "0.9.8"
 
 # === Development Tools ===
@@ -20,7 +21,9 @@ direnv = "2.37.1"                # Environment variable management
 # === CLI Utilities ===
 "aqua:FiloSottile/age" = "1.2.1"                 # File encryption
 "aqua:sharkdp/bat" = "0.26.0"                    # Better cat
-"aqua:eza-community/eza" = "0.23.4"              # Better ls
+{{ if ne .chezmoi.os "darwin" }}
+"aqua:eza-community/eza" = "0.23.4"              # Better ls (use prebuilt binary on Linux)
+{{ end }}
 "aqua:sharkdp/fd" = "10.3.0"                     # Better find
 "aqua:junegunn/fzf" = "0.66.1"                  # Fuzzy finder (junegunn originally, now mirrors exist)
 "aqua:dundee/gdu" = "5.31.0"                     # Disk usage analyzer
