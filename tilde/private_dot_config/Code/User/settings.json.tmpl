@@ -74,5 +74,60 @@
 
   // Misc
   "explorer.confirmDelete": false,
-  "breadcrumbs.enabled": true
+  "breadcrumbs.enabled": true,
+
+  // Remote SSH platforms & agent forwarding
+  "remote.SSH.remotePlatform": {
+    "linux-vm": "linux",
+    "server": "linux"
+  },
+  "remote.SSH.enableAgentForwarding": true,
+
+  // GitHub Copilot experimental suggestion feature
+  "github.copilot.nextEditSuggestions.enabled": true,
+
+  // Language specific settings
+  "[python]": {
+    "diffEditor.ignoreTrimWhitespace": true
+  },
+  "[dockercompose]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.autoIndent": "advanced",
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": true
+    },
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+
+  // Terminal auto approvals (chat tools integration)
+  "chat.tools.terminal.autoApprove": {
+    ".venv/bin/pytest": true,
+    "task": true,
+    "env PYTHONPATH=src uv run pydocstyle --convention=google src || true": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "python": true,
+    "kubectl logs": true,
+    "kubectl get": true,
+    "kubectl describe": true,
+    "openssl": true,
+    "export": true,
+    "jq": true,
+    "base64": true
+  },
+
+  // Kubernetes extension configuration
+  "vs-kubernetes": {
+    "vs-kubernetes.knownKubeconfigs": [
+      "/home/rdhupar/w/mcp/mcp-server-terraform/.kubeconfig"
+    ],
+    "vs-kubernetes.kubeconfig": "/home/rdhupar/w/mcp/mcp-server-terraform/.kubeconfig"
+  }
 }
