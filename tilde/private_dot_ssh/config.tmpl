@@ -15,10 +15,19 @@ Host github-rishid github
     IdentityFile ~/.ssh/github_rishid
     IdentitiesOnly yes
 
-Host linode
-    Hostname 45.79.138.115
-    User root
-    IdentityFile ~/.ssh/id_ecdsa
+# Defaults for all hosts
+Host *
+    ControlMaster auto
+    ControlPath ~/.ssh/controlmasters/%r@%h:%p
+    ControlPersist 60m
+    AddKeysToAgent yes
+     UseKeychain yes
+-    ServerAliveInterval 6
+    AddKeysToAgent yes
+     UseKeychain yes
+-    ServerAliveInterval 60
+-    ServerAliveCountMax 30
+-    ServerAliveCountMax 3
 
 # 12/6/23 Exclude github as cannot reuse socket since user, host and port are same except key
 Host !github.com
