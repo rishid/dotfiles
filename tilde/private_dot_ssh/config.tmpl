@@ -33,10 +33,10 @@ Host *
 # Work-specific includes
 # ---------------------------------------------------------------------------
 {{- if .work }}
-    {{- if (stat "~/.ssh/akamai.cfg" | notNil) }}
+    {{- if (stat "~/.ssh/akamai.cfg").Exists }}
 Include ~/.ssh/akamai.cfg
     {{- end }}
-    {{- if (stat "~/.ssh/linode.cfg" | notNil) }}
+    {{- if (stat "~/.ssh/linode.cfg").Exists }}
 Include ~/.ssh/linode.cfg
     {{- end }}
 {{- end }}
@@ -53,6 +53,7 @@ Host scot-syno
 Host github github.com github-rishid
     HostName github.com
     User git
+    # Disable multiplexing for GitHub (socket reuse can trigger odd auth issues)
     ControlMaster no
     IdentitiesOnly yes
     IdentityFile ~/.ssh/github_rishid
