@@ -50,15 +50,15 @@ Host scot-syno
     Port 8988
     User rishid
 
-Host github github.com github-rishid
-    HostName github.com
-    User git
+#Host github github.com github-rishid
+#    HostName github.com
+#    User git
     # Disable multiplexing for GitHub (socket reuse can trigger odd auth issues)
-    ControlMaster no
-    ControlPath none
-    ControlPersist no
-    IdentitiesOnly yes
-    IdentityFile ~/.ssh/github_rishid
+#    ControlMaster no
+#    ControlPath none
+#    ControlPersist no
+#    IdentitiesOnly yes
+#    IdentityFile ~/.ssh/github_rishid
 
 # ---------------------------------------------------------------------------
 # Notes:
