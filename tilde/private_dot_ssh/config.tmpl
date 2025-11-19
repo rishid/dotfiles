@@ -55,6 +55,8 @@ Host github github.com github-rishid
     User git
     # Disable multiplexing for GitHub (socket reuse can trigger odd auth issues)
     ControlMaster no
+    ControlPath none
+    ControlPersist no
     IdentitiesOnly yes
     IdentityFile ~/.ssh/github_rishid
 
