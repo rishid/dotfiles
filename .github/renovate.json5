@@ -4,6 +4,12 @@
     'github>rishid/renovate-config:default.json5',
   ],
   platform: 'github',
+  mise: {
+    fileMatch: [
+      '(^|/)config\\.toml\\.tmpl$',
+      '(^|/)mise\\.toml\\.tmpl$',
+    ],
+  },
   packageRules: [
     {
       matchUpdateTypes: [
@@ -21,7 +27,7 @@
     {
       customType: 'regex',
       managerFilePatterns: [
-        '/config\\.toml$/',
+        '/config\\.toml(\\.tmpl)?$/',
       ],
       matchStrings: [
         '(?m)^\s*"github:(?<depName>[^"]+)"\s*=\s*"v?(?<currentValue>[0-9.]+)"',
