@@ -3,7 +3,7 @@
 
 [tools]
 # === Programming Languages & Runtimes ===
-go = "1.25.4"
+go = "1.25.5"
 node = "24.11.0"
 python = "3.14.0"
 # rust = "1.90.0"                   # Required for Cargo-based tools
