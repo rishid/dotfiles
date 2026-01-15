@@ -4,12 +4,6 @@
     'github>rishid/renovate-config:default.json5',
   ],
   platform: 'github',
-  mise: {
-    managerFilePatterns: [
-      '/(^|/)config\\.toml\\.tmpl$/',
-      '/(^|/)mise\\.toml\\.tmpl$/',
-    ],
-  },
   packageRules: [
     {
       matchUpdateTypes: [
@@ -20,20 +14,6 @@
         'lockFileMaintenance',
       ],
       automerge: true,
-    },
-  ],
-  customManagers: [
-    {
-      customType: 'regex',
-      managerFilePatterns: [
-        '/config\\.toml(\\.tmpl)?$/',
-      ],
-      matchStrings: [
-        '(?m)^s*"github:(?<depName>[^"]+)"s*=s*"v?(?<currentValue>[0-9.]+)"',
-      ],
-      datasourceTemplate: 'github-releases',
-      versioningTemplate: 'semver-coerced',
-      prCreation: 'immediate',
     },
   ],
   onboarding: false,
