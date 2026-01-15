@@ -19,7 +19,7 @@ yq = "4.48.1"                    # YAML processor
 direnv = "2.37.1"                # Environment variable management
 
 # === CLI Utilities ===
-"aqua:FiloSottile/age" = "1.2.1"                 # File encryption
+"aqua:FiloSottile/age" = "1.3.1"                 # File encryption
 "aqua:sharkdp/bat" = "0.26.1"                    # Better cat
 "aqua:eza-community/eza" = "0.23.4"              # Better ls
 "aqua:sharkdp/fd" = "10.3.0"                     # Better find
