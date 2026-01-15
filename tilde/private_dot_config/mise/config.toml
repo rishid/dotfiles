@@ -45,7 +45,7 @@ direnv = "2.37.1"                # Environment variable management
 "npm:@openai/codex" = "latest"
 
 # === Optional/Project-specific (can be per-directory) ===
-terraform = "1.13.5"
+terraform = "1.14.3"
 
 [settings]
 always_keep_download = true
