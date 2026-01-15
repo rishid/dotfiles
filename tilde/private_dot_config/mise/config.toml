@@ -15,7 +15,7 @@ helm = "3.19.5"
 kubectl = "1.35.0"
 "aqua:argoproj/argo-cd" = "3.2.5"
 "aqua:go-task/task" = "3.46.4"
-yq = "4.48.1"                    # YAML processor
+yq = "4.50.1"                    # YAML processor
 direnv = "2.37.1"                # Environment variable management
 
 # === CLI Utilities ===
