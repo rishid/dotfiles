@@ -12,10 +12,12 @@ HashKnownHosts no
 # Global defaults
 # ---------------------------------------------------------------------------
 Host *
-    # Connection multiplexing (reuse SSH sessions)
-    ControlMaster auto
-    ControlPath ~/.ssh/controlmasters/%r@%h:%p
-    ControlPersist 60m
+    # Connection multiplexing disabled - causes authentication issues when switching
+    # between multiple GitHub accounts. The cached connections use the first authenticated
+    # identity and ignore per-host IdentityFile settings, requiring manual cleanup.
+    # ControlMaster auto
+    # ControlPath ~/.ssh/controlmasters/%r@%h:%p
+    # ControlPersist 60m
 
     # Key management
     AddKeysToAgent yes
@@ -53,17 +55,11 @@ Host scot-syno
 Host github github-rishid
     HostName github.com
     User git
-    # Disable multiplexing for GitHub (socket reuse can trigger odd auth issues)
-    ControlMaster no
-    ControlPath none
-    ControlPersist no
     IdentitiesOnly yes
     IdentityFile ~/.ssh/github_rishid
 
 # ---------------------------------------------------------------------------
 # Notes:
-#   • Ensure ~/.ssh/controlmasters directory exists:
-#       mkdir -p ~/.ssh/controlmasters && chmod 700 ~/.ssh/controlmasters
 #   • Ensure correct file permissions:
 #       chmod 600 ~/.ssh/config
 #   • chezmoi OS detection via .chezmoi.os -> "darwin", "linux", etc.
