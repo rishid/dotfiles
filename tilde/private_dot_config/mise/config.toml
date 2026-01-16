@@ -11,7 +11,7 @@ uv = "0.9.26"
 
 # === Development Tools ===
 github-cli = "2.85.0"
-helm = "3.19.5"
+helm = "4.0.5"
 kubectl = "1.35.0"
 "aqua:argoproj/argo-cd" = "3.2.5"
 "aqua:go-task/task" = "3.46.4"
