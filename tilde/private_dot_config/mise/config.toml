@@ -36,7 +36,7 @@ direnv = "2.37.1"                # Environment variable management
 "pipx:linode-cli" = "5.65.0"
 
 # === Build & CI Tools ===
-"pipx:pre-commit" = "4.4.0"      # Git hook framework
+"pipx:pre-commit" = "4.5.1"      # Git hook framework
 "pipx:yamllint" = "1.38.0"       # YAML linter
 "pipx:black" = "25.12.0"          # Python formatter
 
