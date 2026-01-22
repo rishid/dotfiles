@@ -10,7 +10,7 @@ python = "3.14.2"
 uv = "0.9.26"
 
 # === Development Tools ===
-github-cli = "2.85.0"
+github-cli = "2.86.0"
 helm = "4.0.5"
 kubectl = "1.35.0"
 "aqua:argoproj/argo-cd" = "3.2.5"
