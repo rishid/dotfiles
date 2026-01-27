@@ -1,0 +1,3 @@
+{{- if eq .chezmoi.hostname "bos-lhv9i4" -}}
+{{ include (joinPath .chezmoi.sourceDir "private_dot_config/fish/.encrypted-config.bos-lhv9i4.fish") | decrypt }}
+{{- end -}}

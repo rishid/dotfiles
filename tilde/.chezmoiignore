@@ -10,6 +10,7 @@
 # Shell
 .config/fish/fish_variables
 .config/fish/fish_history
+.config/fish/.encrypted-config.*.fish
 
 # History
 .lesshst
