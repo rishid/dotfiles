@@ -40,8 +40,8 @@ end
 
 #source ~/.config/shell/aliases.sh
 
-if test -f "$__fish_config_dir/config.(hostname).fish"
-  source "$__fish_config_dir/config.(hostname).fish"
+if test -f "$__fish_config_dir/config.$(hostname).fish"
+  source "$__fish_config_dir/config.$(hostname).fish"
 end
 
 if test -f "$__fish_config_dir/config.local.fish"
