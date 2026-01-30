@@ -32,6 +32,7 @@ direnv = "2.37.1"                # Environment variable management
 "aqua:starship/starship" = "1.24.2"              # Shell prompt
 "aqua:aquasecurity/trivy" = "0.68.2"             # Security scanner
 "aqua:ajeetdsouza/zoxide" = "0.9.8"              # Better cd
+"chezmoi" = "2.69.3"
 "pipx:httpie" = "3.2.4"  # Better curl
 "pipx:linode-cli" = "5.65.0"
 
