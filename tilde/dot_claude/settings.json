@@ -96,7 +96,8 @@
             "Bash(poetry show:*)",
             "Bash(poetry check)",
             "Bash(docker ps:*)",
-            "Bash(docker images:*)"
+            "Bash(docker images:*)",
+            "WebFetch",
         ]
     }
 }
