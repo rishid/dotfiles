@@ -4,7 +4,13 @@
         "commit": "",
         "pr": ""
     },
+    "statusLine": {
+        "type": "command",
+        "command": "~/.claude/status-line.sh",
+        "padding": 2
+    },
     "permissions": {
+        "defaultMode": "acceptEdits",
         "allow": [
             "Read(**/*)",
             "Glob(**/*)",
