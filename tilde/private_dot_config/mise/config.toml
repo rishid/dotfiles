@@ -7,7 +7,7 @@ go = "1.26.0"
 node = "24.13.1"
 python = "3.14.3"
 # rust = "1.90.0"                   # Required for Cargo-based tools
-uv = "0.10.2"
+uv = "0.10.3"
 
 # === Development Tools ===
 github-cli = "2.86.0"
