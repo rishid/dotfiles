@@ -34,7 +34,7 @@ direnv = "2.37.1"                # Environment variable management
 "aqua:ajeetdsouza/zoxide" = "0.9.9"              # Better cd
 "chezmoi" = "2.69.3"
 "pipx:httpie" = "3.2.4"  # Better curl
-"pipx:linode-cli" = "5.65.0"
+"pipx:linode-cli" = "5.65.1"
 
 # === Build & CI Tools ===
 "pipx:pre-commit" = "4.5.1"      # Git hook framework
