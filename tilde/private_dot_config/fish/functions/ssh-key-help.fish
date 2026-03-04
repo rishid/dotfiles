@@ -1,4 +1,4 @@
-function ssh-key-help
+function ssh-key-help -d "Show SSH key management command reference"
     echo "SSH Key Management Commands:"
     echo "  ssh-key-add <path>     - Add a key to the agent and optionally to ~/.ssh/autoload"
     echo "  ssh-key-remove <path>  - Remove a key from the agent and optionally from ~/.ssh/autoload"

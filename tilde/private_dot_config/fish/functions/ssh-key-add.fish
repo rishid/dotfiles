@@ -1,4 +1,4 @@
-function ssh-key-add
+function ssh-key-add -d "Add an SSH key to the agent and optionally to autoload"
     set -l key_path $argv[1]
 
     if test -z "$key_path"

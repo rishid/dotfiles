@@ -1,4 +1,4 @@
-function last_download
+function last_download -d "Copy the most recent download to the current directory"
     set last_file (ls ~/Downloads -tr | tail -n 1)
     cp -v ~/Downloads/$last_file .
 end

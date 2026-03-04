@@ -1,4 +1,4 @@
-function ssh-key-remove
+function ssh-key-remove -d "Remove an SSH key from the agent and optionally from autoload"
     set -l key_path $argv[1]
 
     if test -z "$key_path"

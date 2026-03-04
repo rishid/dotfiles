@@ -1,4 +1,4 @@
-function exifdiff
+function exifdiff -d "Diff EXIF metadata between two files side by side"
     # Usage: exifdiff path/file1.ext path/file2.ext parameters
     # eg:    exifdiff dsc_7811.nef ./jpegs/dsc_7811.jpg
     # eg:    exifdiff dsc_7811.nef ./jpegs/dsc_7811.jpg -a -G1 -datetimeoriginal
@@ -10,7 +10,7 @@ function exifdiff
     diff -d -y --left-column /tmp/$B1.txt /tmp/$B2.txt  | less -i
 end
 
-function exif
+function exif -d "Extract EXIF metadata to a temp file"
     if test "$1" = "/dev/null"
         echo "/dev/null"
         return

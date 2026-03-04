@@ -1,4 +1,4 @@
-function ssh-key-list
+function ssh-key-list -d "List loaded SSH keys and autoload configuration"
     echo "Currently loaded SSH keys:"
     ssh-add -l 2>/dev/null || echo "  No keys loaded or agent not accessible"
 

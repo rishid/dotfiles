@@ -1,4 +1,4 @@
-function mkmine
+function mkmine -d "Recursively chown a directory to the current user"
     if test -z $argv
         set target_dir (pwd)
     else

@@ -1,4 +1,4 @@
-function ssh-agent-status
+function ssh-agent-status -d "Show ssh-agent service status and loaded keys"
     echo "SSH Agent Service Status:"
     systemctl --user status ssh-agent.service
 

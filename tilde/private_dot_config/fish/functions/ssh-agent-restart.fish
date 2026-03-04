@@ -1,4 +1,4 @@
-function ssh-agent-restart
+function ssh-agent-restart -d "Restart ssh-agent service and reload autoload keys"
     echo "Restarting ssh-agent service..."
     systemctl --user restart ssh-agent.service
 

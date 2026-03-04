@@ -1,4 +1,4 @@
-function b
+function b -d "Switch git branches, creating if not found"
   if set -q $argv[1]
     git checkout (git-main-branch)
   else if [ "-" = $argv[1] ]
