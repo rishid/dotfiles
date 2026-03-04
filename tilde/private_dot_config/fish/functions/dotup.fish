@@ -1,36 +1,34 @@
 function dotup -d "Update system: dotfiles, mise tools, and self"
-    set -l step 0
+    set -g _dotup_step 0
     set -l errors 0
 
-    function _dotup_step
-        set step (math $step + 1)
-        echo ""
-        echo "── [$step] $argv ──"
-    end
-
     # 1. Chezmoi: pull latest dotfiles and apply
-    _dotup_step "chezmoi update (dotfiles)"
+    set _dotup_step (math $_dotup_step + 1)
+    echo "" && echo "── [$_dotup_step] chezmoi update (dotfiles) ──"
     if not chezmoi update
         echo "⚠ chezmoi update failed"
         set errors (math $errors + 1)
     end
 
     # 2. mise: update the mise binary itself
-    _dotup_step "mise self-update"
+    set _dotup_step (math $_dotup_step + 1)
+    echo "" && echo "── [$_dotup_step] mise self-update ──"
     if not mise self-update --yes
         echo "⚠ mise self-update failed"
         set errors (math $errors + 1)
     end
 
     # 3. mise: upgrade tools to latest within version constraints
-    _dotup_step "mise upgrade (tools)"
+    set _dotup_step (math $_dotup_step + 1)
+    echo "" && echo "── [$_dotup_step] mise upgrade (tools) ──"
     if not mise upgrade
         echo "⚠ mise upgrade failed"
         set errors (math $errors + 1)
     end
 
     # 4. mise: prune old/unused tool versions
-    _dotup_step "mise prune (cleanup old versions)"
+    set _dotup_step (math $_dotup_step + 1)
+    echo "" && echo "── [$_dotup_step] mise prune (cleanup old versions) ──"
     if not mise prune --yes
         echo "⚠ mise prune failed"
         set errors (math $errors + 1)
@@ -38,13 +36,15 @@ function dotup -d "Update system: dotfiles, mise tools, and self"
 
     # 5. fisher: update fish plugins
     if functions --query fisher
-        _dotup_step "fisher update (fish plugins)"
+        set _dotup_step (math $_dotup_step + 1)
+        echo "" && echo "── [$_dotup_step] fisher update (fish plugins) ──"
         if not fisher update
             echo "⚠ fisher update failed"
             set errors (math $errors + 1)
         end
     end
 
+    set -e _dotup_step
     echo ""
     if test $errors -eq 0
         echo "✓ System up to date"
