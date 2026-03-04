@@ -1,4 +1,0 @@
-- name: Install tmux with apt
-  apt: name=tmux state=present
-  tags: bootstrap
-  become: true
