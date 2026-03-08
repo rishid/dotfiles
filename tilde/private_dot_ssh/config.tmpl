@@ -32,6 +32,13 @@ Host *
     ServerAliveCountMax 30
 
 # ---------------------------------------------------------------------------
+# Personal includes
+# ---------------------------------------------------------------------------
+{{- if (stat (joinPath .chezmoi.homeDir ".ssh/personal.cfg")) }}
+Include ~/.ssh/personal.cfg
+{{- end }}
+
+# ---------------------------------------------------------------------------
 # Work-specific includes
 # ---------------------------------------------------------------------------
 {{- if .work }}
@@ -42,25 +49,6 @@ Include ~/.ssh/akamai.cfg
 Include ~/.ssh/linode.cfg
     {{- end }}
 {{- end }}
-
-# ---------------------------------------------------------------------------
-# Personal and host-specific configurations
-# ---------------------------------------------------------------------------
-
-Host scot-syno
-    HostName 146.115.24.74
-    Port 8988
-    User rishid
-
-Host github github-rishid
-    HostName github.com
-    User git
-    IdentitiesOnly yes
-    IdentityFile ~/.ssh/github_rishid
-
-Host server
-    HostName 192.168.1.152
-    User ops
 
 # ---------------------------------------------------------------------------
 # Notes:
