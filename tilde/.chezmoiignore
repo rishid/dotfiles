@@ -7,6 +7,9 @@
 # This list defines globs to ignore, and supports Go's text/template language.
 # See https://www.chezmoi.io/docs/reference/#chezmoiignore
 
+# Claude Code (managed by the app itself)
+.claude/settings.json
+
 # Shell
 .config/fish/fish_variables
 .config/fish/fish_history
