@@ -25,13 +25,13 @@ function dotup -d "Update system: dotfiles, mise tools, and self"
         set errors (math $errors + 1)
     end
 
-    if functions --query fisher
-        echo "" && echo "── fisher update (fish plugins) ──"
-        if not fisher update
-            echo "⚠ fisher update failed"
-            set errors (math $errors + 1)
-        end
-    end
+    # if functions --query fisher
+    #     echo "" && echo "── fisher update (fish plugins) ──"
+    #     if not fisher update
+    #         echo "⚠ fisher update failed"
+    #         set errors (math $errors + 1)
+    #     end
+    # end
 
     echo ""
     if test $errors -eq 0
