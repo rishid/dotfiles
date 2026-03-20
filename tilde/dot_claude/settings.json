@@ -14,9 +14,9 @@
   "permissions": {
     "defaultMode": "acceptEdits",
     "allow": [
-      "Read(**/*)",
-      "Glob(**/*)",
-      "Grep(**/*)",
+      "Read",
+      "Glob",
+      "Grep",
       "TodoWrite",
       "Bash(chezmoi status)",
       "Bash(chezmoi diff:*)",
@@ -47,7 +47,7 @@
       "Bash(mise ls)",
       "Bash(mise doctor)",
       "Bash(mise which:*)",
-      "Bash(git status)",
+      "Bash(git status:*)",
       "Bash(git log:*)",
       "Bash(git show:*)",
       "Bash(git diff:*)",
