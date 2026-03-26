@@ -2,82 +2,76 @@
 
 ## How it works
 
-Host-specific env vars (e.g. API keys, internal URLs) are stored **age-encrypted** in the source
-directory and rendered only on the matching host via a chezmoi template.
+Host-specific env vars (e.g. API keys, internal URLs) are stored **age-encrypted** as native
+chezmoi-managed files. `config.fish` sources `config.$(hostname).fish` automatically, so chezmoi
+just needs to deploy the right file — no hostname logic needed in chezmoi itself.
+
+```fish
+# config.fish (already present)
+if test -f "$__fish_config_dir/config.$(hostname).fish"
+  source "$__fish_config_dir/config.$(hostname).fish"
+end
+```
 
 ### File roles
 
 | Source file | Target file | Purpose |
 |---|---|---|
-| `config.bos-lhv9i4.fish.tmpl` | `~/.config/fish/config.bos-lhv9i4.fish` | Template: decrypts and renders the encrypted file for host `bos-lhv9i4` only |
-| `.encrypted-config.bos-lhv9i4.fish` | _(no target — source only)_ | Age-encrypted env vars for host `bos-lhv9i4` |
+| `encrypted_config.bos-lhv9i4.fish.age` | `~/.config/fish/config.bos-lhv9i4.fish` | Age-encrypted env vars for host `bos-lhv9i4`, deployed by chezmoi to all hosts, sourced only on matching host by fish |
 
-### Why `.encrypted-config.*.fish` files have no chezmoi target
-
-The encrypted files live in the chezmoi source dir but are **not** managed by chezmoi as targets
-themselves. They are referenced directly by the `.tmpl` file via `include ... | decrypt`.
-This is why they are listed in `.chezmoiignore` — to prevent chezmoi from trying to deploy them.
-
-### Template pattern
-
-```
-{{- if eq .chezmoi.hostname "bos-lhv9i4" -}}
-{{ include (joinPath .chezmoi.sourceDir "private_dot_config/fish/.encrypted-config.bos-lhv9i4.fish") | decrypt }}
-{{- end -}}
-```
+The file is deployed to **all hosts** by chezmoi but only sourced on `bos-lhv9i4` by fish.
+Each host gets its own `encrypted_config.HOSTNAME.fish.age` with its own keys.
 
 ---
 
 ## Editing an encrypted config file
 
-### Decrypt → edit → re-encrypt
+### Using chezmoi edit (recommended)
 
 ```fish
-# 1. Decrypt to a temp file
-age --decrypt -i ~/.config/chezmoi/key.txt \
-  ~/.dotfiles/tilde/private_dot_config/fish/.encrypted-config.bos-lhv9i4.fish \
-  > /tmp/claude-config.fish
-
-# 2. Edit the temp file
-$EDITOR /tmp/claude-config.fish
-
-# 3. Re-encrypt back into the source
-age --encrypt \
-  -r age17z6sdx7ceu7xu4llsdt4gakyuzkhvqe9vr226jjvg8rr0j57ta3qd5ry67 \
-  -o ~/.dotfiles/tilde/private_dot_config/fish/.encrypted-config.bos-lhv9i4.fish \
-  /tmp/claude-config.fish
-
-# 4. Apply to deploy
-chezmoi apply ~/.config/fish/config.bos-lhv9i4.fish
-
-# 5. Verify
-cat ~/.config/fish/config.bos-lhv9i4.fish
-
-# 6. Commit
-cd ~/.dotfiles && git add tilde/private_dot_config/fish/.encrypted-config.bos-lhv9i4.fish
-git commit -m "chore: update encrypted config for bos-lhv9i4"
-
-# 7. Clean up
-rm /tmp/claude-config.fish
+chezmoi edit ~/.config/fish/config.bos-lhv9i4.fish
+# Opens decrypted content in $EDITOR, re-encrypts and applies on save
 ```
 
-### View current decrypted content (without editing)
+### Manually with age (alternative)
 
 ```fish
+# Decrypt, edit, re-encrypt
 age --decrypt -i ~/.config/chezmoi/key.txt \
-  ~/.dotfiles/tilde/private_dot_config/fish/.encrypted-config.bos-lhv9i4.fish
+  ~/.dotfiles/tilde/private_dot_config/fish/encrypted_config.bos-lhv9i4.fish.age \
+  > /tmp/cfg.fish && $EDITOR /tmp/cfg.fish
+
+chezmoi add --encrypt ~/.config/fish/config.bos-lhv9i4.fish
+# (after writing new content to the target)
+rm /tmp/cfg.fish
 ```
 
-### Add a new host
+### View current decrypted content
 
-1. Create the encrypted file for the new host:
-   ```fish
-   age --encrypt -r age17z6sdx7ceu7xu4llsdt4gakyuzkhvqe9vr226jjvg8rr0j57ta3qd5ry67 \
-     -o ~/.dotfiles/tilde/private_dot_config/fish/.encrypted-config.NEWHOSTNAME.fish \
-     /tmp/your-config.fish
-   ```
-2. Create a template `config.NEWHOSTNAME.fish.tmpl` with the same pattern above.
-3. Add `.encrypted-config.NEWHOSTNAME.fish` to `.chezmoiignore`.
+```fish
+chezmoi cat ~/.config/fish/config.bos-lhv9i4.fish
+```
+
+---
+
+## Adding a new host
+
+```fish
+# 1. Create the config for the new host
+set hostname (hostname)
+cat > /tmp/cfg.fish << EOF
+export SOME_API_KEY="your-key-here"
+export SOME_URL="https://..."
+EOF
+
+# 2. Copy to target location
+cp /tmp/cfg.fish ~/.config/fish/config.$hostname.fish
+
+# 3. Let chezmoi encrypt and manage it
+chezmoi add --encrypt ~/.config/fish/config.$hostname.fish
+
+rm /tmp/cfg.fish
+```
 
 ---
 
