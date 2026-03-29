@@ -82,3 +82,25 @@ rm /tmp/cfg.fish
 | Age identity (private key) | `~/.config/chezmoi/key.txt` |
 | Age recipient (public key) | `age17z6sdx7ceu7xu4llsdt4gakyuzkhvqe9vr226jjvg8rr0j57ta3qd5ry67` |
 | chezmoi config | `~/.dotfiles/tilde/.chezmoi.yaml.tmpl` |
+
+---
+
+## Fish Completions Directory
+
+The `~/.config/fish/completions/` directory is reserved for custom completion scripts.
+
+### Generating completions from installed tools
+
+Many CLI tools support generating fish completions. Examples:
+
+```fish
+# Generate and save completions
+kubectl completion fish > ~/.config/fish/completions/kubectl.fish
+helm completion fish > ~/.config/fish/completions/helm.fish
+```
+
+**Note:** Some tools installed via `mise` may have built-in completion support or hooks. Check tool documentation for auto-completion options.
+
+### Future work
+
+Completions can be auto-generated via a chezmoi script when tools are installed. This is planned for a future enhancement.
