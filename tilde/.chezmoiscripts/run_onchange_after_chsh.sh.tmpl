@@ -2,7 +2,7 @@
 {{ if (not .ephemeral) -}}
 #!/usr/bin/env bash
 
-set -eufo pipefail
+set -euo pipefail
 
 chsh -s $(which fish)
 
