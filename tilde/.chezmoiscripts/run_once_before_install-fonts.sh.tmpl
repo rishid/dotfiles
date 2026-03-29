@@ -1,12 +1,13 @@
-{{ if eq .chezmoi.os "linux" -}}
-#!/usr/bin/env sh
-
-mkdir -p ~/.local/share/fonts
-cd ~/.local/share/fonts && curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/DroidSansMono/DroidSansMNerdFont-Regular.otf
-
-{{ else if eq .chezmoi.os "darwin" -}}
+{{ if eq .chezmoi.os "darwin" -}}
 #!/bin/sh
 
-cd ~/Library/Fonts && curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/DroidSansMono/DroidSansMNerdFont-Regular.otf
+# Install MesloLGS NF fonts (required by tide v6)
+mkdir -p ~/Library/Fonts
+
+cd ~/Library/Fonts && \
+  curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/Meslo/L/Regular/MesloLGSNerdFont-Regular.ttf && \
+  curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/Meslo/L/Bold/MesloLGSNerdFont-Bold.ttf && \
+  curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/Meslo/L/Italic/MesloLGSNerdFont-Italic.ttf && \
+  curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/Meslo/L/BoldItalic/MesloLGSNerdFont-BoldItalic.ttf
 
 {{ end -}}
