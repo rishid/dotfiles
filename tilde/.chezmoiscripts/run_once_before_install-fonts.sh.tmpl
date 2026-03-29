@@ -1,13 +1,25 @@
 {{ if eq .chezmoi.os "darwin" -}}
-#!/bin/sh
+#!/usr/bin/env bash
+
+set -euo pipefail
 
 # Install MesloLGS NF fonts (required by tide v6)
 mkdir -p ~/Library/Fonts
 
-cd ~/Library/Fonts && \
-  curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/Meslo/L/Regular/MesloLGSNerdFont-Regular.ttf && \
-  curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/Meslo/L/Bold/MesloLGSNerdFont-Bold.ttf && \
-  curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/Meslo/L/Italic/MesloLGSNerdFont-Italic.ttf && \
-  curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/Meslo/L/BoldItalic/MesloLGSNerdFont-BoldItalic.ttf
+fonts=(
+  "Regular/MesloLGSNerdFont-Regular.ttf"
+  "Bold/MesloLGSNerdFont-Bold.ttf"
+  "Italic/MesloLGSNerdFont-Italic.ttf"
+  "BoldItalic/MesloLGSNerdFont-BoldItalic.ttf"
+)
 
+cd ~/Library/Fonts
+
+for font in "${fonts[@]}"; do
+  url="https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/Meslo/L/${font}"
+  echo "Installing ${font##*/}..."
+  curl -fLO "$url" || { echo "Failed to download $font"; exit 1; }
+done
+
+echo "Fonts installed successfully"
 {{ end -}}
