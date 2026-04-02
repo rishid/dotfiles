@@ -43,7 +43,7 @@ set --universal tide_kubectl_bg_color 326CE5
 set --universal tide_kubectl_color 000000
 set --universal tide_kubectl_icon \u2388
 set --universal tide_left_prompt_frame_enabled false
-set --universal tide_left_prompt_items os\x1epwd\x1egit\x1echaracter
+set --universal tide_left_prompt_items pwd\x1egit\x1enewline\x1echaracter
 set --universal tide_left_prompt_prefix
 set --universal tide_left_prompt_separator_diff_color \ue0b0
 set --universal tide_left_prompt_separator_same_color \ue0b1
@@ -72,7 +72,7 @@ set --universal tide_pwd_icon_home \uf015
 set --universal tide_pwd_icon_unwritable \uf023
 set --universal tide_pwd_markers \x2ebzr\x1e\x2ecitc\x1e\x2egit\x1e\x2ehg\x1e\x2enode\x2dversion\x1e\x2epython\x2dversion\x1e\x2eruby\x2dversion\x1e\x2eshorten_folder_marker\x1e\x2esvn\x1e\x2eterraform\x1eCargo\x2etoml\x1ecomposer\x2ejson\x1eCVS\x1ego\x2emod\x1epackage\x2ejson
 set --universal tide_right_prompt_frame_enabled false
-set --universal tide_right_prompt_items status\x1ecmd_duration\x1econtext\x1ejobs\x1enode\x1epython\x1erustc\x1ephp\x1ego\x1ekubectl\x1etime
+set --universal tide_right_prompt_items
 set --universal tide_right_prompt_prefix \ue0b2
 set --universal tide_right_prompt_separator_diff_color \ue0b2
 set --universal tide_right_prompt_separator_same_color \ue0b3
