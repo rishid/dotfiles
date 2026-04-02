@@ -43,7 +43,7 @@ set --universal tide_kubectl_bg_color 326CE5
 set --universal tide_kubectl_color 000000
 set --universal tide_kubectl_icon \u2388
 set --universal tide_left_prompt_frame_enabled false
-set --universal tide_left_prompt_items os\x1epwd\x1egit\x1enewline\x1echaracter
+set --universal tide_left_prompt_items os\x1epwd\x1egit\x1echaracter
 set --universal tide_left_prompt_prefix
 set --universal tide_left_prompt_separator_diff_color \ue0b0
 set --universal tide_left_prompt_separator_same_color \ue0b1
