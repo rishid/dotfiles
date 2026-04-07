@@ -10,15 +10,16 @@ fi
 
 echo "Installing agent skills..."
 
+# Personal skills from dotfiles repo (skills/ at repo root, one subdir per skill)
+# Note: .chezmoiroot is "tilde" so sourceDir is ~/.dotfiles/tilde/; go up one level for repo root
+npx skills add "{{ .chezmoi.sourceDir }}/.." -g --all -y
+
 # Third-party skills (from GitHub)
 npx skills add anthropics/skills@find-skills -g -y
 npx skills add anthropics/skills@karpathy-guidelines -g -y
 npx skills add anthropics/skills@frontend-design -g -y
 
-# Local/private skills (chezmoi deploys these as files before this script runs)
-# Note: {{ .chezmoi.sourceDir }} uses dot_claude/ naming so npx can't discover it directly;
-# we reference the deployed target path instead
+# Encrypted private skills (chezmoi deploys these before this after-script runs)
 npx skills add "{{ .chezmoi.homeDir }}/.claude/skills/ria-dismissal" -g -y
-npx skills add "{{ .chezmoi.homeDir }}/.claude/skills/pull-master-branch-commit-pr" -g -y
 
 echo "Agent skills installed successfully."
