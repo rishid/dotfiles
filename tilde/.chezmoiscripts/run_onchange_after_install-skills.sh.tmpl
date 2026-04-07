@@ -15,8 +15,6 @@ echo "Installing agent skills..."
 npx skills add "{{ .chezmoi.sourceDir }}/.." -g --all -y
 
 # Third-party skills (from GitHub)
-npx skills add anthropics/skills@find-skills -g -y
-npx skills add anthropics/skills@karpathy-guidelines -g -y
 npx skills add anthropics/skills@frontend-design -g -y
 
 # Encrypted private skills (chezmoi deploys these before this after-script runs)
