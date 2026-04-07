@@ -24,6 +24,8 @@ add_skill "{{ .chezmoi.sourceDir }}/.." --all
 
 # Third-party skills (from GitHub)
 add_skill anthropics/skills@frontend-design
+
+add_skill cc-devops-skills/devops-skills-plugin --skill dockerfile-generator
 add_skill vercel-labs/agent-skills --skill vercel-react-best-practices
 
 echo "Agent skills installed successfully."
