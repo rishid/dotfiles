@@ -10,8 +10,8 @@ python = "3.14.3"
 uv = "0.11.3"
 
 # === Development Tools ===
-claude = "2.1.92"
-codex = "0.116.0"
+"aqua:anthropics/claude-code" = "2.1.92"
+"aqua:openai/codex" = "0.116.0"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.89.0"
 helm = "4.1.3"
