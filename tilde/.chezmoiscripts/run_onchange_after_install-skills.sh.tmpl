@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Install agent skills via npx skills CLI
+# Re-runs whenever this file changes (add/remove skills here to trigger reinstall)
+set -euo pipefail
+
+if ! command -v npx &>/dev/null; then
+    echo "npx not found, skipping skills install"
+    exit 0
+fi
+
+echo "Installing agent skills..."
+
+npx skills add anthropics/skills@find-skills -g -y
+npx skills add anthropics/skills@karpathy-guidelines -g -y
+npx skills add anthropics/skills@frontend-design -g -y
+
+echo "Agent skills installed successfully."
