@@ -1,50 +1,43 @@
 # Claude Skills
 
-Skills are managed via `npx skills` + chezmoi for cross-machine persistence.
+Skills are managed via chezmoi + `npx skills`. The source of truth is
+`.chezmoiscripts/run_onchange_after_install-skills.sh.tmpl`.
 
-## Commands
+## Adding a skill (best practice)
+
+```fish
+chezmoi edit ~/.dotfiles/tilde/.chezmoiscripts/run_onchange_after_install-skills.sh.tmpl
+# add: npx skills add <source> -g -y
+chezmoi apply
+```
+
+Chezmoi detects the file changed and re-runs the script, which installs the skill.
+
+## Skill types
+
+**Third-party** (GitHub): Add a line to the script.
+```bash
+npx skills add anthropics/skills@claude-api -g -y
+```
+
+**Private/local**: Add the SKILL.md files to `tilde/dot_claude/skills/<name>/` via chezmoi,
+then add a reference line to the script using the deployed path:
+```bash
+npx skills add "{{ .chezmoi.homeDir }}/.claude/skills/<name>" -g -y
+```
+Chezmoi deploys the files first (it's an `after` script), so the path exists when the script runs.
+
+## Day-to-day commands
 
 | Command | Description |
 |---|---|
-| `skill-install <source>` | Install skill and commit to dotfiles |
+| `skill-install <source>` | Install immediately + commit (bypasses the script) |
 | `skill-update [skill\|--all]` | Update skill(s) and sync to dotfiles |
 | `skill-remove <skill>` | Remove skill and commit to dotfiles |
 | `skill-list` | List installed skills |
 
-## Installing a Skill
+## Why not `{{ .chezmoi.sourceDir }}`?
 
-```fish
-# From a specific skill in a repo
-skill-install anthropics/skills@frontend-design
-
-# Browse and select from a multi-skill repo
-skill-install anthropics/skills
-```
-
-## Updating Skills
-
-```fish
-skill-update frontend-design   # update one skill
-skill-update --all             # update all skills
-```
-
-## How It Works
-
-1. `npx skills add --copy` installs real files (not symlinks) to `~/.claude/skills/`
-2. `chezmoi add` tracks the skills directory and lockfile in dotfiles
-3. A git commit records the change with a descriptive message
-4. On new machines, `chezmoi apply` restores all skills automatically
-
-## Lockfile
-
-`~/.claude/.skills-lock.json` pins exact versions and integrity hashes. It is committed alongside skills for supply chain security and reproducibility.
-
-## Adding Skills Manually
-
-If a skill isn't in the `npx skills` ecosystem, add it manually:
-
-```fish
-cp -r /path/to/skill ~/.claude/skills/my-skill/
-chezmoi add ~/.claude/skills/
-cd ~/.dotfiles && git add . && git commit -m "feat(skill): add my-skill"
-```
+Chezmoi stores `.claude/skills/` as `dot_claude/skills/` in source, so npx skills can't
+discover skills there. The deployed target (`~/.claude/skills/`) works because `after`
+scripts run after file deployment.

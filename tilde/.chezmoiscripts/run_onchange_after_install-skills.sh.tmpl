@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Install agent skills via npx skills CLI
-# Re-runs whenever this file changes (add/remove skills here to trigger reinstall)
+# Re-runs whenever this file changes — to add a skill, add a line here and run chezmoi apply
 set -euo pipefail
 
 if ! command -v npx &>/dev/null; then
@@ -10,8 +10,15 @@ fi
 
 echo "Installing agent skills..."
 
+# Third-party skills (from GitHub)
 npx skills add anthropics/skills@find-skills -g -y
 npx skills add anthropics/skills@karpathy-guidelines -g -y
 npx skills add anthropics/skills@frontend-design -g -y
+
+# Local/private skills (chezmoi deploys these as files before this script runs)
+# Note: {{ .chezmoi.sourceDir }} uses dot_claude/ naming so npx can't discover it directly;
+# we reference the deployed target path instead
+npx skills add "{{ .chezmoi.homeDir }}/.claude/skills/ria-dismissal" -g -y
+npx skills add "{{ .chezmoi.homeDir }}/.claude/skills/pull-master-branch-commit-pr" -g -y
 
 echo "Agent skills installed successfully."
