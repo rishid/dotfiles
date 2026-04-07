@@ -1,111 +1,183 @@
 #!/bin/bash
 # Claude Code Status Line
-# Multi-line display with model, git, context usage, cost, and duration
 
 input=$(cat)
 
-# Extract JSON fields
-MODEL=$(echo "$input" | jq -r '.model.display_name')
-AGENT=$(echo "$input" | jq -r '.agent.name // ""')
-DIR=$(echo "$input" | jq -r '.workspace.current_dir')
-COST=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
-PCT=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
-DURATION_MS=$(echo "$input" | jq -r '.cost.total_duration_ms // 0')
-LINES_ADDED=$(echo "$input" | jq -r '.cost.total_lines_added // 0')
-LINES_REMOVED=$(echo "$input" | jq -r '.cost.total_lines_removed // 0')
+eval "$(echo "$input" | jq -r '
+  @sh "used_pct=\(.context_window.used_percentage // 0)",
+  @sh "window_size=\(.context_window.context_window_size // 0)",
+  @sh "model=\(.model.display_name // "")",
+  @sh "cost=\(.cost.total_cost_usd // 0)",
+  @sh "duration_ms=\(.cost.total_duration_ms // 0)",
+  @sh "lines_added=\(.cost.total_lines_added // 0)",
+  @sh "lines_removed=\(.cost.total_lines_removed // 0)",
+  @sh "project_dir=\(.workspace.project_dir // .workspace.current_dir // "")",
+  @sh "transcript_path=\(.transcript_path // "")",
+  @sh "agent_name=\(.agent.name // "")"
+')"
 
-# ANSI color codes
-CYAN='\033[36m'
-GREEN='\033[32m'
-YELLOW='\033[33m'
-RED='\033[31m'
-RESET='\033[0m'
+# --- ANSI colors ---
+RST=$'\033[0m'
+CYAN=$'\033[36m'
+GREEN=$'\033[32m'
+YELLOW=$'\033[33m'
+RED=$'\033[31m'
+DIM=$'\033[2m'
+MAGENTA=$'\033[35m'
+BLUE=$'\033[34m'
+CYAN_UL=$'\033[36;4m'
 
-# Cache expensive git operations
-CACHE_FILE="/tmp/statusline-git-cache-$(echo "$DIR" | md5sum | cut -d' ' -f1)"
-CACHE_MAX_AGE=5  # seconds
+# --- OSC 8 hyperlink helpers ---
+LINK_OPEN=$'\033]8;;'
+LINK_CLOSE=$'\033\\'
 
-cache_is_stale() {
-    if [ ! -f "$CACHE_FILE" ]; then
-        return 0
-    fi
-    # Use date and stat in a portable way
-    local now=$(date +%s)
-    local mtime
-    if stat -c %Y "$CACHE_FILE" >/dev/null 2>&1; then
-        # Linux
-        mtime=$(stat -c %Y "$CACHE_FILE")
-    elif stat -f %m "$CACHE_FILE" >/dev/null 2>&1; then
-        # macOS
-        mtime=$(stat -f %m "$CACHE_FILE")
-    else
-        # Fallback: always refresh
-        return 0
-    fi
-    local age=$((now - mtime))
-    [ "$age" -gt "$CACHE_MAX_AGE" ]
+# --- Fallback ---
+if [ "${window_size:-0}" -le 0 ] 2>/dev/null; then
+  printf '%s\n' "[....................] --% | ?"
+  exit 0
+fi
+
+# --- Helpers ---
+fmt_k() {
+  local n=$1
+  if [ "$n" -ge 1000 ]; then
+    printf "%sK" "$((n / 1000))"
+  else
+    printf "%s" "$n"
+  fi
 }
 
-# Update git cache if stale
-if cache_is_stale; then
-    if git -C "$DIR" rev-parse --git-dir > /dev/null 2>&1; then
-        BRANCH=$(git -C "$DIR" branch --show-current 2>/dev/null)
-        STAGED=$(git -C "$DIR" diff --cached --numstat 2>/dev/null | wc -l | tr -d ' ')
-        MODIFIED=$(git -C "$DIR" diff --numstat 2>/dev/null | wc -l | tr -d ' ')
-        echo "$BRANCH|$STAGED|$MODIFIED" > "$CACHE_FILE"
-    else
-        echo "||" > "$CACHE_FILE"
-    fi
+# --- Git caching (per-project, keyed by dir) ---
+dir_hash=$(echo "$project_dir" | md5sum | cut -d' ' -f1)
+GIT_CACHE="/tmp/claude-statusline-git-${dir_hash}.cache"
+GIT_TTL=5
+
+cache_is_fresh() {
+  local file="$1" ttl="$2"
+  [ -f "$file" ] || return 1
+  local now file_mtime age
+  now=$(date +%s)
+  if file_mtime=$(stat -c %Y "$file" 2>/dev/null); then
+    :
+  else
+    file_mtime=$(stat -f %m "$file" 2>/dev/null) || return 1
+  fi
+  age=$((now - file_mtime))
+  [ "$age" -lt "$ttl" ]
+}
+
+if ! cache_is_fresh "$GIT_CACHE" "$GIT_TTL"; then
+  if git -C "$project_dir" rev-parse --git-dir >/dev/null 2>&1; then
+    branch=$(git -C "$project_dir" branch --show-current 2>/dev/null)
+    staged=$(git -C "$project_dir" diff --cached --numstat 2>/dev/null | wc -l | tr -d ' ')
+    modified=$(git -C "$project_dir" diff --numstat 2>/dev/null | wc -l | tr -d ' ')
+    remote=$(git -C "$project_dir" remote get-url origin 2>/dev/null)
+    printf '%s\n%s\n%s\n%s\n' "$branch" "$staged" "$modified" "$remote" > "$GIT_CACHE"
+  else
+    printf '\n0\n0\n\n' > "$GIT_CACHE"
+  fi
 fi
 
-# Read cached git data
-IFS='|' read -r BRANCH STAGED MODIFIED < "$CACHE_FILE"
+{
+  IFS= read -r git_branch
+  IFS= read -r git_staged
+  IFS= read -r git_modified
+  IFS= read -r git_remote
+} < "$GIT_CACHE"
 
-# Build first line: Model, agent, directory, git info, lines changed
-MODEL_DISPLAY="${CYAN}[${MODEL}]${RESET}"
-if [ -n "$AGENT" ]; then
-    MODEL_DISPLAY="${MODEL_DISPLAY} ${YELLOW}@${AGENT}${RESET}"
+# --- Plan detection (from transcript) ---
+PLAN_CACHE="/tmp/claude-statusline-plan-${dir_hash}.cache"
+PLAN_TTL=10
+plan_name=""
+
+if cache_is_fresh "$PLAN_CACHE" "$PLAN_TTL"; then
+  read -r cached_transcript cached_plan < "$PLAN_CACHE" 2>/dev/null
+  [ "$cached_transcript" = "$transcript_path" ] && plan_name="$cached_plan"
 fi
 
-GIT_INFO=""
-if [ -n "$BRANCH" ]; then
-    GIT_STATUS=""
-    [ "$STAGED" -gt 0 ] && GIT_STATUS="${GREEN}+${STAGED}${RESET}"
-    [ "$MODIFIED" -gt 0 ] && GIT_STATUS="${GIT_STATUS}${YELLOW}~${MODIFIED}${RESET}"
-    GIT_INFO=" | ${GREEN}🌿 ${BRANCH}${RESET} ${GIT_STATUS}"
+if [ -z "$plan_name" ] && [ -n "$transcript_path" ] && [ -f "$transcript_path" ]; then
+  match=$(grep -o '\.claude/plans/[^"]*\.md' "$transcript_path" 2>/dev/null | tail -1)
+  [ -n "$match" ] && plan_name=$(basename "$match" .md)
+  echo "$transcript_path $plan_name" > "$PLAN_CACHE"
 fi
 
-# Add lines changed
-LINES_INFO=""
-if [ "$LINES_ADDED" -gt 0 ] || [ "$LINES_REMOVED" -gt 0 ]; then
-    [ "$LINES_ADDED" -gt 0 ] && LINES_INFO="${GREEN}+${LINES_ADDED}${RESET}"
-    [ "$LINES_REMOVED" -gt 0 ] && LINES_INFO="${LINES_INFO}${RED}-${LINES_REMOVED}${RESET}"
-    [ -n "$LINES_INFO" ] && LINES_INFO=" ${LINES_INFO}"
+# --- Convert git remote to GitHub URL ---
+github_url=""
+if [ -n "$git_remote" ]; then
+  if [[ "$git_remote" =~ ^git@([^:]+):(.+)\.git$ ]]; then
+    github_url="https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
+  elif [[ "$git_remote" =~ ^git@([^:]+):(.+)$ ]]; then
+    github_url="https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
+  elif [[ "$git_remote" =~ ^https?:// ]]; then
+    github_url="${git_remote%.git}"
+  fi
 fi
 
-printf '%b' "${MODEL_DISPLAY} 📁 ${DIR##*/}${GIT_INFO}${LINES_INFO}\n"
+# --- Line 1: Model, dir, git, plan ---
+line1="${CYAN}[${model}]${RST}"
 
-# Build second line: Context bar with color-coding
-if [ "$PCT" -ge 90 ]; then
-    BAR_COLOR="$RED"
-elif [ "$PCT" -ge 70 ]; then
-    BAR_COLOR="$YELLOW"
-else
-    BAR_COLOR="$GREEN"
+[ -n "$agent_name" ] && line1="${line1} ${MAGENTA}@${agent_name}${RST}"
+
+[ -n "$project_dir" ] && line1="${line1} ${project_dir##*/}"
+
+if [ -n "$git_branch" ]; then
+  line1="${line1} (${GREEN}${git_branch}${RST}"
+  [ "${git_staged:-0}" -gt 0 ] && line1="${line1} ${GREEN}+${git_staged}${RST}"
+  [ "${git_modified:-0}" -gt 0 ] && line1="${line1} ${YELLOW}~${git_modified}${RST}"
+  line1="${line1})"
 fi
 
-# Create progress bar (10 characters wide)
-FILLED=$((PCT / 10))
-EMPTY=$((10 - FILLED))
-BAR=""
-[ "$FILLED" -gt 0 ] && BAR=$(printf "%${FILLED}s" | tr ' ' '█')
-[ "$EMPTY" -gt 0 ] && BAR="${BAR}$(printf "%${EMPTY}s" | tr ' ' '░')"
+if [ -n "$github_url" ]; then
+  line1="${line1} ${LINK_OPEN}${github_url}${LINK_CLOSE}${CYAN_UL}GitHub>${RST}${LINK_OPEN}${LINK_CLOSE}"
+fi
 
-# Format duration
-MINS=$((DURATION_MS / 60000))
-SECS=$(((DURATION_MS % 60000) / 1000))
+if [ -n "$plan_name" ]; then
+  line1="${line1} | ${GREEN}plan:${plan_name}${RST}"
+fi
 
-# Format cost
-COST_FMT=$(printf '$%.2f' "$COST")
+# --- Line 2: Bar, usage, cost, duration, diff ---
+used_pct=$(awk 'BEGIN { printf "%d", int('"$used_pct"') }')
+used_tokens=$((used_pct * window_size / 100))
 
-printf '%b' "${BAR_COLOR}${BAR}${RESET} ${PCT}% | ${YELLOW}${COST_FMT}${RESET} | ⏱️  ${MINS}m ${SECS}s\n"
+bar_w=20
+filled=$((used_pct * bar_w / 100))
+empty=$((bar_w - filled))
+
+if [ "$used_pct" -lt 70 ]; then bar_color="$GREEN"
+elif [ "$used_pct" -lt 90 ];  then bar_color="$YELLOW"
+else                                bar_color="$RED"
+fi
+
+bar_filled=$(printf "%${filled}s" '' | sed 's/ /█/g')
+bar_empty=$(printf "%${empty}s"   '' | sed 's/ /░/g')
+bar="${bar_color}${bar_filled}${DIM}${bar_empty}${RST}"
+
+# Cost (color-coded)
+cost_cmp=$(awk 'BEGIN { print ('"$cost"' > 5) ? "red" : ('"$cost"' >= 1) ? "yellow" : "green" }')
+cost_val=$(printf "%.2f" "$cost")
+case "$cost_cmp" in
+  red)    cost_fmt="${RED}\$${cost_val}${RST}" ;;
+  yellow) cost_fmt="${YELLOW}\$${cost_val}${RST}" ;;
+  *)      cost_fmt="${GREEN}\$${cost_val}${RST}" ;;
+esac
+
+# Duration
+total_s=$((duration_ms / 1000))
+hrs=$((total_s / 3600))
+mins=$(( (total_s % 3600) / 60 ))
+secs=$((total_s % 60))
+[ "$hrs" -gt 0 ] && duration="${hrs}h${mins}m" || duration="${mins}m${secs}s"
+
+# Lines changed
+diff_stat="${GREEN}+${lines_added}${RST}/${RED}-${lines_removed}${RST}"
+
+# Tip
+tip=""
+if   [ "$used_pct" -gt 90 ]; then tip=" | ${RED}!! /compact or /clear${RST}"
+elif [ "$used_pct" -gt 75 ]; then tip=" | ${YELLOW}! Consider /compact${RST}"
+elif [ "$used_pct" -gt 50 ]; then tip=" | ${DIM}Summarize if stuck${RST}"
+fi
+
+line2="[${bar}] ${used_pct}% $(fmt_k "$used_tokens")/$(fmt_k "$window_size") | ${cost_fmt} ${duration} ${diff_stat}${tip}"
+
+printf '%s\n%s\n' "$line1" "$line2"
