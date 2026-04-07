@@ -11,7 +11,7 @@ uv = "0.11.3"
 
 # === Development Tools ===
 claude = "2.1.92"
-codex = "1.0.0"
+codex = "0.116.0"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.89.0"
 helm = "4.1.3"
@@ -40,14 +40,11 @@ yq = "4.52.5"                    # YAML processor
 "pipx:linode-cli" = "5.66.0"
 
 # === Build & CI Tools ===
+"pipx:black" = "26.3.1"          # Python formatter
 "pipx:pre-commit" = "4.5.1"      # Git hook framework
 "pipx:yamllint" = "1.38.0"       # YAML linter
-"pipx:black" = "26.3.1"          # Python formatter
 
 # === NPM Global Tools ===
-
-
-# === Optional/Project-specific (can be per-directory) ===
 
 
 [settings]
