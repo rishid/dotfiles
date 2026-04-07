@@ -11,18 +11,18 @@ fi
 # Disable telemetry
 export DISABLE_TELEMETRY=1
 
+# Helper to add a skill to Claude Code
+add_skill() {
+  npx skills add "$1" -g ${2:-} -y
+}
+
 echo "Installing agent skills..."
 
 # Personal skills from dotfiles repo (skills/ at repo root, one subdir per skill)
 # Note: .chezmoiroot is "tilde" so sourceDir is ~/.dotfiles/tilde/; go up one level for repo root
-npx skills add "{{ .chezmoi.sourceDir }}/.." -g --all -y
+add_skill "{{ .chezmoi.sourceDir }}/.." --all
 
 # Third-party skills (from GitHub)
-npx skills add vercel-labs/skills -g --all -y
-
-npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-best-practices
-
-
-npx skills add anthropics/skills@frontend-design -g -y
+add_skill anthropics/skills@frontend-design
 
 echo "Agent skills installed successfully."
