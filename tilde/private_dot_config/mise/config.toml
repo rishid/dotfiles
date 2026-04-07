@@ -10,14 +10,16 @@ python = "3.14.3"
 uv = "0.11.3"
 
 # === Development Tools ===
-claude = "latest"
+claude = "2.1.92"
+codex = "1.0.0"
+direnv = "2.37.1"                # Environment variable management
 github-cli = "2.89.0"
 helm = "4.1.3"
 kubectl = "1.35.3"
 "aqua:argoproj/argo-cd" = "3.3.6"
 "aqua:go-task/task" = "3.49.1"
+terraform = "1.14.8"
 yq = "4.52.5"                    # YAML processor
-direnv = "2.37.1"                # Environment variable management
 
 # === CLI Utilities ===
 "aqua:FiloSottile/age" = "1.3.1"                 # File encryption
@@ -43,10 +45,10 @@ direnv = "2.37.1"                # Environment variable management
 "pipx:black" = "26.3.1"          # Python formatter
 
 # === NPM Global Tools ===
-"npm:@openai/codex" = "latest"
+
 
 # === Optional/Project-specific (can be per-directory) ===
-terraform = "1.14.8"
+
 
 [settings]
 always_keep_download = true
