@@ -13,7 +13,7 @@ export DISABLE_TELEMETRY=1
 
 # Helper to add a skill to Claude Code
 add_skill() {
-  npx skills add "$1" -g ${2:-} -y
+  npx skills add "$1" -a claude-code ${2:-} -y
 }
 
 echo "Installing agent skills..."
