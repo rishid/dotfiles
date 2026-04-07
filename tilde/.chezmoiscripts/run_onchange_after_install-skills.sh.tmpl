@@ -8,6 +8,9 @@ if ! command -v npx &>/dev/null; then
     exit 0
 fi
 
+# Disable telemetry
+export DISABLE_TELEMETRY=1
+
 echo "Installing agent skills..."
 
 # Personal skills from dotfiles repo (skills/ at repo root, one subdir per skill)

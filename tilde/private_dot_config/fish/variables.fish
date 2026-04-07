@@ -105,3 +105,7 @@ set --universal tide_vi_mode_icon_visual VISUAL
 set --universal tide_virtual_env_bg_color 444444
 set --universal tide_virtual_env_color 00AFAF
 set --universal tide_virtual_env_icon \ue73c
+
+# Disable telemetry in agent skills and other tools
+set -gx DISABLE_TELEMETRY 1
+set -gx DO_NOT_TRACK 1
