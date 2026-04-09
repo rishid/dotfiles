@@ -43,6 +43,7 @@ if ! xcode-select -p &>/dev/null; then
     xcode-select --install
     echo "Press Enter once the Xcode CLT installation popup is complete..."
     read -r < /dev/tty
+    success "Installed: $(xcode-select -p)"
 else
     success "Already installed: $(xcode-select -p)"
 fi
@@ -69,9 +70,9 @@ else
 fi
 
 # ── 4. Essential bootstrap tools ─────────────────────────────────────────────
-step "4/7  Essential tools (git, curl, fish, age, chezmoi, mise)"
+step "4/7  Essential tools (git, curl, fish, chezmoi, mise)"
 for pkg in git curl fish chezmoi mise; do
-    if brew list --formula "$pkg" &>/dev/null 2>&1; then
+    if brew list --formula "$pkg" &>/dev/null; then
         success "$pkg already installed"
     else
         info "Installing $pkg..."
@@ -127,7 +128,7 @@ fi
 
 if [[ "$SHELL" != "$FISH_PATH" ]]; then
     info "Changing default shell to fish (you may be prompted for your password)..."
-    chsh -s "$FISH_PATH" || die "chsh failed — try: chsh -s $FISH_PATH"
+    chsh -s "$FISH_PATH" < /dev/tty || die "chsh failed — try: chsh -s $FISH_PATH"
     success "Default shell → $FISH_PATH"
 else
     success "fish is already the default shell"
@@ -139,5 +140,5 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 success "Bootstrap complete!"
 echo ""
 echo "  Open a new terminal to start using fish."
-echo "  To keep everything up to date, run: dotup"
+  echo "  To keep everything up to date, open fish and run: dotup"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
