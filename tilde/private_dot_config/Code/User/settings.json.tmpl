@@ -1,7 +1,7 @@
 {
   // UI / Editor experience
   "editor.fontSize": 14,
-  "editor.fontFamily": "Fira Code, Menlo, monospace",
+  "editor.fontFamily": "JetBrains Mono, monospace",
   "editor.fontLigatures": true,
   "editor.formatOnSave": true,
   "editor.tabSize": 4,
@@ -21,16 +21,17 @@
   "workbench.startupEditor": "none",
   "workbench.editor.enablePreview": false,
 
-  // Terminal
-  "terminal.integrated.fontFamily": "Menlo, monospace",
+  // Terminal — use Nerd Font variant so tide icons render correctly
+  "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font, monospace",
+  "terminal.integrated.fontSize": 13,
   "terminal.integrated.cursorBlinking": true,
   "terminal.integrated.scrollback": 10000,
   "terminal.integrated.copyOnSelection": true,
   "terminal.integrated.rightClickBehavior": "paste",
 {{- if eq .chezmoi.os "linux" }}
-  "terminal.integrated.defaultProfile.linux": "zsh",
+  "terminal.integrated.defaultProfile.linux": "fish",
 {{- else if eq .chezmoi.os "darwin" }}
-  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.defaultProfile.osx": "fish",
 {{- end }}
 
   // Window
@@ -121,13 +122,5 @@
     "export": true,
     "jq": true,
     "base64": true
-  },
-
-  // Kubernetes extension configuration
-  "vs-kubernetes": {
-    "vs-kubernetes.knownKubeconfigs": [
-      "/home/rdhupar/w/mcp/mcp-server-terraform/.kubeconfig"
-    ],
-    "vs-kubernetes.kubeconfig": "/home/rdhupar/w/mcp/mcp-server-terraform/.kubeconfig"
   }
 }

@@ -3,23 +3,27 @@
 
 set -euo pipefail
 
-# Install MesloLGS NF fonts (required by tide v6)
+# Install JetBrains Mono Nerd Font (patched with icons for tide/terminal)
 mkdir -p ~/Library/Fonts
 
-fonts=(
-  "Regular/MesloLGSNerdFont-Regular.ttf"
-  "Bold/MesloLGSNerdFont-Bold.ttf"
-  "Italic/MesloLGSNerdFont-Italic.ttf"
-  "BoldItalic/MesloLGSNerdFont-BoldItalic.ttf"
-)
+FONT_ZIP=$(mktemp /tmp/JetBrainsMonoNF.XXXXXX.zip)
+trap 'rm -f "$FONT_ZIP"' EXIT
 
-cd ~/Library/Fonts
+echo "Downloading JetBrainsMono Nerd Font..."
+curl -fL \
+    "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip" \
+    -o "$FONT_ZIP" \
+    || { echo "Failed to download JetBrainsMono Nerd Font zip"; exit 1; }
 
-for font in "${fonts[@]}"; do
-  url="https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/Meslo/L/${font}"
-  echo "Installing ${font##*/}..."
-  curl -fLO "$url" || { echo "Failed to download $font"; exit 1; }
-done
+echo "Extracting fonts to ~/Library/Fonts/..."
+# Extract only the regular-weight variants (skip NL/ligature variants and Windows fonts)
+unzip -o "$FONT_ZIP" \
+    "JetBrainsMonoNerdFont-Regular.ttf" \
+    "JetBrainsMonoNerdFont-Bold.ttf" \
+    "JetBrainsMonoNerdFont-Italic.ttf" \
+    "JetBrainsMonoNerdFont-BoldItalic.ttf" \
+    -d ~/Library/Fonts/ \
+    || { echo "Extracting all fonts (specific names not matched)"; unzip -o "$FONT_ZIP" -d ~/Library/Fonts/; }
 
-echo "Fonts installed successfully"
+echo "JetBrains Mono Nerd Font installed successfully"
 {{ end -}}
