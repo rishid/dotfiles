@@ -1,14 +1,39 @@
-# Cross-platform, cross-shell ~/.📂 powered by [Chezmoi](https://www.chezmoi.io/)
+# Cross-platform dotfiles powered by [Chezmoi](https://www.chezmoi.io/)
 
-## Installation
-### Fresh
+## macOS Setup (Fresh Machine)
 
- `sh -c "$(curl -fsLS get.chezmoi.io)" -- init -S $HOME/.dotfiles --apply rishid`
+Run the bootstrap script — it installs Xcode CLT, Homebrew, fish, chezmoi, and applies dotfiles in one shot:
 
-### Update
+```bash
+curl -fsSL https://raw.githubusercontent.com/rishid/dotfiles/master/bootstrap-macos.sh | bash
+```
 
-Re-apply ansible to machine
-`chezmoi -v apply`
+Or clone first and run locally:
+
+```bash
+git clone https://github.com/rishid/dotfiles.git /tmp/dotfiles
+bash /tmp/dotfiles/bootstrap-macos.sh
+```
+
+> **Note:** You'll need your age private key at `~/.config/chezmoi/key.txt` to decrypt secrets.
+> Copy it from another machine before running, or the script will prompt you.
+
+## Linux / Update
+
+```bash
+# Fresh install
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init -S $HOME/.dotfiles --apply rishid
+
+# Update (re-apply)
+chezmoi update   # or abbreviation: cu
+chezmoi apply    # or abbreviation: ca
+```
+
+## After bootstrap: install dev tools
+
+```bash
+mise install   # installs all tools from ~/.config/mise/config.toml
+```
 
 ## Encrypted Hostname-Specific Config
 

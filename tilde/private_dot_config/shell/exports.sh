@@ -17,11 +17,25 @@ export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 
+### Homebrew (macOS) — must come early so brew-installed tools are available
+if [ "$(uname)" = "Darwin" ]; then
+    if [ -x /opt/homebrew/bin/brew ]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [ -x /usr/local/bin/brew ]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+    fi
+fi
+
 ### Paths
 export PATH="/opt/local/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/lib"
+export PATH="$HOME/.local/share/mise/shims:$PATH"
+
+# LD_LIBRARY_PATH is Linux-only (macOS uses DYLD_LIBRARY_PATH and generally doesn't need this)
+if [ "$(uname)" != "Darwin" ]; then
+    export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:/usr/local/lib"
+fi
 
 ###
 ### General
@@ -87,9 +101,6 @@ export HISTTIMEFORMAT="%F %T "
 export HISTIGNORE="&:[bf]g:c:clear:history:exit:q:afk:pwd:* --help"
 export SAVEHIST=50000
 
-# NixOS
-export NIX_LD_LIBRARY_PATH=/run/current-system/sw/share/nix-ld/lib
-export NIX_LD=/run/current-system/sw/share/nix-ld/lib/ld.so
 
 ### Man pages
 # TODO: move to bash specific file

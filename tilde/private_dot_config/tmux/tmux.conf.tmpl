@@ -181,25 +181,12 @@ if-shell 'test -n "$SSH_CONNECTION"' \
 ##############################
 # Plugins Settings
 ##############################
-{{- if ne .chezmoi.osRelease.id "nixos" }}
-source-file '~/.config/tmux/tmux-plugin-resurrect.conf'
-source-file '~/.config/tmux/tmux-plugin-continuum.conf'
-{{- end}}
-
-##############################
-# Plugins Settings
-##############################
-{{- if ne .chezmoi.osRelease.id "nixos" }}
 source-file '~/.config/tmux/plugin-resurrect.conf'
 source-file '~/.config/tmux/plugin-continuum.conf'
-{{- end}}
 
 ##############################
 # Plugins
 ##############################
-{{- if ne .chezmoi.osRelease.id "nixos" }}
-# On NixOS we do not auto install plugins they are managed in
-# the NixOS config and loaded in `/etc/tmux.conf`.
 run '~/.config/tmux/scripts/install-tpm.sh'
 
 set -g @plugin 'tmux-plugins/tpm'
@@ -210,4 +197,3 @@ set -g @plugin 'jimeh/tmuxifier'
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.config/tmux/plugins/tpm/tpm'
-{{- end }}

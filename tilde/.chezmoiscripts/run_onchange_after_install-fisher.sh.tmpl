@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Install Fisher (fish plugin manager) and sync plugins.
+# Re-runs whenever fish_plugins changes.
+
+set -euo pipefail
+
+# fish_plugins hash: {{ include "private_dot_config/fish/fish_plugins" | sha256sum }}
+
+# Find fish shell — check Homebrew paths (macOS) and then $PATH
+FISH=""
+for p in /opt/homebrew/bin/fish /usr/local/bin/fish; do
+    if [[ -x "$p" ]]; then
+        FISH="$p"
+        break
+    fi
+done
+
+if [[ -z "$FISH" ]]; then
+    FISH=$(command -v fish 2>/dev/null || true)
+fi
+
+if [[ -z "$FISH" ]]; then
+    echo "Fish not found, skipping fisher install"
+    exit 0
+fi
+
+echo -e "\033[0;32m Installing Fish shell plugins \033[0m"
+
+"$FISH" -c '
+if not functions --query fisher
+    curl -fsSL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source \
+        && fisher install jorgebucaran/fisher
+end
+fisher update
+'
+
+echo -e "\033[0;32m Fish shell plugins installed \033[0m"

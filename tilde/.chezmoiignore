@@ -20,7 +20,7 @@
 .*_history
 
 {{ if ne .chezmoi.os "darwin" -}}
-# macOS flies
+# macOS files (excluded on non-macOS)
 **/.DS_Store
 .CFUserTextEncoding
 .Trash
@@ -29,5 +29,6 @@ tilde/private_Library/
 {{ end }}
 
 {{ if eq .chezmoi.os "darwin" -}}
-.chezmoiscripts/install-fisher.fish
-{{- end }}
+# systemd is Linux-only
+.config/systemd/
+{{ end }}

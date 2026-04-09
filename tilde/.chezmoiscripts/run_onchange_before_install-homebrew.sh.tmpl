@@ -1,0 +1,54 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+#######################################
+# macOS: Install Homebrew and packages
+#######################################
+
+# Install Homebrew if not present
+if ! command -v brew &>/dev/null; then
+    echo "Installing Homebrew..."
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+# Ensure Homebrew is in PATH for this script session
+if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+# Install fish shell
+if ! command -v fish &>/dev/null; then
+    echo "Installing fish shell..."
+    brew install fish
+fi
+
+# Install essential packages (skip if already installed)
+PACKAGES=(
+    git
+    curl
+    wget
+    jq
+    tree
+    htop
+    socat
+    pv
+    tmux
+    age
+    mise
+)
+
+echo "Installing essential packages..."
+for pkg in "${PACKAGES[@]}"; do
+    if brew list --formula "$pkg" &>/dev/null 2>&1; then
+        echo "  $pkg already installed, skipping"
+    else
+        brew install "$pkg" || echo "  Warning: failed to install $pkg"
+    fi
+done
+
+echo "macOS Homebrew packages installed successfully"
+{{ end -}}

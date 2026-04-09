@@ -29,8 +29,12 @@ git:
 
 {{- $docker := false -}}{{/* true if this machine should have Docker installed */}}
 {{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
-# {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
-{{- $headless := or (env "SSH_CLIENT" | not | not) (not (or (env "DISPLAY") (env "WAYLAND_DISPLAY"))) -}}
+{{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
+{{- if eq .chezmoi.os "darwin" -}}
+{{-   $headless = (env "SSH_CLIENT" | not | not) -}}
+{{- else -}}
+{{-   $headless = or (env "SSH_CLIENT" | not | not) (not (or (env "DISPLAY") (env "WAYLAND_DISPLAY"))) -}}
+{{- end -}}
 {{- $devcontainer := or (env "REMOTE_CONTAINERS") (env "CODESPACES") (env "VSCODE_REMOTE_CONTAINERS_SESSION") (env "GITPOD_HOST") | not | not -}}
 {{- $minimum := or $devcontainer -}}
 

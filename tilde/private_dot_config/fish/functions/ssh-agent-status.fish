@@ -1,9 +1,15 @@
-function ssh-agent-status -d "Show ssh-agent service status and loaded keys"
-    echo "SSH Agent Service Status:"
-    systemctl --user status ssh-agent.service
+function ssh-agent-status -d "Show ssh-agent status and loaded keys"
+    if test (uname) = "Darwin"
+        echo "SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
+        echo ""
+    else
+        echo "SSH Agent Service Status:"
+        systemctl --user status ssh-agent.service
+        echo ""
+        echo "SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
+        echo ""
+    end
 
-    echo -e "\nSSH_AUTH_SOCK: $SSH_AUTH_SOCK"
-
-    echo -e "\nLoaded keys:"
-    ssh-add -l 2>/dev/null || echo "No keys loaded or agent not accessible"
+    echo "Loaded keys:"
+    ssh-add -l 2>/dev/null; or echo "No keys loaded or agent not accessible"
 end

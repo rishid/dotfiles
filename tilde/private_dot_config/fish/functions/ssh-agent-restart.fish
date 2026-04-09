@@ -1,19 +1,26 @@
-function ssh-agent-restart -d "Restart ssh-agent service and reload autoload keys"
-    echo "Restarting ssh-agent service..."
-    systemctl --user restart ssh-agent.service
+function ssh-agent-restart -d "Restart ssh-agent and reload autoload keys"
+    if test (uname) = "Darwin"
+        # macOS: kill existing agent and start a new one
+        set -l sock_path "$HOME/.ssh/agent.sock"
+        pkill -u (id -u) ssh-agent 2>/dev/null; or true
+        rm -f "$sock_path"
+        eval (ssh-agent -a "$sock_path" -s 2>/dev/null) > /dev/null
+        set -gx SSH_AUTH_SOCK "$sock_path"
+        echo "SSH Agent restarted. SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
+    else
+        # Linux: restart systemd user service
+        echo "Restarting ssh-agent service..."
+        systemctl --user restart ssh-agent.service
 
-    # Wait a moment for the service to start
-    sleep 1
+        sleep 1
 
-    # Re-import environment
-    set -x SSH_AUTH_SOCK (systemctl --user show-environment | grep SSH_AUTH_SOCK | cut -d= -f2)
+        set -gx SSH_AUTH_SOCK (systemctl --user show-environment | grep SSH_AUTH_SOCK | cut -d= -f2)
+        echo "SSH Agent restarted. SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
+    end
 
-    echo "SSH Agent restarted. New SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
-
-    # Reload keys from ~/.ssh/autoload (single source of truth)
-    echo "Reloading keys..."
-
+    # Reload keys from ~/.ssh/autoload
     if test -f ~/.ssh/autoload
+        echo "Reloading keys..."
         grep -v '^#' ~/.ssh/autoload | grep -v '^$' | while read -l key_path
             set -l full_path (string replace '~' $HOME "$key_path")
             if test -f "$full_path"
