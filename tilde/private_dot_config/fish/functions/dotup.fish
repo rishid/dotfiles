@@ -32,15 +32,8 @@ function dotup -d "Update system: dotfiles, mise tools, and fish plugins"
         set errors (math $errors + 1)
     end
 
-    echo "" && echo "── fisher update (fish plugins) ──"
-    if functions --query fisher
-        if not fisher update
-            echo "⚠ fisher update failed"
-            set errors (math $errors + 1)
-        end
-    else
-        echo "fisher not installed, skipping"
-    end
+    # fisher plugins are managed by chezmoi's onchange script (run_onchange_after_install-fisher.sh.tmpl)
+    # which re-runs automatically when fish_plugins changes — no need to call fisher update here.
 
     echo ""
     if test $errors -eq 0
