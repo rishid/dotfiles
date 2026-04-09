@@ -70,8 +70,8 @@ else
 fi
 
 # ── 4. Essential bootstrap tools ─────────────────────────────────────────────
-step "4/7  Essential tools (git, curl, fish, chezmoi, mise)"
-for pkg in git curl fish chezmoi mise; do
+step "4/7  Essential tools (git, curl, fish, chezmoi)"
+for pkg in git curl fish chezmoi; do
     if brew list --formula "$pkg" &>/dev/null; then
         success "$pkg already installed"
     else
@@ -80,6 +80,16 @@ for pkg in git curl fish chezmoi mise; do
         success "Installed $pkg"
     fi
 done
+
+# Install mise via official installer (not brew) so that mise self-update works
+if [[ -x "$HOME/.local/bin/mise" ]]; then
+    success "mise already installed: $($HOME/.local/bin/mise --version)"
+else
+    info "Installing mise via official installer..."
+    curl https://mise.run | sh || die "mise installation failed"
+    success "mise installed: $($HOME/.local/bin/mise --version)"
+fi
+export PATH="$HOME/.local/bin:$PATH"
 
 # ── 5. chezmoi init & apply ───────────────────────────────────────────────────
 step "5/7  chezmoi init + apply"
@@ -104,11 +114,11 @@ fi
 
 info "Trusting mise config and installing all tools (go, node, python, kubectl, gh, ...)..."
 info "This will take several minutes on a fresh machine."
-mise trust "$MISE_CONFIG" 2>/dev/null || true
-mise install || warn "Some mise tools failed — run 'mise install' manually to retry"
+"$HOME/.local/bin/mise" trust "$MISE_CONFIG" 2>/dev/null || true
+"$HOME/.local/bin/mise" install || warn "Some mise tools failed — run 'mise install' manually to retry"
 success "mise tools installed"
 echo ""
-mise list
+"$HOME/.local/bin/mise" list
 
 # ── 7. Set fish as default shell ──────────────────────────────────────────────
 step "7/7  Default shell → fish"
