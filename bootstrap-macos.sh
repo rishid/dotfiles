@@ -70,7 +70,7 @@ fi
 
 # ── 4. Essential bootstrap tools ─────────────────────────────────────────────
 step "4/7  Essential tools (git, curl, fish, age, chezmoi, mise)"
-for pkg in git curl fish age chezmoi mise; do
+for pkg in git curl fish chezmoi mise; do
     if brew list --formula "$pkg" &>/dev/null 2>&1; then
         success "$pkg already installed"
     else
