@@ -121,17 +121,27 @@ if [[ -z "$FISH_PATH" ]]; then
     die "fish not found — 'brew install fish' should have succeeded above"
 fi
 
-if ! grep -qF "$FISH_PATH" /etc/shells; then
-    info "Adding $FISH_PATH to /etc/shells (requires sudo)..."
-    echo "$FISH_PATH" | sudo tee -a /etc/shells > /dev/null
-fi
-
-if [[ "$SHELL" != "$FISH_PATH" ]]; then
-    info "Changing default shell to fish (you may be prompted for your password)..."
-    chsh -s "$FISH_PATH" < /dev/tty || die "chsh failed — try: chsh -s $FISH_PATH"
-    success "Default shell → $FISH_PATH"
+# On MDM-managed work Macs, security policy blocks editing /etc/shells and
+# running chsh. chezmoi deploys ~/.zshrc with an exec-into-fish guard instead.
+if grep -qF "$FISH_PATH" /etc/shells 2>/dev/null; then
+    # /etc/shells already has fish — we can use chsh normally
+    if [[ "$SHELL" != "$FISH_PATH" ]]; then
+        info "Changing default shell to fish (you may be prompted for your password)..."
+        chsh -s "$FISH_PATH" < /dev/tty || warn "chsh failed — fish will still launch via ~/.zshrc"
+        success "Default shell → $FISH_PATH"
+    else
+        success "fish is already the default shell"
+    fi
 else
-    success "fish is already the default shell"
+    # /etc/shells is not writable (common on corporate Macs)
+    if echo "$FISH_PATH" | sudo tee -a /etc/shells > /dev/null 2>&1; then
+        info "Changing default shell to fish (you may be prompted for your password)..."
+        chsh -s "$FISH_PATH" < /dev/tty || warn "chsh failed — fish will still launch via ~/.zshrc"
+        success "Default shell → $FISH_PATH"
+    else
+        warn "/etc/shells is policy-restricted — skipping chsh"
+        info "fish will auto-launch via ~/.zshrc (deployed by chezmoi)"
+    fi
 fi
 
 # ── Done ──────────────────────────────────────────────────────────────────────

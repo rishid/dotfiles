@@ -1,0 +1,22 @@
+# ~/.zshrc: executed by zsh for interactive shells.
+
+# If not running interactively, don't do anything
+[[ $- == *i* ]] || return 0
+{{ if .work }}
+# Work macOS: /etc/shells is policy-restricted so chsh cannot set fish as the
+# default shell. Exec into fish from here instead.
+for _fish in /opt/homebrew/bin/fish /usr/local/bin/fish; do
+    if [[ -x "$_fish" ]]; then
+        export SHELL="$_fish"
+        exec "$_fish"
+    fi
+done
+unset _fish
+{{ end }}
+### Import Common Settings
+[ ! -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/profile.sh" ] || . "${XDG_CONFIG_HOME:-$HOME/.config}/shell/profile.sh"
+
+# mise — activate for zsh sessions that don't exec into fish
+eval "$("$HOME/.local/bin/mise" activate zsh)"
+
+export PATH="$HOME/bin:$PATH"
