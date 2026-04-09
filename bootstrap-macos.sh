@@ -29,7 +29,7 @@ die()     { error "$*"; exit 1; }
 trap 'error "Failed at line $LINENO: $BASH_COMMAND (exit $?)"' ERR
 
 # ── 1. Verify macOS ──────────────────────────────────────────────────────────
-step "1/8  Verify macOS"
+step "1/7  Verify macOS"
 if [[ "$(uname)" != "Darwin" ]]; then
     die "This script is for macOS only."
 fi
@@ -37,7 +37,7 @@ sw_vers
 success "macOS confirmed"
 
 # ── 2. Xcode Command Line Tools ──────────────────────────────────────────────
-step "2/8  Xcode Command Line Tools"
+step "2/7  Xcode Command Line Tools"
 if ! xcode-select -p &>/dev/null; then
     info "Installing Xcode Command Line Tools..."
     xcode-select --install
@@ -48,7 +48,7 @@ else
 fi
 
 # ── 3. Homebrew ───────────────────────────────────────────────────────────────
-step "3/8  Homebrew"
+step "3/7  Homebrew"
 if ! command -v brew &>/dev/null; then
     info "Installing Homebrew..."
     NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
@@ -69,7 +69,7 @@ else
 fi
 
 # ── 4. Essential bootstrap tools ─────────────────────────────────────────────
-step "4/8  Essential tools (git, curl, fish, age, chezmoi, mise)"
+step "4/7  Essential tools (git, curl, fish, age, chezmoi, mise)"
 for pkg in git curl fish age chezmoi mise; do
     if brew list --formula "$pkg" &>/dev/null 2>&1; then
         success "$pkg already installed"
@@ -80,29 +80,9 @@ for pkg in git curl fish age chezmoi mise; do
     fi
 done
 
-# ── 5. Age key (required for decrypting secrets) ──────────────────────────────
-step "5/8  Age decryption key"
-AGE_KEY="$HOME/.config/chezmoi/key.txt"
-mkdir -p "$(dirname "$AGE_KEY")"
-
-if [[ ! -f "$AGE_KEY" ]]; then
-    warn "Age decryption key not found at $AGE_KEY"
-    echo ""
-    echo "This key is required to decrypt secrets in the dotfiles."
-    echo "Copy it from another machine before continuing:"
-    echo "  scp other-machine:~/.config/chezmoi/key.txt $AGE_KEY"
-    echo ""
-    echo "Press Enter once the key is in place (Ctrl-C to abort)..."
-    read -r < /dev/tty
-    if [[ ! -f "$AGE_KEY" ]]; then
-        die "Age key not found at $AGE_KEY — cannot decrypt secrets. Aborting."
-    fi
-fi
-chmod 400 "$AGE_KEY"
-success "Age key present"
-
-# ── 6. chezmoi init & apply ───────────────────────────────────────────────────
-step "6/8  chezmoi init + apply"
+# ── 5. chezmoi init & apply ───────────────────────────────────────────────────
+step "5/7  chezmoi init + apply"
+info "chezmoi will prompt for your age key passphrase to decrypt secrets."
 if [[ -d "$DOTFILES_DIR/.git" ]]; then
     info "Dotfiles already at $DOTFILES_DIR — running update..."
     chezmoi update || die "chezmoi update failed"
@@ -114,8 +94,8 @@ else
 fi
 success "chezmoi apply complete"
 
-# ── 7. Install all mise tools ─────────────────────────────────────────────────
-step "7/8  mise tool install"
+# ── 6. Install all mise tools ─────────────────────────────────────────────────
+step "6/7  mise tool install"
 MISE_CONFIG="$HOME/.config/mise/config.toml"
 if [[ ! -f "$MISE_CONFIG" ]]; then
     die "Expected mise config at $MISE_CONFIG — chezmoi apply may have failed"
@@ -129,8 +109,8 @@ success "mise tools installed"
 echo ""
 mise list
 
-# ── 8. Set fish as default shell ──────────────────────────────────────────────
-step "8/8  Default shell → fish"
+# ── 7. Set fish as default shell ──────────────────────────────────────────────
+step "7/7  Default shell → fish"
 FISH_PATH=""
 for p in /opt/homebrew/bin/fish /usr/local/bin/fish; do
     if [[ -x "$p" ]]; then FISH_PATH="$p"; break; fi
