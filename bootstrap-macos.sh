@@ -6,7 +6,7 @@
 #   # or clone first then run:
 #   ./bootstrap-macos.sh
 
-set -euo pipefail
+set -uo pipefail   # -e removed: we handle errors explicitly for better messages
 
 DOTFILES_REPO="rishid"
 DOTFILES_DIR="$HOME/.dotfiles"
@@ -15,151 +15,149 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+BOLD='\033[1m'
 NC='\033[0m'
 
 info()    { echo -e "${BLUE}[INFO]${NC}  $*"; }
 success() { echo -e "${GREEN}[OK]${NC}    $*"; }
 warn()    { echo -e "${YELLOW}[WARN]${NC}  $*"; }
-error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; exit 1; }
+error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; }
+step()    { echo -e "\n${BOLD}── $* ──${NC}"; }
+die()     { error "$*"; exit 1; }
+
+# Print the failing command and line number if anything exits non-zero
+trap 'error "Failed at line $LINENO: $BASH_COMMAND (exit $?)"' ERR
 
 # ── 1. Verify macOS ──────────────────────────────────────────────────────────
+step "1/8  Verify macOS"
 if [[ "$(uname)" != "Darwin" ]]; then
-    error "This script is for macOS only."
+    die "This script is for macOS only."
 fi
-
-info "Starting macOS bootstrap..."
 sw_vers
+success "macOS confirmed"
 
 # ── 2. Xcode Command Line Tools ──────────────────────────────────────────────
+step "2/8  Xcode Command Line Tools"
 if ! xcode-select -p &>/dev/null; then
     info "Installing Xcode Command Line Tools..."
     xcode-select --install
-    echo "Press Enter once Xcode Command Line Tools installation is complete..."
-    read -r
+    echo "Press Enter once the Xcode CLT installation popup is complete..."
+    read -r < /dev/tty
 else
-    success "Xcode Command Line Tools already installed"
+    success "Already installed: $(xcode-select -p)"
 fi
 
 # ── 3. Homebrew ───────────────────────────────────────────────────────────────
+step "3/8  Homebrew"
 if ! command -v brew &>/dev/null; then
     info "Installing Homebrew..."
-    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
+        || die "Homebrew installation failed"
 else
-    success "Homebrew already installed"
+    success "Already installed: $(brew --version | head -1)"
 fi
 
 # Load Homebrew into current shell session
 if [[ -x /opt/homebrew/bin/brew ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
-    success "Homebrew configured (Apple Silicon: /opt/homebrew)"
+    success "Homebrew in PATH (Apple Silicon: /opt/homebrew)"
 elif [[ -x /usr/local/bin/brew ]]; then
     eval "$(/usr/local/bin/brew shellenv)"
-    success "Homebrew configured (Intel: /usr/local)"
+    success "Homebrew in PATH (Intel: /usr/local)"
 else
-    error "Homebrew installed but brew not found in expected locations"
+    die "Homebrew installed but brew not found in /opt/homebrew or /usr/local"
 fi
 
 # ── 4. Essential bootstrap tools ─────────────────────────────────────────────
-info "Installing essential tools..."
+step "4/8  Essential tools (git, curl, fish, age, chezmoi, mise)"
 for pkg in git curl fish age chezmoi mise; do
     if brew list --formula "$pkg" &>/dev/null 2>&1; then
         success "$pkg already installed"
     else
-        brew install "$pkg"
+        info "Installing $pkg..."
+        brew install "$pkg" || die "Failed to install $pkg"
         success "Installed $pkg"
     fi
 done
 
-# ── 5. Age key (required for encrypted secrets) ───────────────────────────────
+# ── 5. Age key (required for decrypting secrets) ──────────────────────────────
+step "5/8  Age decryption key"
 AGE_KEY="$HOME/.config/chezmoi/key.txt"
 mkdir -p "$(dirname "$AGE_KEY")"
 
 if [[ ! -f "$AGE_KEY" ]]; then
     warn "Age decryption key not found at $AGE_KEY"
     echo ""
-    echo "You need to place your age private key at: $AGE_KEY"
-    echo "Options:"
-    echo "  1. Copy from another machine:  scp other-machine:~/.config/chezmoi/key.txt $AGE_KEY"
-    echo "  2. Decrypt from backup:        age --decrypt -o $AGE_KEY key.txt.age"
+    echo "This key is required to decrypt secrets in the dotfiles."
+    echo "Copy it from another machine before continuing:"
+    echo "  scp other-machine:~/.config/chezmoi/key.txt $AGE_KEY"
     echo ""
-    echo "Press Enter to continue after placing the key (or Ctrl-C to abort)..."
-    read -r
+    echo "Press Enter once the key is in place (Ctrl-C to abort)..."
+    read -r < /dev/tty
     if [[ ! -f "$AGE_KEY" ]]; then
-        warn "Key still not found — chezmoi will fail on encrypted files"
-    else
-        chmod 400 "$AGE_KEY"
-        success "Age key found"
+        die "Age key not found at $AGE_KEY — cannot decrypt secrets. Aborting."
     fi
-else
-    chmod 400 "$AGE_KEY"
-    success "Age key already present"
 fi
+chmod 400 "$AGE_KEY"
+success "Age key present"
 
 # ── 6. chezmoi init & apply ───────────────────────────────────────────────────
-info "Initializing chezmoi with dotfiles from $DOTFILES_REPO..."
-
+step "6/8  chezmoi init + apply"
 if [[ -d "$DOTFILES_DIR/.git" ]]; then
-    warn "Dotfiles already cloned at $DOTFILES_DIR, running update instead"
-    chezmoi update
+    info "Dotfiles already at $DOTFILES_DIR — running update..."
+    chezmoi update || die "chezmoi update failed"
 else
-    # -S sets the source directory; chezmoi clones the repo there and applies
-    chezmoi init -S "$DOTFILES_DIR" --apply "$DOTFILES_REPO"
+    info "Cloning dotfiles to $DOTFILES_DIR and applying..."
+    # Use the same flags as the documented install command in README
+    chezmoi init --source "$DOTFILES_DIR" --apply "$DOTFILES_REPO" \
+        || die "chezmoi init failed — check output above for details"
 fi
-
-success "chezmoi apply completed"
+success "chezmoi apply complete"
 
 # ── 7. Install all mise tools ─────────────────────────────────────────────────
-# mise config.toml is now deployed at ~/.config/mise/config.toml
-# Trust it so mise doesn't prompt, then install everything.
-info "Installing development tools via mise (this may take a while)..."
-info "Tools: go, node, python, kubectl, terraform, gh, and many more..."
-
+step "7/8  mise tool install"
 MISE_CONFIG="$HOME/.config/mise/config.toml"
-if [[ -f "$MISE_CONFIG" ]]; then
-    # Trust the config file so mise doesn't ask interactively
-    mise trust "$MISE_CONFIG" 2>/dev/null || true
-    mise install
-    success "All mise tools installed"
-    echo ""
-    info "Installed tools:"
-    mise list
-else
-    warn "mise config not found at $MISE_CONFIG — run 'mise install' after chezmoi applies"
+if [[ ! -f "$MISE_CONFIG" ]]; then
+    die "Expected mise config at $MISE_CONFIG — chezmoi apply may have failed"
 fi
+
+info "Trusting mise config and installing all tools (go, node, python, kubectl, gh, ...)..."
+info "This will take several minutes on a fresh machine."
+mise trust "$MISE_CONFIG" 2>/dev/null || true
+mise install || warn "Some mise tools failed — run 'mise install' manually to retry"
+success "mise tools installed"
+echo ""
+mise list
 
 # ── 8. Set fish as default shell ──────────────────────────────────────────────
+step "8/8  Default shell → fish"
 FISH_PATH=""
 for p in /opt/homebrew/bin/fish /usr/local/bin/fish; do
-    if [[ -x "$p" ]]; then
-        FISH_PATH="$p"
-        break
-    fi
+    if [[ -x "$p" ]]; then FISH_PATH="$p"; break; fi
 done
 
-if [[ -n "$FISH_PATH" ]]; then
-    if ! grep -qF "$FISH_PATH" /etc/shells; then
-        info "Adding $FISH_PATH to /etc/shells..."
-        echo "$FISH_PATH" | sudo tee -a /etc/shells > /dev/null
-    fi
-
-    if [[ "$SHELL" != "$FISH_PATH" ]]; then
-        info "Setting default shell to fish..."
-        chsh -s "$FISH_PATH"
-        success "Default shell set to $FISH_PATH"
-    else
-        success "Fish is already the default shell"
-    fi
-else
-    warn "Fish shell not found — run 'brew install fish' manually"
+if [[ -z "$FISH_PATH" ]]; then
+    die "fish not found — 'brew install fish' should have succeeded above"
 fi
 
-# ── 9. Summary ────────────────────────────────────────────────────────────────
+if ! grep -qF "$FISH_PATH" /etc/shells; then
+    info "Adding $FISH_PATH to /etc/shells (requires sudo)..."
+    echo "$FISH_PATH" | sudo tee -a /etc/shells > /dev/null
+fi
+
+if [[ "$SHELL" != "$FISH_PATH" ]]; then
+    info "Changing default shell to fish (you may be prompted for your password)..."
+    chsh -s "$FISH_PATH" || die "chsh failed — try: chsh -s $FISH_PATH"
+    success "Default shell → $FISH_PATH"
+else
+    success "fish is already the default shell"
+fi
+
+# ── Done ──────────────────────────────────────────────────────────────────────
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 success "Bootstrap complete!"
 echo ""
-echo "Next steps:"
-echo "  • Open a new terminal (or log out/in) to start using fish"
-echo "  • Add SSH keys to ~/.ssh/autoload for auto-loading"
-echo "  • To update dotfiles later: chezmoi update"
+echo "  Open a new terminal to start using fish."
+echo "  To keep everything up to date, run: dotup"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
