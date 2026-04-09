@@ -1,37 +1,40 @@
 #!/usr/bin/env bash
-# Install Fisher (fish plugin manager) and sync plugins.
+# Install Fisher and sync plugins from fish_plugins.
 # Re-runs whenever fish_plugins changes.
+# fish_plugins hash: {{ include "private_dot_config/fish/fish_plugins" | sha256sum }}
 
 set -euo pipefail
 
-# fish_plugins hash: {{ include "private_dot_config/fish/fish_plugins" | sha256sum }}
-
-# Find fish shell — check Homebrew paths (macOS) and then $PATH
+# Find fish shell — check Homebrew paths first (macOS), then $PATH
 FISH=""
 for p in /opt/homebrew/bin/fish /usr/local/bin/fish; do
-    if [[ -x "$p" ]]; then
-        FISH="$p"
-        break
-    fi
+    if [[ -x "$p" ]]; then FISH="$p"; break; fi
 done
+if [[ -z "$FISH" ]]; then FISH=$(command -v fish 2>/dev/null || true); fi
+if [[ -z "$FISH" ]]; then echo "fish not found, skipping fisher install"; exit 0; fi
 
-if [[ -z "$FISH" ]]; then
-    FISH=$(command -v fish 2>/dev/null || true)
-fi
-
-if [[ -z "$FISH" ]]; then
-    echo "Fish not found, skipping fisher install"
+# Read the exact plugin list from the chezmoi-deployed fish_plugins.
+# We use 'fisher install <plugins>' (not 'fisher update') to guarantee we
+# install exactly what's in our source — not whatever the local file may
+# have accumulated from previous partial runs or corruption.
+FISH_PLUGINS_FILE="$HOME/.config/fish/fish_plugins"
+if [[ ! -f "$FISH_PLUGINS_FILE" ]]; then
+    echo "fish_plugins not found at $FISH_PLUGINS_FILE, skipping"
     exit 0
 fi
 
-echo -e "\033[0;32m Installing Fish shell plugins \033[0m"
+PLUGINS=$(grep -v '^[[:space:]]*#' "$FISH_PLUGINS_FILE" | grep -v '^[[:space:]]*$' | tr '\n' ' ')
 
-"$FISH" -c '
+echo "Installing Fish shell plugins: $PLUGINS"
+
+# Double-quoted fish -c so bash expands $PLUGINS before fish sees it.
+# 'fisher install' is idempotent: skips already-up-to-date plugins.
+"$FISH" -c "
 if not functions --query fisher
-    curl -fsSL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source \
-        && fisher install jorgebucaran/fisher
+    curl -fsSL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source
+    and fisher install jorgebucaran/fisher
 end
-fisher update
-' </dev/null
+fisher install $PLUGINS
+"
 
-echo -e "\033[0;32m Fish shell plugins installed \033[0m"
+echo "Fish shell plugins installed"
