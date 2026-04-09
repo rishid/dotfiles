@@ -34,7 +34,6 @@ sw_vers
 if ! xcode-select -p &>/dev/null; then
     info "Installing Xcode Command Line Tools..."
     xcode-select --install
-    # Wait for installation to finish
     echo "Press Enter once Xcode Command Line Tools installation is complete..."
     read -r
 else
@@ -62,7 +61,7 @@ fi
 
 # ── 4. Essential bootstrap tools ─────────────────────────────────────────────
 info "Installing essential tools..."
-for pkg in git curl fish age chezmoi; do
+for pkg in git curl fish age chezmoi mise; do
     if brew list --formula "$pkg" &>/dev/null 2>&1; then
         success "$pkg already installed"
     else
@@ -73,6 +72,8 @@ done
 
 # ── 5. Age key (required for encrypted secrets) ───────────────────────────────
 AGE_KEY="$HOME/.config/chezmoi/key.txt"
+mkdir -p "$(dirname "$AGE_KEY")"
+
 if [[ ! -f "$AGE_KEY" ]]; then
     warn "Age decryption key not found at $AGE_KEY"
     echo ""
@@ -80,13 +81,11 @@ if [[ ! -f "$AGE_KEY" ]]; then
     echo "Options:"
     echo "  1. Copy from another machine:  scp other-machine:~/.config/chezmoi/key.txt $AGE_KEY"
     echo "  2. Decrypt from backup:        age --decrypt -o $AGE_KEY key.txt.age"
-    echo "  3. Generate a new key (will break encrypted secret decryption):"
-    echo "     age-keygen -o $AGE_KEY"
     echo ""
     echo "Press Enter to continue after placing the key (or Ctrl-C to abort)..."
     read -r
     if [[ ! -f "$AGE_KEY" ]]; then
-        warn "Key still not found — chezmoi will prompt for it or skip encrypted files"
+        warn "Key still not found — chezmoi will fail on encrypted files"
     else
         chmod 400 "$AGE_KEY"
         success "Age key found"
@@ -101,23 +100,31 @@ info "Initializing chezmoi with dotfiles from $DOTFILES_REPO..."
 
 if [[ -d "$DOTFILES_DIR/.git" ]]; then
     warn "Dotfiles already cloned at $DOTFILES_DIR, running update instead"
-    chezmoi update --source-path "$DOTFILES_DIR/tilde"
+    chezmoi update
 else
-    chezmoi init \
-        --source "$DOTFILES_DIR" \
-        --apply \
-        "$DOTFILES_REPO"
+    # -S sets the source directory; chezmoi clones the repo there and applies
+    chezmoi init -S "$DOTFILES_DIR" --apply "$DOTFILES_REPO"
 fi
 
 success "chezmoi apply completed"
 
-# ── 7. Install mise and tools ─────────────────────────────────────────────────
-if command -v mise &>/dev/null; then
-    info "Installing development tools via mise (this may take a while)..."
-    mise install 2>&1 || warn "Some mise tools failed to install — run 'mise install' manually"
-    success "mise tools installed"
+# ── 7. Install all mise tools ─────────────────────────────────────────────────
+# mise config.toml is now deployed at ~/.config/mise/config.toml
+# Trust it so mise doesn't prompt, then install everything.
+info "Installing development tools via mise (this may take a while)..."
+info "Tools: go, node, python, kubectl, terraform, gh, and many more..."
+
+MISE_CONFIG="$HOME/.config/mise/config.toml"
+if [[ -f "$MISE_CONFIG" ]]; then
+    # Trust the config file so mise doesn't ask interactively
+    mise trust "$MISE_CONFIG" 2>/dev/null || true
+    mise install
+    success "All mise tools installed"
+    echo ""
+    info "Installed tools:"
+    mise list
 else
-    warn "mise not found — run 'brew install mise && mise install' to install dev tools"
+    warn "mise config not found at $MISE_CONFIG — run 'mise install' after chezmoi applies"
 fi
 
 # ── 8. Set fish as default shell ──────────────────────────────────────────────
@@ -139,13 +146,11 @@ if [[ -n "$FISH_PATH" ]]; then
         info "Setting default shell to fish..."
         chsh -s "$FISH_PATH"
         success "Default shell set to $FISH_PATH"
-        echo ""
-        warn "Log out and back in (or open a new terminal) for fish to take effect"
     else
         success "Fish is already the default shell"
     fi
 else
-    warn "Fish shell not found in expected paths — run 'brew install fish' manually"
+    warn "Fish shell not found — run 'brew install fish' manually"
 fi
 
 # ── 9. Summary ────────────────────────────────────────────────────────────────
@@ -155,6 +160,6 @@ success "Bootstrap complete!"
 echo ""
 echo "Next steps:"
 echo "  • Open a new terminal (or log out/in) to start using fish"
-echo "  • Run 'mise install' if any tools failed during setup"
 echo "  • Add SSH keys to ~/.ssh/autoload for auto-loading"
+echo "  • To update dotfiles later: chezmoi update"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

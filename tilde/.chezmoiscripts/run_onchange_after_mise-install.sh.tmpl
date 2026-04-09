@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Run mise install whenever mise/config.toml changes.
+# This keeps dev tools in sync on both macOS and Linux.
+# mise/config.toml hash: {{ include "private_dot_config/mise/config.toml" | sha256sum }}
+
+set -euo pipefail
+
+# Ensure mise shims are in PATH
+export PATH="$HOME/.local/share/mise/shims:$PATH"
+
+# On macOS, add Homebrew to PATH so brew-installed mise is found
+if [[ "$(uname)" == "Darwin" ]]; then
+    if [[ -x /opt/homebrew/bin/brew ]]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [[ -x /usr/local/bin/brew ]]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+    fi
+fi
+
+if ! command -v mise &>/dev/null; then
+    echo "mise not found — skipping tool install"
+    echo "Install mise: brew install mise  (macOS) or https://mise.jdx.dev"
+    exit 0
+fi
+
+MISE_CONFIG="$HOME/.config/mise/config.toml"
+if [[ -f "$MISE_CONFIG" ]]; then
+    mise trust "$MISE_CONFIG" 2>/dev/null || true
+fi
+
+echo "Running mise install..."
+mise install
+echo "mise install complete"
