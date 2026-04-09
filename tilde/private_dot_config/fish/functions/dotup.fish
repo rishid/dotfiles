@@ -20,12 +20,6 @@ function dotup -d "Update system: dotfiles, mise tools, and fish plugins"
         set errors (math $errors + 1)
     end
 
-    echo "" && echo "── mise upgrade (all tools to latest) ──"
-    if not mise upgrade
-        echo "⚠ mise upgrade failed"
-        set errors (math $errors + 1)
-    end
-
     echo "" && echo "── mise prune (cleanup old versions) ──"
     if not mise prune --yes
         echo "⚠ mise prune failed"
