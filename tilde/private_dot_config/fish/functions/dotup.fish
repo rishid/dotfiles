@@ -1,4 +1,4 @@
-function dotup -d "Update system: dotfiles, mise tools, and self"
+function dotup -d "Update system: dotfiles, mise tools, and fish plugins"
     set -l errors 0
 
     echo "" && echo "── chezmoi update (dotfiles) ──"
@@ -13,7 +13,14 @@ function dotup -d "Update system: dotfiles, mise tools, and self"
         set errors (math $errors + 1)
     end
 
-    echo "" && echo "── mise upgrade (tools) ──"
+    # Install any tools newly added to mise/config.toml
+    echo "" && echo "── mise install (new tools) ──"
+    if not mise install
+        echo "⚠ mise install failed"
+        set errors (math $errors + 1)
+    end
+
+    echo "" && echo "── mise upgrade (all tools to latest) ──"
     if not mise upgrade
         echo "⚠ mise upgrade failed"
         set errors (math $errors + 1)
@@ -25,13 +32,15 @@ function dotup -d "Update system: dotfiles, mise tools, and self"
         set errors (math $errors + 1)
     end
 
-    # if functions --query fisher
-    #     echo "" && echo "── fisher update (fish plugins) ──"
-    #     if not fisher update
-    #         echo "⚠ fisher update failed"
-    #         set errors (math $errors + 1)
-    #     end
-    # end
+    echo "" && echo "── fisher update (fish plugins) ──"
+    if functions --query fisher
+        if not fisher update
+            echo "⚠ fisher update failed"
+            set errors (math $errors + 1)
+        end
+    else
+        echo "fisher not installed, skipping"
+    end
 
     echo ""
     if test $errors -eq 0
