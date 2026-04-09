@@ -16,22 +16,6 @@ function skill-install -d "Install a skill and track with chezmoi"
         return 1
     end
 
-    chezmoi add ~/.claude/skills/
-    if test $status -ne 0
-        echo "✗ chezmoi add failed for ~/.claude/skills/"
-        return 1
-    end
-
-    if test -f ~/.claude/.skills-lock.json
-        chezmoi add ~/.claude/.skills-lock.json
-    end
-
-    cd (git -C (chezmoi source-path) rev-parse --show-toplevel)
-    git add .
-    git commit -m "feat(skill): add $argv"
-    if test $status -ne 0
-        echo "⚠ git commit failed (nothing to commit?)"
-    end
-
+    _skill-dotfiles-sync "feat(skill): add $argv"
     echo "✓ Skill installed and committed to dotfiles"
 end

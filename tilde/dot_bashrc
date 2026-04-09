@@ -85,15 +85,6 @@ fi
 #-------
 export PS1="[\[\033[36m\]\u\[\033[37m\]@\[\033[32m\]\h:\[\033[34;1m\]\w\[\033[m\]]$ "
 
-# Save and reload the history after each command finishes
-#export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
-
-#if [ -z "$PROMPT_COMMAND" ]; then
-#    export PROMPT_COMMAND="history -a";
-#else
-#    export PROMPT_COMMAND="$PROMPT_COMMAND;history -a";
-#fi
-
 # env vars
 #export CDPATH=".:~/:~/dev"
 export INPUTRC="/etc/inputrc"

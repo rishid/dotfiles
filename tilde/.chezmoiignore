@@ -32,3 +32,7 @@ tilde/private_Library/
 # systemd is Linux-only
 .config/systemd/
 {{ end }}
+
+# fish auto-generates this on 4.3+ upgrade; its own comment says to delete it.
+# Ignoring prevents a chezmoi-delete → fish-recreate loop.
+.config/fish/conf.d/fish_frozen_key_bindings.fish
