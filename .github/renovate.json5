@@ -4,6 +4,9 @@
     'github>rishid/renovate-config:default.json5',
   ],
   platform: 'github',
+  mise: {
+    fileMatch: ['(^|/)config\\.toml\\.tmpl$'],
+  },
   packageRules: [
     {
       matchUpdateTypes: [
