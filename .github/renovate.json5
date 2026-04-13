@@ -5,7 +5,9 @@
   ],
   platform: 'github',
   mise: {
-    fileMatch: ['(^|/)config\\.toml\\.tmpl$'],
+    managerFilePatterns: [
+      '/(^|/)config\\.toml\\.tmpl$/',
+    ],
   },
   packageRules: [
     {
@@ -19,7 +21,9 @@
       automerge: true,
     },
     {
-      matchPackageNames: ['openai/codex'],
+      matchPackageNames: [
+        'openai/codex',
+      ],
       extractVersion: '^rust-v(?<version>.+)$',
     },
   ],
