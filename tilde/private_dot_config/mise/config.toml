@@ -18,7 +18,7 @@ github-cli = "2.89.0"
 helm = "4.1.4"
 kubectl = "1.35.3"
 "aqua:argoproj/argo-cd" = "3.3.6"
-"aqua:go-task/task" = "3.49.1"
+"aqua:go-task/task" = "3.50.0"
 terraform = "1.14.8"
 yq = "4.52.5"                    # YAML processor
 
