@@ -4,19 +4,19 @@
     'github>rishid/renovate-config:default.json5',
   ],
   platform: 'github',
-  mise: {
-    fileMatch: ['(^|/)config\\.toml\\.tmpl$'],
-  },
+
+  // Explicitly override Renovate's hardcoded default of 2
+  // Don't rely on :disableRateLimiting coming through the preset chain
+  prHourlyLimit: 0,
+  prConcurrentLimit: 0,
+  branchConcurrentLimit: 0,
+
   packageRules: [
     {
-      matchUpdateTypes: [
-        'minor',
-        'patch',
-        'pin',
-        'digest',
-        'lockFileMaintenance',
-      ],
+      matchUpdateTypes: ['minor', 'patch', 'pin', 'digest', 'lockFileMaintenance'],
       automerge: true,
+      automergeType: 'pr',
+      platformAutomerge: true,
     },
     {
       matchPackageNames: ['openai/codex'],
