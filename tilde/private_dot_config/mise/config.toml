@@ -4,7 +4,7 @@
 [tools]
 # === Programming Languages & Runtimes ===
 go = "1.26.2"
-node = "24.14.1"
+node = "24.15.0"
 python = "3.14.4"
 rust = "stable"                   # Required for Cargo-based tools
 uv = "0.11.7"
