@@ -38,7 +38,7 @@ yq = "4.52.5"                    # YAML processor
 "aqua:ajeetdsouza/zoxide" = "0.9.9"              # Better cd
 "aqua:twpayne/chezmoi" = "2.70.1"
 "pipx:httpie" = "3.2.4"  # Better curl
-"aqua:aws/aws-cli" = "1.0.0"
+"aqua:aws/aws-cli" = "2.22.28"
 "pipx:linode-cli" = "5.66.0"
 
 # === Build & CI Tools ===
