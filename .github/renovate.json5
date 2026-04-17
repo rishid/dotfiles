@@ -4,6 +4,7 @@
     'github>rishid/renovate-config:default.json5',
   ],
   platform: 'github',
+  platformAutomerge: false,
 
   // Explicitly override Renovate's hardcoded default of 2
   // Don't rely on :disableRateLimiting coming through the preset chain
@@ -16,11 +17,20 @@
       matchUpdateTypes: ['minor', 'patch', 'pin', 'digest', 'lockFileMaintenance'],
       automerge: true,
       automergeType: 'pr',
-      platformAutomerge: true,
+      platformAutomerge: false,
+      ignoreTests: true,
     },
     {
       matchPackageNames: ['openai/codex'],
       extractVersion: '^rust-v(?<version>.+)$',
+    },
+    {
+      matchManagers: ['mise'],
+      groupName: 'mise tools',
+      automerge: true,
+      automergeType: 'pr',
+      platformAutomerge: false,
+      ignoreTests: true,
     },
   ],
   onboarding: false,
