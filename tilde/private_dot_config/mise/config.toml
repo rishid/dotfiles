@@ -11,7 +11,7 @@ uv = "0.11.7"
 
 # === Development Tools ===
 "aqua:anthropics/claude-code" = "2.1.112"
-"aqua:openai/codex" = "0.118.0"
+"aqua:openai/codex" = "0.122.0"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.90.0"
 "aqua:hadolint/hadolint" = "2.14.0" # Dockerfile linter
@@ -22,7 +22,7 @@ kubectl = "1.35.4"
 "pipx:linode-cli" = "5.66.0"
 "aqua:go-task/task" = "3.50.0"
 terraform = "1.14.8"
-yq = "4.52.5"                    # YAML processor
+yq = "4.53.2"                    # YAML processor
 
 # === CLI Utilities ===
 "aqua:FiloSottile/age" = "1.3.1"                 # File encryption
@@ -36,9 +36,9 @@ yq = "4.52.5"                    # YAML processor
 "aqua:sharkdp/numbat" = "1.23.0"                 # Calculator
 "aqua:BurntSushi/ripgrep" = "15.1.0"             # Better grep
 "aqua:starship/starship" = "1.24.2"              # Shell prompt
-"aqua:aquasecurity/trivy" = "0.69.3"             # Security scanner
+"aqua:aquasecurity/trivy" = "0.70.0"             # Security scanner
 "aqua:ajeetdsouza/zoxide" = "0.9.9"              # Better cd
-"aqua:twpayne/chezmoi" = "2.70.1"
+"aqua:twpayne/chezmoi" = "2.70.2"
 "pipx:httpie" = "3.2.4"  # Better curl
 
 
