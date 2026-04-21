@@ -21,7 +21,7 @@ kubectl = "1.35.4"
 "aqua:aws/aws-cli" = "2.34.33"
 "pipx:linode-cli" = "5.66.0"
 "aqua:go-task/task" = "3.50.0"
-terraform = "1.14.8"
+terraform = "1.14.9"
 yq = "4.53.2"                    # YAML processor
 
 # === CLI Utilities ===
