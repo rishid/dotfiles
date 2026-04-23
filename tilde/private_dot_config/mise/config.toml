@@ -10,16 +10,16 @@ rust = "stable"                   # Required for Cargo-based tools
 uv = "0.11.7"
 
 # === Development Tools ===
-"aqua:anthropics/claude-code" = "2.1.117"
-"aqua:openai/codex" = "0.122.0"
+"aqua:anthropics/claude-code" = "2.1.118"
+"aqua:openai/codex" = "0.123.0"
 direnv = "2.37.1"                # Environment variable management
-github-cli = "2.90.0"
+github-cli = "2.91.0"
 "aqua:hadolint/hadolint" = "2.14.0" # Dockerfile linter
 helm = "4.1.4"
-kubectl = "1.35.4"
+kubectl = "1.36.0"
 "aqua:argoproj/argo-cd" = "3.3.8"
-"aqua:aws/aws-cli" = "2.34.34"
-"pipx:linode-cli" = "5.66.0"
+"aqua:aws/aws-cli" = "2.34.35"
+"pipx:linode-cli" = "5.67.0"
 "aqua:go-task/task" = "3.50.0"
 terraform = "1.14.9"
 yq = "4.53.2"                    # YAML processor
