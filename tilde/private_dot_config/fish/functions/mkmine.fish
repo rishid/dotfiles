@@ -6,8 +6,8 @@ function mkmine -d "Recursively chown a directory to the current user"
 
     set failed 0
     for target in $targets
-        if not test -d $target
-            echo "Directory '$target' does not exist." >&2
+        if not test -e $target
+            echo "'$target' does not exist." >&2
             set failed 1
             continue
         end
