@@ -16,8 +16,7 @@
     {
       matchUpdateTypes: ['minor', 'patch', 'pin', 'digest', 'lockFileMaintenance'],
       automerge: true,
-      automergeType: 'pr',
-      platformAutomerge: false,
+      automergeType: 'branch',
       ignoreTests: true,
     },
     {
@@ -28,8 +27,7 @@
       matchManagers: ['mise'],
       groupName: 'mise tools',
       automerge: true,
-      automergeType: 'pr',
-      platformAutomerge: false,
+      automergeType: 'branch',
       ignoreTests: true,
     },
   ],
