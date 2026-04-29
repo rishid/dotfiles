@@ -10,10 +10,10 @@ rust = "stable"                   # Required for Cargo-based tools
 uv = "0.11.8"
 
 # === Development Tools ===
-"aqua:anthropics/claude-code" = "2.1.121"
+"aqua:anthropics/claude-code" = "2.1.123"
 "aqua:openai/codex" = "0.125.0"
 direnv = "2.37.1"                # Environment variable management
-github-cli = "2.91.0"
+github-cli = "2.92.0"
 "aqua:hadolint/hadolint" = "2.14.0" # Dockerfile linter
 helm = "4.1.4"
 kubectl = "1.36.0"
