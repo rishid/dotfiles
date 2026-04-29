@@ -1,18 +1,63 @@
 {
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   extends: [
-    'github>rishid/renovate-config:default.json5',
+    'config:best-practices',
+    ':semanticCommits',
   ],
-  platform: 'github',
-  platformAutomerge: false,
 
-  // Explicitly override Renovate's hardcoded default of 2
-  // Don't rely on :disableRateLimiting coming through the preset chain
+  platform: 'github',
+  timezone: 'America/New_York',
+  onboarding: false,
+  requireConfig: 'ignored',
+  dependencyDashboardTitle: 'Renovate Dashboard 🤖',
+  suppressNotifications: ['prIgnoreNotification'],
+  commitBodyTable: true,
+  rebaseWhen: 'conflicted',
+
+  platformAutomerge: false,
   prHourlyLimit: 0,
   prConcurrentLimit: 0,
   branchConcurrentLimit: 0,
 
+  commitMessageTopic: '{{depName}}',
+  commitMessageExtra: 'to {{newVersion}}',
+  commitMessageSuffix: '',
+
+  regexManagers: [
+    {
+      description: 'Process various dependencies in YAML files',
+      fileMatch: ['\\.ya?ml$'],
+      matchStrings: [
+        '\\S+:\\s+"?(?<currentValue>[^"\\s]+)"?\\s*# ?renovate: depName=(?<depName>\\S+)( datasource=(?<datasource>\\S+))?( versioning=(?<versioning>\\S+))?( extractVersion=(?<extractVersion>\\S+))?',
+        '(?m:^\\s+# ?renovate: depName=(?<depName>\\S+)( datasource=(?<datasource>\\S+))?( versioning=(?<versioning>\\S+))?( extractVersion=(?<extractVersion>\\S+))?\\n[ \\t ]*? \\S+: "?(?<currentValue>[^" ]+)"?$)',
+        '(?m:^\\s+# ?renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)( versioning=(?<versioning>\\S+))?( versionTemplate=(?<extractVersion>\\S+))?\\n[ \\t ]*? \\S+: "?(?<currentValue>[^" ]+)"?$)',
+      ],
+      datasourceTemplate: '{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}',
+      versioningTemplate: '{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}',
+      extractVersionTemplate: '{{#if extractVersion}}{{{extractVersion}}}{{else}}^v?(?<version>.*)${{/if}}',
+    },
+  ],
+
   packageRules: [
+    // Labels by update type
+    { matchUpdateTypes: ['major'], labels: ['type/major'] },
+    { matchUpdateTypes: ['minor'], labels: ['type/minor'] },
+    { matchUpdateTypes: ['patch'], labels: ['type/patch'] },
+    { matchUpdateTypes: ['digest'], labels: ['type/digest'] },
+
+    // Labels by datasource/manager
+    { matchDatasources: ['github-releases', 'github-tags'], addLabels: ['renovate/github-release'] },
+    { matchManagers: ['github-actions'], addLabels: ['renovate/github-action'] },
+
+    // Semantic commit scopes
+    { matchDatasources: ['github-releases', 'github-tags'], matchUpdateTypes: ['major'], commitMessagePrefix: 'feat(github-release)!: ' },
+    { matchDatasources: ['github-releases', 'github-tags'], matchUpdateTypes: ['minor'], semanticCommitType: 'feat', semanticCommitScope: 'github-release' },
+    { matchDatasources: ['github-releases', 'github-tags'], matchUpdateTypes: ['patch'], semanticCommitType: 'fix', semanticCommitScope: 'github-release' },
+    { matchManagers: ['github-actions'], matchUpdateTypes: ['major'], commitMessagePrefix: 'feat(github-action)!: ' },
+    { matchManagers: ['github-actions'], matchUpdateTypes: ['minor'], semanticCommitType: 'feat', semanticCommitScope: 'github-action' },
+    { matchManagers: ['github-actions'], matchUpdateTypes: ['patch'], semanticCommitType: 'fix', semanticCommitScope: 'github-action' },
+
+    // Automerge via branch (no PRs)
     {
       matchUpdateTypes: ['minor', 'patch', 'pin', 'digest', 'lockFileMaintenance'],
       automerge: true,
@@ -41,6 +86,4 @@
       ignoreTests: true,
     },
   ],
-  onboarding: false,
-  requireConfig: 'ignored',
 }
