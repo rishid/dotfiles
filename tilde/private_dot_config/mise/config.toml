@@ -11,14 +11,14 @@ uv = "0.11.8"
 
 # === Development Tools ===
 "aqua:anthropics/claude-code" = "2.1.123"
-"aqua:openai/codex" = "0.125.0"
+"aqua:openai/codex" = "0.127.0"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.92.0"
 "aqua:hadolint/hadolint" = "2.14.0" # Dockerfile linter
 helm = "4.1.4"
 kubectl = "1.36.0"
 "aqua:argoproj/argo-cd" = "3.3.8"
-"aqua:aws/aws-cli" = "2.34.38"
+"aqua:aws/aws-cli" = "2.34.39"
 "pipx:linode-cli" = "5.67.0"
 "aqua:go-task/task" = "3.50.0"
 terraform = "1.14.9"
@@ -30,7 +30,7 @@ yq = "4.53.2"                    # YAML processor
 "cargo:eza" = "0.23.4"                            # Better ls
 "aqua:sharkdp/fd" = "10.4.2"                     # Better find
 "aqua:junegunn/fzf" = "0.72.0"                  # Fuzzy finder (junegunn originally, now mirrors exist)
-"aqua:dundee/gdu" = "5.36.0"                     # Disk usage analyzer
+"aqua:dundee/gdu" = "5.36.1"                     # Disk usage analyzer
 "aqua:sharkdp/hexyl" = "0.17.0"                  # Hex viewer
 "aqua:sharkdp/hyperfine" = "1.20.0"              # Benchmarking tool
 "aqua:sharkdp/numbat" = "1.23.0"                 # Calculator
