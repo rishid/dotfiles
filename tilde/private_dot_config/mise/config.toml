@@ -39,6 +39,7 @@ yq = "4.53.2"                    # YAML processor
 "aqua:aquasecurity/trivy" = "0.70.0"             # Security scanner
 "aqua:ajeetdsouza/zoxide" = "0.9.9"              # Better cd
 "aqua:twpayne/chezmoi" = "2.70.2"
+"aqua:tokei" = "latest" # count lines of code
 "pipx:httpie" = "3.2.4"  # Better curl
 
 
