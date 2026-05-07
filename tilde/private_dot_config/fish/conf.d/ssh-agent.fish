@@ -20,11 +20,13 @@ if test (uname) = "Darwin"
     end
 else
     # Linux: SSH agent managed via systemd user service
-    if test -z "$SSH_AUTH_SOCK"
+    # Always validate the socket exists, don't just check if variable is set
+    # This handles cases where SSH_AUTH_SOCK is inherited but stale (e.g., VS Code session died)
+    if test -z "$SSH_AUTH_SOCK" -o ! -S "$SSH_AUTH_SOCK" 2>/dev/null
         set -gx SSH_AUTH_SOCK (systemctl --user show-environment 2>/dev/null | grep SSH_AUTH_SOCK | cut -d= -f2)
     end
 
-    if test -z "$SSH_AUTH_SOCK"
+    if test -z "$SSH_AUTH_SOCK" -o ! -S "$SSH_AUTH_SOCK" 2>/dev/null
         set -gx SSH_AUTH_SOCK "$XDG_RUNTIME_DIR/ssh-agent.socket"
     end
 
