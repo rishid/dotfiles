@@ -3,14 +3,14 @@
 
 [tools]
 # === Programming Languages & Runtimes ===
-go = "1.26.3"
+go = "1.26.4"
 node = "24.16.0"
 python = "3.14.5"
 rust = "stable"                   # Required for Cargo-based tools
 uv = "0.11.18"
 
 # === Development Tools ===
-"aqua:anthropics/claude-code" = "2.1.160"
+"aqua:anthropics/claude-code" = "2.1.161"
 "aqua:openai/codex" = "0.136.0"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.93.0"
@@ -18,7 +18,7 @@ github-cli = "2.93.0"
 helm = "4.2.0"
 kubectl = "1.36.1"
 "aqua:argoproj/argo-cd" = "3.4.3"
-"aqua:aws/aws-cli" = "2.34.58"
+"aqua:aws/aws-cli" = "2.34.60"
 "pipx:linode-cli" = "5.68.0"
 "aqua:go-task/task" = "3.51.1"
 terraform = "1.15.5"
