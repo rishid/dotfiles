@@ -114,6 +114,7 @@
             "Bash(pytest --help)",
             "Bash(npm list:*)",
             "Bash(npm outdated:*)",
+            "Bash(npm run build:*)",
             "Bash(pip list:*)",
             "Bash(pip show:*)",
             "Bash(poetry show:*)",
