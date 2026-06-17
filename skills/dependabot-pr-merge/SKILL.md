@@ -8,7 +8,7 @@ allowed-tools: Bash, AskUserQuestion
 
 # Dependabot PR Merge
 
-Review and merge open Dependabot PRs for a GitHub repository. Iterates through each PR one at a time, checking CI status before prompting to approve and merge.
+Review and merge open Dependabot PRs for a GitHub repository. Checks CI on all PRs first, then batch-merges all passing ones (single confirmation), and handles failing/pending ones individually.
 
 ## Prerequisites
 
@@ -43,53 +43,75 @@ If no PRs found, report "No open Dependabot PRs for OWNER/REPO" and stop.
 
 Otherwise, show a summary table: count of open PRs, list of PR numbers + titles.
 
-## Step 3: Iterate One at a Time
+## Step 3: Check CI Status for All PRs
 
-For each PR in order (oldest first):
-
-### 3a. Show PR Details
-
-```bash
-gh pr view NUMBER --repo OWNER/REPO \
-  --json title,url,body,additions,deletions,headRefName,createdAt
-```
-
-Display: PR number, title, URL, what dependency is being bumped (parse from title/body), and diff size.
-
-### 3b. Check CI Status
+Before merging anything, check CI on **every** open PR:
 
 ```bash
 gh pr checks NUMBER --repo OWNER/REPO
 ```
 
-Interpret the results:
+Run this for each PR. Categorize each PR into one of three buckets:
 
-| Status | Action |
-|--------|--------|
-| All checks pass | Proceed to 3c (merge prompt) |
-| Some checks pending | Report which checks are pending. Proceed to 3c (retry prompt) |
-| Any check failed | Report failures. Proceed to 3c (retry prompt) |
-| No checks configured | Warn that there are no required checks. Proceed to 3c (merge prompt) |
+| Bucket | Criteria |
+|--------|----------|
+| **passing** | All checks pass, or no checks configured |
+| **pending** | Some checks are still running |
+| **failed** | One or more checks failed |
 
-### 3c. Prompt User
+After checking all PRs, display a triage summary:
 
-**If checks pass (or no checks configured)** — automatically proceed to 3d without prompting. Do NOT ask the user for confirmation; just approve and merge.
+```
+CI Triage — OWNER/REPO
+──────────────────────
+Passing (ready to merge): #121, #123, #125
+Pending (still running):  #124
+Failed:                   #122
+```
 
-**If checks pending or failed** — use `AskUserQuestion` with:
+## Step 4: Batch Merge All Passing PRs
+
+**If there are 2 or more passing PRs**, ask once using `AskUserQuestion`:
+- **Merge all N passing PRs** — approve and merge every passing PR sequentially without further prompts
+- **Review one at a time** — skip batch mode; handle each PR individually (proceed to Step 5)
+- **Stop** — end the skill, show summary
+
+**If there is exactly 1 passing PR**, skip the batch prompt and merge it automatically (no confirmation needed).
+
+**If there are 0 passing PRs**, skip to Step 5.
+
+### Batch merge execution
+
+Build a single chained Bash command covering all passing PRs (oldest first) and execute it in one shot:
+
+```bash
+gh pr review 121 --repo OWNER/REPO --approve --body "Approved via automated Dependabot review" && \
+gh pr merge 121 --repo OWNER/REPO --squash --delete-branch && \
+gh pr review 123 --repo OWNER/REPO --approve --body "Approved via automated Dependabot review" && \
+gh pr merge 123 --repo OWNER/REPO --squash --delete-branch && \
+gh pr review 125 --repo OWNER/REPO --approve --body "Approved via automated Dependabot review" && \
+gh pr merge 125 --repo OWNER/REPO --squash --delete-branch
+```
+
+The `&&` chain stops on the first failure, which is desirable — a failed merge on PR N prevents accidentally merging PR N+1 on a potentially broken base. If the command stops early, report which PR failed, add it to the "failed" bucket, and move on to Step 5 for the non-passing PRs.
+
+## Step 5: Handle Non-Passing PRs Individually
+
+For each PR in the **pending** or **failed** buckets, in order:
+
+Show the PR (number, title, which checks are pending/failed), then use `AskUserQuestion` with:
 - **Re-run failed checks** — re-run only the failed/pending workflow runs without changing the branch (good for flaky tests)
-- **Update branch & re-run** — update the PR branch with latest base branch changes, which triggers a full fresh CI run (good when the base branch has fixes since the PR was created)
+- **Update branch & re-run** — rebase the PR onto the latest base branch, triggering a full fresh CI run (good when the base branch has fixes)
 - **Skip** — move to the next PR
 - **Stop** — end the skill, show summary
 
 #### Re-run failed checks
 
-Find the failed/pending workflow run IDs from the PR's head commit and re-run them:
-
 ```bash
 # Get the head SHA
 HEAD_SHA=$(gh pr view NUMBER --repo OWNER/REPO --json headRefOid --jq '.headRefOid')
 
-# List check runs that failed or are pending
+# List failed/pending check run IDs
 gh api "repos/OWNER/REPO/commits/${HEAD_SHA}/check-runs" \
   --jq '.check_runs[] | select(.conclusion == "failure" or .conclusion == null) | .id'
 
@@ -97,7 +119,7 @@ gh api "repos/OWNER/REPO/commits/${HEAD_SHA}/check-runs" \
 gh run rerun RUN_ID --repo OWNER/REPO --failed
 ```
 
-After triggering re-runs, report what was re-triggered and move to the next PR. The user can re-invoke the skill later to merge PRs whose checks now pass.
+After triggering, report what was re-triggered and move to the next PR.
 
 #### Update branch & re-run
 
@@ -106,33 +128,11 @@ gh api -X PUT "repos/OWNER/REPO/pulls/NUMBER/update-branch" \
   -f update_method="rebase"
 ```
 
-This rebases the PR onto the latest base branch, which triggers a full CI run. After triggering, report and move to the next PR. The user can re-invoke the skill later to merge once checks pass.
+This rebases the PR onto the latest base, triggering a full CI run. After triggering, report and move to the next PR.
 
-### 3d. Approve and Merge
+The user can re-invoke the skill later to merge PRs whose checks now pass.
 
-When CI passes, proceed automatically without user confirmation:
-
-```bash
-gh pr review NUMBER --repo OWNER/REPO --approve --body "Approved via automated Dependabot review"
-```
-
-Then merge using squash (required when running non-interactively):
-
-```bash
-gh pr merge NUMBER --repo OWNER/REPO --squash --delete-branch
-```
-
-If merge fails (e.g., branch protection, merge conflicts), report the error and ask:
-- **Skip** — move to next PR
-- **Stop** — end early
-
-After a successful merge, pause briefly before the next PR to let GitHub process the merge (dependabot may rebase remaining PRs).
-
-### 3e. Continue
-
-Move to the next PR and repeat from 3a.
-
-## Step 4: Summary
+## Step 6: Summary
 
 After all PRs are processed (or user chose "stop"), report:
 
@@ -146,11 +146,11 @@ Failed:       N PRs
 Remaining:    N PRs (if stopped early)
 ```
 
-List the merged PR numbers+titles, any re-triggered (with what action was taken), and any that were skipped or failed with reasons. If PRs were re-triggered, remind the user they can re-invoke the skill in ~15 minutes to merge them once checks pass.
+List merged PR numbers+titles, re-triggered PRs with the action taken, and skipped/failed PRs with reasons. If PRs were re-triggered, remind the user they can re-invoke the skill in ~15 minutes to merge them.
 
 ## Common Mistakes
 
-- **Merging without checking CI** — always verify checks pass before offering merge
+- **Merging without checking CI** — always verify checks pass before merging
 - **Not handling merge conflicts** — dependabot PRs can conflict with each other; after merging one, later PRs may need rebasing by dependabot
 - **Approving PRs in repos you don't have write access to** — `gh pr review --approve` will fail; detect this early
 - **Ignoring `--delete-branch`** — always clean up the dependabot branch after merge
@@ -158,5 +158,6 @@ List the merged PR numbers+titles, any re-triggered (with what action was taken)
 ## Notes
 
 - Dependabot PRs are authored by `app/dependabot` (not a regular user account)
+- GitHub has no batch merge API — PRs must be merged one at a time, but a single upfront confirmation covers all passing PRs
 - After merging one dependabot PR, GitHub may auto-rebase remaining ones — checks on subsequent PRs may temporarily show as pending
 - The skill uses `--squash` with `gh pr merge` because `gh` requires an explicit strategy flag when running non-interactively
