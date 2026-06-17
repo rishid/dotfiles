@@ -73,10 +73,7 @@ Interpret the results:
 
 ### 3c. Prompt User
 
-**If checks pass (or no checks configured)** — use `AskUserQuestion` with:
-- **Approve & merge** — approve the PR and merge it
-- **Skip** — move to the next PR
-- **Stop** — end the skill, show summary
+**If checks pass (or no checks configured)** — automatically proceed to 3d without prompting. Do NOT ask the user for confirmation; just approve and merge.
 
 **If checks pending or failed** — use `AskUserQuestion` with:
 - **Re-run failed checks** — re-run only the failed/pending workflow runs without changing the branch (good for flaky tests)
@@ -113,16 +110,16 @@ This rebases the PR onto the latest base branch, which triggers a full CI run. A
 
 ### 3d. Approve and Merge
 
-If user chose "Approve & merge":
+When CI passes, proceed automatically without user confirmation:
 
 ```bash
 gh pr review NUMBER --repo OWNER/REPO --approve --body "Approved via automated Dependabot review"
 ```
 
-Then merge (auto-detects repo's configured merge method):
+Then merge using squash (required when running non-interactively):
 
 ```bash
-gh pr merge NUMBER --repo OWNER/REPO --delete-branch
+gh pr merge NUMBER --repo OWNER/REPO --squash --delete-branch
 ```
 
 If merge fails (e.g., branch protection, merge conflicts), report the error and ask:
@@ -162,4 +159,4 @@ List the merged PR numbers+titles, any re-triggered (with what action was taken)
 
 - Dependabot PRs are authored by `app/dependabot` (not a regular user account)
 - After merging one dependabot PR, GitHub may auto-rebase remaining ones — checks on subsequent PRs may temporarily show as pending
-- The skill uses `gh pr merge` without an explicit strategy flag so it respects each repo's configured default merge method
+- The skill uses `--squash` with `gh pr merge` because `gh` requires an explicit strategy flag when running non-interactively
