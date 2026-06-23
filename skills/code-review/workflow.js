@@ -2,7 +2,7 @@ export const meta = {
   name: 'code-review',
   description: 'Multi-agent code review with adversarial verification',
   phases: [
-    { title: 'Context', detail: 'Gather diff, changed files, project guidelines' },
+    { title: 'Context', detail: 'Gather diff and project guidelines' },
     { title: 'Review', detail: 'Parallel specialized review agents', model: 'sonnet' },
     { title: 'Verify', detail: 'Adversarial verification of findings', model: 'haiku' },
   ],
@@ -16,22 +16,19 @@ const FINDING_SCHEMA = {
       items: {
         type: 'object',
         properties: {
-          file: { type: 'string', description: 'File path relative to repo root' },
-          line_start: { type: 'integer', description: 'Starting line number' },
-          line_end: { type: 'integer', description: 'Ending line number (same as start if single line)' },
+          file: { type: 'string' },
+          line_start: { type: 'integer' },
+          line_end: { type: 'integer' },
           category: {
             type: 'string',
             enum: ['bug', 'security', 'failure-mode', 'edge-case', 'convention', 'test-gap', 'performance', 'simplification'],
           },
           severity: { type: 'string', enum: ['critical', 'high', 'medium', 'low'] },
-          title: { type: 'string', description: 'Brief description of the issue (under 80 chars)' },
-          description: { type: 'string', description: 'Detailed explanation of the issue and why it matters' },
-          evidence: { type: 'string', description: 'Code snippet or command output that proves this issue' },
-          suggested_fix: { type: 'string', description: 'Concrete code or approach to fix the issue' },
-          self_score: {
-            type: 'integer', minimum: 0, maximum: 100,
-            description: 'Confidence 0-100 that this is a real NEW issue introduced in this diff',
-          },
+          title: { type: 'string', description: 'Under 80 chars' },
+          description: { type: 'string' },
+          evidence: { type: 'string' },
+          suggested_fix: { type: 'string' },
+          self_score: { type: 'integer', minimum: 0, maximum: 100 },
         },
         required: ['file', 'line_start', 'line_end', 'category', 'severity', 'title', 'description', 'self_score'],
       },
@@ -43,12 +40,9 @@ const FINDING_SCHEMA = {
 const VERDICT_SCHEMA = {
   type: 'object',
   properties: {
-    refuted: { type: 'boolean', description: 'true if the finding is a false positive' },
-    reason: { type: 'string', description: 'Why the finding was confirmed or refuted' },
-    adjusted_score: {
-      type: 'integer', minimum: 0, maximum: 100,
-      description: 'Adjusted confidence after verification. 0-25: false positive. 26-50: uncertain. 51-75: likely real. 76-100: confirmed real.',
-    },
+    refuted: { type: 'boolean' },
+    reason: { type: 'string' },
+    adjusted_score: { type: 'integer', minimum: 0, maximum: 100 },
   },
   required: ['refuted', 'reason', 'adjusted_score'],
 }
@@ -56,21 +50,17 @@ const VERDICT_SCHEMA = {
 const CONTEXT_SCHEMA = {
   type: 'object',
   properties: {
-    diffCommand: { type: 'string', description: 'The exact command to run to see the diff' },
-    changedFiles: { type: 'array', items: { type: 'string' }, description: 'Array of changed file paths' },
-    diffStat: { type: 'string', description: 'Human-readable diff stats' },
-    claudeMdPaths: { type: 'array', items: { type: 'string' }, description: 'Paths to CLAUDE.md files found' },
+    diffCommand: { type: 'string' },
+    diffContent: { type: 'string', description: 'The full diff output' },
+    changedFiles: { type: 'array', items: { type: 'string' } },
+    diffStat: { type: 'string' },
+    claudeMdContent: { type: 'string', description: 'Concatenated content of all CLAUDE.md files found' },
   },
-  required: ['diffCommand', 'changedFiles', 'diffStat', 'claudeMdPaths'],
+  required: ['diffCommand', 'diffContent', 'changedFiles', 'diffStat'],
 }
 
-// --- Args are intentionally minimal ---
-// PR review:    { scope: "pr", repo: "owner/repo", prNumber: 123, skillDir: "..." }
-// Local branch: { scope: "branch", skillDir: "..." }
-// Staged:       { scope: "staged", skillDir: "..." }
-// Last commit:  { scope: "commit", skillDir: "..." }
+// --- Parse args (handle string or object) ---
 
-// Handle args passed as JSON string (common mistake) or object
 let safeArgs = args || {}
 if (typeof safeArgs === 'string') {
   try { safeArgs = JSON.parse(safeArgs) } catch (e) { safeArgs = {} }
@@ -81,52 +71,53 @@ const repo = safeArgs.repo || null
 const prNumber = safeArgs.prNumber || safeArgs.pr_number || safeArgs.pr || null
 const skillDir = safeArgs.skillDir || safeArgs.skill_dir || null
 
-log(`Args received — scope: ${scope}, repo: ${repo}, prNumber: ${prNumber}, skillDir: ${skillDir ? 'yes' : 'missing'}`)
+log(`Args — scope: ${scope}, repo: ${repo}, prNumber: ${prNumber}`)
 
-// --- Phase 1: Context agent ALWAYS runs to gather the correct diff ---
+// --- Phase 1: Context agent fetches diff ONCE ---
 
 phase('Context')
 
 let contextPrompt
 if (scope === 'pr' && repo && prNumber) {
-  log(`Gathering context for PR #${prNumber} on ${repo}`)
-  contextPrompt = `Gather context for reviewing GitHub PR #${prNumber} on ${repo}.
+  log(`Fetching diff for PR #${prNumber} on ${repo}`)
+  contextPrompt = `Gather ALL context for reviewing GitHub PR #${prNumber} on ${repo}.
 
-Run these commands and return structured results:
+Run these commands:
 
-1. Get changed files (return as array):
-   gh pr diff ${prNumber} --repo ${repo} --name-only
+1. gh pr diff ${prNumber} --repo ${repo} --name-only
+   → return as changedFiles array
 
-2. The diffCommand is exactly: gh pr diff ${prNumber} --repo ${repo}
+2. gh pr diff ${prNumber} --repo ${repo}
+   → return the FULL output as diffContent (this is critical — other agents need this)
+   → also set diffCommand to: gh pr diff ${prNumber} --repo ${repo}
 
-3. Get diff stats:
-   gh pr view ${prNumber} --repo ${repo} --json additions,deletions,changedFiles --template '{{.changedFiles}} files changed, {{.additions}} insertions(+), {{.deletions}} deletions(-)'
+3. gh pr view ${prNumber} --repo ${repo} --json additions,deletions,changedFiles --template '{{.changedFiles}} files changed, {{.additions}} insertions(+), {{.deletions}} deletions(-)'
+   → return as diffStat
 
-4. Find CLAUDE.md files:
-   find . -name 'CLAUDE.md' -maxdepth 3 -not -path '*/node_modules/*' 2>/dev/null
+4. find . -name 'CLAUDE.md' -maxdepth 3 -not -path '*/node_modules/*' 2>/dev/null
+   → if any found, read them and concatenate into claudeMdContent. If none, set to empty string.
 
-Return changedFiles as a JSON array of file path strings. claudeMdPaths as an array (empty array if none found).`
+IMPORTANT: diffContent must contain the complete diff output. Do not truncate it.`
 } else {
-  log(`Gathering context for local ${scope} review`)
-  contextPrompt = `Gather context for a local code review. Scope: ${scope}
+  log(`Fetching diff for local ${scope} review`)
+  contextPrompt = `Gather ALL context for a local code review. Scope: ${scope}
 
-Run these commands and return structured results:
-
-1. Detect the base branch:
+1. Detect base branch:
    git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main"
 
-2. Detect current branch:
-   git branch --show-current
+2. Based on scope "${scope}":
+   - "branch": diffCommand = "git diff origin/<base>...HEAD"
+   - "staged": diffCommand = "git diff --staged"
+   - "commit": diffCommand = "git show HEAD"
 
-3. Based on scope "${scope}":
-   - "branch": diffCommand = "git diff origin/<base>...HEAD", get files with --name-only, stats with --stat
-   - "staged": diffCommand = "git diff --staged", get files with --name-only, stats with --stat
-   - "commit": diffCommand = "git show HEAD", get files with --name-only --diff-filter, stats with --stat
+3. Run the diffCommand → return FULL output as diffContent
+4. Run diffCommand with --name-only → return as changedFiles array
+5. Run diffCommand with --stat → return as diffStat
 
-4. Find CLAUDE.md files:
-   find . -name 'CLAUDE.md' -maxdepth 3 -not -path '*/node_modules/*' 2>/dev/null
+6. find . -name 'CLAUDE.md' -maxdepth 3 -not -path '*/node_modules/*' 2>/dev/null
+   → if any found, read them and concatenate into claudeMdContent. If none, empty string.
 
-Return changedFiles as a JSON array. claudeMdPaths as an array (empty if none).`
+IMPORTANT: diffContent must contain the complete diff output. Do not truncate it.`
 }
 
 const ctx = await agent(contextPrompt, {
@@ -139,11 +130,12 @@ if (!ctx || !ctx.changedFiles || ctx.changedFiles.length === 0) {
 }
 
 const diffCommand = ctx.diffCommand
+const diffContent = ctx.diffContent || ''
 const changedFiles = ctx.changedFiles
 const diffStat = ctx.diffStat || ''
-const claudeMdPaths = ctx.claudeMdPaths || []
+const claudeMdContent = ctx.claudeMdContent || ''
 
-log(`Found ${changedFiles.length} changed files: ${changedFiles.slice(0, 5).join(', ')}${changedFiles.length > 5 ? '...' : ''}`)
+log(`${changedFiles.length} files, diff is ${diffContent.length} chars`)
 
 // --- Detect languages ---
 
@@ -163,187 +155,130 @@ const detectedLangs = [...new Set(
   }).filter(Boolean)
 )]
 
-// --- Build shared prompt parts ---
+// --- Build shared prompt parts (diff is INLINE, not fetched per agent) ---
 
 const rulesInstruction = skillDir ? [
-  'Read the following rule files for review guidance:',
-  `- ${skillDir}/rules/universal.md (ALWAYS)`,
+  'Read these rule files for review checklists:',
+  `- ${skillDir}/rules/universal.md`,
   ...detectedLangs.map(l => `- ${skillDir}/rules/${l}.md (if exists)`),
-  '',
-  'Read these project guidelines:',
-  ...(claudeMdPaths.length > 0 ? claudeMdPaths.map(p => `- ${p}`) : ['(none found)']),
-].join('\n') : [
-  'Read any CLAUDE.md or project guidelines files found in the repo.',
-  ...(claudeMdPaths.length > 0 ? claudeMdPaths.map(p => `- ${p}`) : []),
-].join('\n')
+].join('\n') : ''
 
-const isPR = scope === 'pr' && repo && prNumber
-
-const diffInstruction = [
-  `To see the diff under review, run: ${diffCommand}`,
-  `Changed files: ${changedFiles.join(', ')}`,
-  `Stats: ${diffStat}`,
-  ...(isPR ? [
-    '',
-    `This is a GitHub PR review (PR #${prNumber} on ${repo}).`,
-    `To read a file's full content on the PR branch: gh api repos/${repo}/contents/{path}?ref=$(gh pr view ${prNumber} --repo ${repo} --json headRefName -q .headRefName) --jq .content | base64 -d`,
-  ] : []),
-].join('\n')
+const guidelinesSection = claudeMdContent
+  ? `\n\n## Project Guidelines (from CLAUDE.md)\n\n${claudeMdContent}`
+  : ''
 
 const falsePositiveGuidance = `
-DO NOT flag:
-- Pre-existing issues not introduced in this diff
-- Issues linters/typecheckers/compilers catch (formatting, types, imports)
-- General code quality unless explicitly in project guidelines (CLAUDE.md)
-- Issues on lines not modified in this diff
-- Pure style nitpicks unrelated to correctness
-- Intentional behavior explained by surrounding context
+DO NOT flag: pre-existing issues, linter/type issues, issues on unmodified lines, pure style nitpicks, intentional behavior.
+DO flag even if minor: missing error handling, edge case gaps, null access without guards, resource leaks, test gaps, security vulns.`
 
-DO flag even if minor:
-- Missing error handling for operations that can fail
-- Missing edge case handling in parsing/validation
-- Potential null/undefined/nil access without guards
-- Resource leaks on error paths
-- Test coverage gaps for new code paths
-- Security vulnerabilities (injection, secrets, auth bypass)
-`
+// The diff is embedded directly — agents do NOT run git/gh commands to get it
+const buildPrompt = (role, focus) => `${role}
+${rulesInstruction}${guidelinesSection}
 
-const basePromptParts = (role, focus) => [role, '', rulesInstruction, '', diffInstruction, '', focus, '', falsePositiveGuidance,
-  '', 'Score each finding 0-100 on confidence that it is a real NEW issue in this diff.'].join('\n')
+## Diff Under Review
 
-// --- Build agent list scaled by diff size ---
+Changed files: ${changedFiles.join(', ')}
+Stats: ${diffStat}
+
+\`\`\`diff
+${diffContent}
+\`\`\`
+
+${focus}
+${falsePositiveGuidance}
+
+IMPORTANT TOKEN EFFICIENCY RULES:
+- The diff above contains ALL the changes. Do NOT re-fetch it with git or gh commands.
+- Do NOT read full file contents unless you need surrounding context to confirm a specific bug.
+- Limit file reads to at most 5 files, only when the diff alone is ambiguous.
+- Return at most 7 findings, prioritized by severity. Quality over quantity.
+
+Score each finding 0-100 on confidence it is a real NEW issue in this diff.`
+
+// --- Scale agents: 3 base, +1 at 10 files, +1 at 20 files (max 5) ---
 
 const fileCount = changedFiles.length
 const agentConfig = []
 
+// Always: combined bug + failure mode scanner
 agentConfig.push({
-  label: 'deep-bug-scan',
+  label: 'bugs-and-failures',
   effort: 'high',
-  prompt: basePromptParts(
-    'You are a deep bug scanner.',
-    `Read the FULL content of every changed file (not just the diff). Scan at multiple depths:
+  prompt: buildPrompt(
+    'You are a bug hunter and failure mode analyst.',
+    `Scan the diff for bugs at multiple depths:
 
 **Surface**: Typos, wrong variable names, missing returns, copy-paste errors.
-**Logic**: Trace through conditionals and loops with concrete example inputs. For each branch, construct an input that takes that path.
-**Edge cases**: Empty inputs, boundary values, malformed data, single-item collections, zero/negative, very large inputs.
-**Cross-function**: Read callees of changed functions. Verify return value contracts, error propagation, state assumptions.
-**Refactoring regressions**: When code is reorganized, verify non-default values (thresholds, timeouts, config) survived the move.
-**Guard correctness**: For each conditional guard, verify it handles the ACTUAL type space correctly.
-**Incomplete coverage**: For switch/if-else/match chains, ask what the COMPLETE set of runtime inputs is and whether all are handled.`
+**Logic**: Trace conditionals/loops with concrete inputs. For each branch, what input takes that path?
+**Failure modes**: For each operation — what if it fails? Null returns, exceptions, unhandled rejections, timeouts.
+**Edge cases**: Empty inputs, boundary values, malformed data, zero/negative values.
+**Cross-function**: If a changed function calls another changed function, verify the contract is honored.
+**Guard correctness**: Does each conditional handle the actual type space? (null, 0, "", arrays, etc.)
+**Incomplete coverage**: For switch/if-else chains, are all runtime inputs handled?
+
+Only read a source file if the diff alone is genuinely ambiguous about a specific bug. Most issues are visible from the diff.`
   ),
 })
 
-agentConfig.push({
-  label: 'failure-modes',
-  prompt: basePromptParts(
-    'You are a failure mode and execution scope analyst.',
-    `For every changed function/method, analyze:
-
-**Error paths**: What happens when each operation fails? Are all error returns checked?
-**Async safety**: Unhandled rejections/panics? Fire-and-forget without error handling? Missing timeouts?
-**Resource management**: Files, connections, locks — released on ALL paths including errors?
-**Concurrency**: Shared mutable state? Race conditions? Deadlock potential?
-
-**Execution scope mismatch** — ask "where does this code actually run?":
-- Module-level code that does I/O or instantiates resources unconditionally
-- Code in hot paths that should be lazy/cached
-- Code assumed to run once but placed where it runs repeatedly
-- Subscriptions/timers without cleanup
-
-Ask: "If I were trying to break this code, what input would I use?"`
-  ),
-})
-
+// Always: security
 agentConfig.push({
   label: 'security',
-  prompt: basePromptParts(
+  prompt: buildPrompt(
     'You are a security specialist.',
     `Check for:
-- **Injection**: SQL, command, XSS, LDAP, template injection via string interpolation in queries/commands
-- **Auth/Authz**: Missing auth checks, privilege escalation, insecure session handling
-- **Secrets**: Hardcoded credentials, API keys, tokens, connection strings
-- **Input validation**: Missing or insufficient validation at trust boundaries
-- **Crypto**: Weak algorithms, hardcoded IVs/salts, homebrew crypto
-- **Data exposure**: Error messages leaking internals, overly verbose logging, PII in logs
-- **Unsafe operations**: Deserialization of untrusted data, unsafe file operations, path traversal`
+- **Injection**: SQL, command, XSS, template injection via string interpolation
+- **Auth/Authz**: Missing checks, privilege escalation, insecure sessions
+- **Secrets**: Hardcoded credentials, API keys, tokens
+- **Input validation**: Missing validation at trust boundaries
+- **Data exposure**: Error messages leaking internals, PII in logs
+- **Unsafe ops**: Deserialization of untrusted data, path traversal`
   ),
 })
 
-if (fileCount > 3) {
-  agentConfig.push({
-    label: 'context-and-patterns',
-    prompt: basePromptParts(
-      'You are a historical context and pattern analyst.',
-      `**Historical context**:
-- Run \`git blame\` on modified files. Understand WHY the code was written this way.
-- Run \`git log --oneline -10 -- <file>\` for each modified file.
-- Do these changes break patterns that were deliberately established?
+// Always: conventions + simplification + tests (combined to save an agent)
+agentConfig.push({
+  label: 'quality-and-tests',
+  prompt: buildPrompt(
+    'You are a code quality, test coverage, and simplification reviewer.',
+    `**Conventions**: Check compliance with project guidelines above (if any). Flag only explicit violations.
 
-**Related code**:
-- Read sibling files and related modules
-- Check for patterns that should be followed consistently
-- Look for inconsistencies with existing code style
-
-**Code comment compliance**:
-- Do changes contradict documented behavior in comments?
-- Check TODOs/FIXMEs — are any addressed or introduced?
-
-**Convention compliance**:
-- Read CLAUDE.md/project guidelines. Flag violations of explicitly stated conventions.`
-    ),
-  })
-
-  agentConfig.push({
-    label: 'tests-and-quality',
-    prompt: basePromptParts(
-      'You are a test coverage and code quality reviewer.',
-      `**Test coverage gaps**:
-- New code paths: Is there a test for each?
-- Conditional branches: Are all branches tested?
-- Error handling: Are error paths tested?
-- Edge cases: Corresponding test cases?
-- Critical paths (auth, data integrity): Proportionate coverage?
-
-**Test quality**:
-- Tests verify behavior, not implementation details?
-- Flakiness risks (timing, external state, order-dependent)?
+**Test coverage**:
+- New code paths: Is there a corresponding test?
+- Error paths tested? Edge cases?
+- Critical paths (auth, data integrity): proportionate coverage?
 
 **Simplification**:
-- Abstractions that don't pull their weight?
-- Could achieve same result with less code?
+- Could this be simpler? Premature abstractions? Helpers used once?
 - Over-configured solutions for simple problems?
-- Premature abstractions (helpers used once, unnecessary indirection)?`
+- Could existing patterns/libraries handle this?`
+  ),
+})
+
+// 10+ files: add context/patterns agent
+if (fileCount >= 10) {
+  agentConfig.push({
+    label: 'context-and-patterns',
+    prompt: buildPrompt(
+      'You are a historical context and pattern analyst.',
+      `Check if changes break established patterns or contradict existing code.
+Run git blame on at most 3 key modified files (the most complex ones) to understand why code was written that way.
+Check at most 2 sibling files for pattern consistency.
+Flag only issues where historical context reveals a real problem.
+
+Limit yourself to at most 10 tool calls total.`
     ),
   })
 }
 
-if (fileCount > 15) {
+// 20+ files: add performance + deployment agent
+if (fileCount >= 20) {
   agentConfig.push({
-    label: 'performance',
-    prompt: basePromptParts(
-      'You are a performance analyst.',
-      `Check for:
-- N+1 query patterns
-- Blocking I/O in async contexts
-- Unnecessary recomputations in hot paths
-- Memory leaks (unclosed resources, growing collections without eviction)
-- Missing pagination for large datasets
-- Expensive operations that should be cached or batched
-- String concatenation in loops instead of builders/joins
-- Unnecessary copies of large data structures`
-    ),
-  })
-
-  agentConfig.push({
-    label: 'deployment-safety',
-    prompt: basePromptParts(
-      'You are a deployment safety reviewer.',
-      `**Breaking changes**: Public API modifications? Type/interface changes that break consumers?
-**Migration safety**: Database migrations that lock tables? Data backfill issues?
-**Backwards compatibility**: Works with existing production data/state?
-**Rollback safety**: Can this be safely rolled back?
-**Observability**: If this fails in production, how would we know? Are errors observable?
-**Dependency changes**: New deps justified? Well-maintained? Known vulnerabilities?`
+    label: 'perf-and-deploy',
+    prompt: buildPrompt(
+      'You are a performance and deployment safety reviewer.',
+      `**Performance**: N+1 queries, blocking I/O in async, unnecessary recomputations, memory leaks, missing pagination.
+**Breaking changes**: Public API modifications? Consumer-breaking type changes?
+**Deployment**: Migration risks? Backwards compatibility? Rollback safety? Observability gaps?`
     ),
   })
 }
@@ -351,7 +286,7 @@ if (fileCount > 15) {
 // --- Phase 2: Review ---
 
 phase('Review')
-log(`Launching ${agentConfig.length} review agents for ${fileCount} changed files`)
+log(`Launching ${agentConfig.length} review agents for ${fileCount} files`)
 
 const reviews = await parallel(
   agentConfig.map(a => () =>
@@ -372,7 +307,7 @@ if (allFindings.length === 0) {
   return { confirmed: [], stats: { total: 0, deduped: 0, verified: 0, confirmed: 0, agentCount: agentConfig.length } }
 }
 
-// --- Dedup by file + overlapping line range + category ---
+// --- Dedup ---
 
 const deduped = []
 for (const f of allFindings) {
@@ -383,12 +318,8 @@ for (const f of allFindings) {
   )
   if (overlap) {
     overlap.self_score = Math.min(100, Math.max(overlap.self_score, f.self_score) + 10)
-    if (f.evidence && (!overlap.evidence || f.evidence.length > overlap.evidence.length)) {
-      overlap.evidence = f.evidence
-    }
-    if (f.suggested_fix && (!overlap.suggested_fix || f.suggested_fix.length > overlap.suggested_fix.length)) {
-      overlap.suggested_fix = f.suggested_fix
-    }
+    if (f.evidence && (!overlap.evidence || f.evidence.length > overlap.evidence.length)) overlap.evidence = f.evidence
+    if (f.suggested_fix && (!overlap.suggested_fix || f.suggested_fix.length > overlap.suggested_fix.length)) overlap.suggested_fix = f.suggested_fix
   } else {
     deduped.push({ ...f })
   }
@@ -396,50 +327,71 @@ for (const f of allFindings) {
 
 log(`${deduped.length} unique findings after dedup`)
 
-const worthVerifying = deduped.filter(f => f.self_score >= 40)
-log(`${worthVerifying.length} findings above self-score threshold for verification`)
+// Filter + cap: raise threshold and limit verifier count
+const MAX_VERIFIERS = 15
+const allWorthVerifying = deduped
+  .filter(f => f.self_score >= 55)
+  .sort((a, b) => {
+    const sev = { critical: 0, high: 1, medium: 2, low: 3 }
+    return (sev[a.severity] - sev[b.severity]) || (b.self_score - a.self_score)
+  })
+const worthVerifying = allWorthVerifying.slice(0, MAX_VERIFIERS)
+if (allWorthVerifying.length > MAX_VERIFIERS) {
+  log(`${allWorthVerifying.length} findings above threshold, capping verification at ${MAX_VERIFIERS} (top by severity)`)
+}
+log(`${worthVerifying.length} findings to verify`)
 
 if (worthVerifying.length === 0) {
   return { confirmed: [], stats: { total: allFindings.length, deduped: deduped.length, verified: 0, confirmed: 0, agentCount: agentConfig.length } }
 }
 
 // --- Phase 3: Adversarial Verification ---
+// Verifiers get the diff excerpt INLINE and must NOT use tools (no file reads, no git commands).
+// This keeps each verifier under ~5k tokens instead of 30-45k.
 
 phase('Verify')
-log(`Launching ${worthVerifying.length} adversarial verifiers`)
+log(`Launching ${worthVerifying.length} adversarial verifiers (tool-free, diff inline)`)
 
 const verifications = await parallel(
-  worthVerifying.map(f => () =>
-    agent(
-      `You are an adversarial verifier. Try to REFUTE this finding. Default to refuted=true if uncertain.
+  worthVerifying.map(f => {
+    const fileHunks = diffContent.split(/^diff --git /m)
+      .filter(h => h.includes(f.file))
+      .join('\n')
+      .substring(0, 4000)
 
-**Finding:**
+    return () => agent(
+      `You are an adversarial verifier. Your ONLY job is to decide if this finding is real or a false positive.
+
+DO NOT read files. DO NOT run any commands. All the information you need is below.
+
+**Finding:** ${f.title}
 - File: ${f.file}, Line: ${f.line_start}-${f.line_end}
 - Category: ${f.category}, Severity: ${f.severity}
-- Title: ${f.title}
 - Description: ${f.description}
 ${f.evidence ? '- Evidence: ' + f.evidence : ''}
 
-**Steps:**
-1. Read the file ${f.file} around line ${f.line_start}
-2. Run \`${diffCommand}\` to confirm this is in the current changes (not pre-existing)
-3. Try to refute:
-   - Is this pre-existing, not introduced in this diff?
-   - Is the code actually correct (false positive)?
-   - Does surrounding context show this is intentional?
-   - Would the language/runtime prevent this?
-   - Is this stylistic preference, not a real issue?
+**Diff for this file:**
+\`\`\`diff
+${fileHunks}
+\`\`\`
 
-Be skeptical. False positives waste the author's time.`,
+Based ONLY on the diff above, try to refute:
+- Is the code actually correct? Is this a false positive?
+- Does the diff context show this is intentional?
+- Would the language/runtime prevent this?
+- Is this a style preference, not a correctness issue?
+- Could this be pre-existing (not introduced in the + lines)?
+
+Default to refuted=true if the diff doesn't clearly confirm the issue.
+Score 0-100. Below 70 = refuted.`,
       {
         label: `verify:${f.file}:${f.line_start}`,
         phase: 'Verify',
         model: 'haiku',
-        effort: 'medium',
         schema: VERDICT_SCHEMA,
       }
     )
-  )
+  })
 )
 
 const confirmed = worthVerifying
