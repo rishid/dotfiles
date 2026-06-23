@@ -2,7 +2,7 @@ export const meta = {
   name: 'code-review',
   description: 'Multi-agent code review with adversarial verification',
   phases: [
-    { title: 'Context', detail: 'Gather review scope if not provided' },
+    { title: 'Context', detail: 'Gather diff, changed files, project guidelines' },
     { title: 'Review', detail: 'Parallel specialized review agents', model: 'sonnet' },
     { title: 'Verify', detail: 'Adversarial verification of findings', model: 'haiku' },
   ],
@@ -53,67 +53,92 @@ const VERDICT_SCHEMA = {
   required: ['refuted', 'reason', 'adjusted_score'],
 }
 
-// --- Resolve args, filling in missing values via a context agent ---
-
 const CONTEXT_SCHEMA = {
   type: 'object',
   properties: {
-    diffCommand: { type: 'string' },
-    changedFiles: { type: 'array', items: { type: 'string' } },
-    diffStat: { type: 'string' },
-    claudeMdPaths: { type: 'array', items: { type: 'string' } },
-    skillDir: { type: 'string' },
+    diffCommand: { type: 'string', description: 'The exact command to run to see the diff' },
+    changedFiles: { type: 'array', items: { type: 'string' }, description: 'Array of changed file paths' },
+    diffStat: { type: 'string', description: 'Human-readable diff stats' },
+    claudeMdPaths: { type: 'array', items: { type: 'string' }, description: 'Paths to CLAUDE.md files found' },
   },
   required: ['diffCommand', 'changedFiles', 'diffStat', 'claudeMdPaths'],
 }
 
-const safeArgs = args || {}
-let diffCommand = safeArgs.diffCommand
-let changedFiles = Array.isArray(safeArgs.changedFiles) ? safeArgs.changedFiles : null
-let diffStat = safeArgs.diffStat
-let skillDir = safeArgs.skillDir
-let claudeMdPaths = Array.isArray(safeArgs.claudeMdPaths) ? safeArgs.claudeMdPaths : null
+// --- Args are intentionally minimal ---
+// PR review:    { scope: "pr", repo: "owner/repo", prNumber: 123, skillDir: "..." }
+// Local branch: { scope: "branch", skillDir: "..." }
+// Staged:       { scope: "staged", skillDir: "..." }
+// Last commit:  { scope: "commit", skillDir: "..." }
 
-if (!diffCommand || !changedFiles || !diffStat) {
-  log('Missing args — launching context agent to gather review scope')
-  const ctx = await agent(
-    `Determine the code review scope for this repo. Run these commands and return the results:
+const safeArgs = args || {}
+const scope = safeArgs.scope || 'branch'
+const repo = safeArgs.repo || null
+const prNumber = safeArgs.prNumber || null
+const skillDir = safeArgs.skillDir || null
+
+// --- Phase 1: Context agent ALWAYS runs to gather the correct diff ---
+
+phase('Context')
+
+let contextPrompt
+if (scope === 'pr' && repo && prNumber) {
+  log(`Gathering context for PR #${prNumber} on ${repo}`)
+  contextPrompt = `Gather context for reviewing GitHub PR #${prNumber} on ${repo}.
+
+Run these commands and return structured results:
+
+1. Get changed files (return as array):
+   gh pr diff ${prNumber} --repo ${repo} --name-only
+
+2. The diffCommand is exactly: gh pr diff ${prNumber} --repo ${repo}
+
+3. Get diff stats:
+   gh pr view ${prNumber} --repo ${repo} --json additions,deletions,changedFiles --template '{{.changedFiles}} files changed, {{.additions}} insertions(+), {{.deletions}} deletions(-)'
+
+4. Find CLAUDE.md files:
+   find . -name 'CLAUDE.md' -maxdepth 3 -not -path '*/node_modules/*' 2>/dev/null
+
+Return changedFiles as a JSON array of file path strings. claudeMdPaths as an array (empty array if none found).`
+} else {
+  log(`Gathering context for local ${scope} review`)
+  contextPrompt = `Gather context for a local code review. Scope: ${scope}
+
+Run these commands and return structured results:
 
 1. Detect the base branch:
    git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main"
 
-2. Detect the current branch:
+2. Detect current branch:
    git branch --show-current
 
-3. If on a feature branch (different from base), the diff command is:
-   git diff origin/<base>...HEAD
-   If on main/master with staged changes: git diff --staged
-   If on main/master with nothing staged: git show HEAD
+3. Based on scope "${scope}":
+   - "branch": diffCommand = "git diff origin/<base>...HEAD", get files with --name-only, stats with --stat
+   - "staged": diffCommand = "git diff --staged", get files with --name-only, stats with --stat
+   - "commit": diffCommand = "git show HEAD", get files with --name-only --diff-filter, stats with --stat
 
-4. Get changed files: run the diff command with --name-only
-5. Get diff stats: run the diff command with --stat
-6. Find CLAUDE.md files: find . -name 'CLAUDE.md' -maxdepth 3 -not -path '*/node_modules/*'
+4. Find CLAUDE.md files:
+   find . -name 'CLAUDE.md' -maxdepth 3 -not -path '*/node_modules/*' 2>/dev/null
 
-${safeArgs.skillDir ? 'skillDir: ' + safeArgs.skillDir : ''}
-
-Return structured results. changedFiles must be an array of file paths. claudeMdPaths must be an array of paths.`,
-    { label: 'gather-context', model: 'haiku', schema: CONTEXT_SCHEMA }
-  )
-  if (ctx) {
-    diffCommand = diffCommand || ctx.diffCommand
-    changedFiles = changedFiles || ctx.changedFiles || []
-    diffStat = diffStat || ctx.diffStat || ''
-    claudeMdPaths = claudeMdPaths || ctx.claudeMdPaths || []
-  }
+Return changedFiles as a JSON array. claudeMdPaths as an array (empty if none).`
 }
 
-changedFiles = changedFiles || []
-claudeMdPaths = claudeMdPaths || []
+const ctx = await agent(contextPrompt, {
+  label: 'gather-context', model: 'haiku', schema: CONTEXT_SCHEMA,
+})
 
-if (changedFiles.length === 0) {
+if (!ctx || !ctx.changedFiles || ctx.changedFiles.length === 0) {
   log('No changed files found — nothing to review')
   return { confirmed: [], stats: { total: 0, deduped: 0, verified: 0, confirmed: 0, agentCount: 0 } }
 }
+
+const diffCommand = ctx.diffCommand
+const changedFiles = ctx.changedFiles
+const diffStat = ctx.diffStat || ''
+const claudeMdPaths = ctx.claudeMdPaths || []
+
+log(`Found ${changedFiles.length} changed files: ${changedFiles.slice(0, 5).join(', ')}${changedFiles.length > 5 ? '...' : ''}`)
+
+// --- Detect languages ---
 
 const langMap = {
   '.py': 'python', '.go': 'go', '.c': 'c', '.h': 'c',
@@ -131,18 +156,21 @@ const detectedLangs = [...new Set(
   }).filter(Boolean)
 )]
 
-const rulesInstruction = [
+// --- Build shared prompt parts ---
+
+const rulesInstruction = skillDir ? [
   'Read the following rule files for review guidance:',
   `- ${skillDir}/rules/universal.md (ALWAYS)`,
   ...detectedLangs.map(l => `- ${skillDir}/rules/${l}.md (if exists)`),
   '',
   'Read these project guidelines:',
   ...(claudeMdPaths.length > 0 ? claudeMdPaths.map(p => `- ${p}`) : ['(none found)']),
+].join('\n') : [
+  'Read any CLAUDE.md or project guidelines files found in the repo.',
+  ...(claudeMdPaths.length > 0 ? claudeMdPaths.map(p => `- ${p}`) : []),
 ].join('\n')
 
-const repo = safeArgs.repo || null
-const prNumber = safeArgs.prNumber || null
-const isPR = !!(repo && prNumber)
+const isPR = scope === 'pr' && repo && prNumber
 
 const diffInstruction = [
   `To see the diff under review, run: ${diffCommand}`,
@@ -151,8 +179,7 @@ const diffInstruction = [
   ...(isPR ? [
     '',
     `This is a GitHub PR review (PR #${prNumber} on ${repo}).`,
-    `To read a file's full content: gh api repos/${repo}/contents/{path}?ref=$(gh pr view ${prNumber} --repo ${repo} --json headRefName -q .headRefName) --jq .content | base64 -d`,
-    `Or use: gh pr diff ${prNumber} --repo ${repo} to see the full diff.`,
+    `To read a file's full content on the PR branch: gh api repos/${repo}/contents/{path}?ref=$(gh pr view ${prNumber} --repo ${repo} --json headRefName -q .headRefName) --jq .content | base64 -d`,
   ] : []),
 ].join('\n')
 
@@ -182,7 +209,6 @@ const basePromptParts = (role, focus) => [role, '', rulesInstruction, '', diffIn
 const fileCount = changedFiles.length
 const agentConfig = []
 
-// Always present: deep bug scanner
 agentConfig.push({
   label: 'deep-bug-scan',
   effort: 'high',
@@ -200,7 +226,6 @@ agentConfig.push({
   ),
 })
 
-// Always present: failure modes
 agentConfig.push({
   label: 'failure-modes',
   prompt: basePromptParts(
@@ -222,7 +247,6 @@ Ask: "If I were trying to break this code, what input would I use?"`
   ),
 })
 
-// Always present: security
 agentConfig.push({
   label: 'security',
   prompt: basePromptParts(
@@ -238,7 +262,6 @@ agentConfig.push({
   ),
 })
 
-// Medium+ diffs: add context/patterns agent
 if (fileCount > 3) {
   agentConfig.push({
     label: 'context-and-patterns',
@@ -262,10 +285,7 @@ if (fileCount > 3) {
 - Read CLAUDE.md/project guidelines. Flag violations of explicitly stated conventions.`
     ),
   })
-}
 
-// Medium+ diffs: add tests/simplification agent
-if (fileCount > 3) {
   agentConfig.push({
     label: 'tests-and-quality',
     prompt: basePromptParts(
@@ -290,7 +310,6 @@ if (fileCount > 3) {
   })
 }
 
-// Large diffs: add performance agent
 if (fileCount > 15) {
   agentConfig.push({
     label: 'performance',
@@ -307,10 +326,7 @@ if (fileCount > 15) {
 - Unnecessary copies of large data structures`
     ),
   })
-}
 
-// Large diffs: add deployment safety agent
-if (fileCount > 15) {
   agentConfig.push({
     label: 'deployment-safety',
     prompt: basePromptParts(
@@ -324,6 +340,8 @@ if (fileCount > 15) {
     ),
   })
 }
+
+// --- Phase 2: Review ---
 
 phase('Review')
 log(`Launching ${agentConfig.length} review agents for ${fileCount} changed files`)
@@ -348,6 +366,7 @@ if (allFindings.length === 0) {
 }
 
 // --- Dedup by file + overlapping line range + category ---
+
 const deduped = []
 for (const f of allFindings) {
   const overlap = deduped.find(d =>
@@ -377,6 +396,8 @@ if (worthVerifying.length === 0) {
   return { confirmed: [], stats: { total: allFindings.length, deduped: deduped.length, verified: 0, confirmed: 0, agentCount: agentConfig.length } }
 }
 
+// --- Phase 3: Adversarial Verification ---
+
 phase('Verify')
 log(`Launching ${worthVerifying.length} adversarial verifiers`)
 
@@ -393,8 +414,8 @@ const verifications = await parallel(
 ${f.evidence ? '- Evidence: ' + f.evidence : ''}
 
 **Steps:**
-1. Read ${f.file} around line ${f.line_start}
-2. Run \`${diffCommand}\` to confirm this is in the current changes
+1. Read the file ${f.file} around line ${f.line_start}
+2. Run \`${diffCommand}\` to confirm this is in the current changes (not pre-existing)
 3. Try to refute:
    - Is this pre-existing, not introduced in this diff?
    - Is the code actually correct (false positive)?

@@ -9,94 +9,59 @@ Multi-agent code review with adversarial verification. Scales agent count by dif
 
 ## Process
 
-### Step 1: Detect Scope & Gather Context
+### Step 1: Detect Scope
 
-Determine what to review and collect all context before launching the workflow.
+Determine what to review:
 
-**Scope priority:**
+1. **User specifies PR** — `review PR 123` or a GitHub PR URL → scope is `pr`
+2. **User specifies commit** — `review commit abc123` → scope is `commit`
+3. **On a feature branch** (not main/master) → scope is `branch`
+4. **On main/master with staged changes** → scope is `staged`
+5. **On main/master, nothing staged** → scope is `commit`
 
-1. **User specifies PR** — `review PR 123` or a GitHub PR URL
-2. **User specifies commit** — `review commit abc123`
-3. **User specifies files** — `review src/auth.py`
-4. **On a feature branch** — diff against base
-5. **On main/master with staged changes** — staged diff
-6. **On main/master, nothing staged** — latest commit
-
-**For PR reviews:**
-
+For PR reviews, extract the repo (`owner/repo`) and PR number from the URL or user input. If not obvious, run:
 ```bash
-# Get PR metadata
-REPO="<owner/repo>"  # from gh repo view or PR URL
-PR_NUM=<number>
-gh pr view $PR_NUM --repo $REPO --json baseRefName,headRefName,number,url,title
-
-# Get diff — this is the diffCommand for PR reviews
-gh pr diff $PR_NUM --repo $REPO
-
-# Get changed files
-gh pr diff $PR_NUM --repo $REPO --name-only
-
-# Get diff stats via API (gh pr diff has no --stat flag)
-gh pr view $PR_NUM --repo $REPO --json additions,deletions,changedFiles \
-  --template '{{.changedFiles}} files changed, {{.additions}} insertions(+), {{.deletions}} deletions(-)'
+gh repo view --json nameWithOwner -q .nameWithOwner
 ```
-
-**For local branch reviews:**
-
-```bash
-BASE=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")
-# diffCommand: git diff origin/$BASE...HEAD
-git diff --name-only origin/$BASE...HEAD
-git diff --stat origin/$BASE...HEAD
-```
-
-Also find project guidelines:
-
-```bash
-find . -name 'CLAUDE.md' -maxdepth 3 -not -path '*/node_modules/*'
-```
-
-If nothing to review, explain and stop.
 
 ### Step 2: Launch Workflow
 
-Use the `Workflow` tool with `workflow.js` from this skill's directory.
+Use the `Workflow` tool with `workflow.js` from this skill's directory. Pass **minimal args** — the workflow's context agent handles gathering the diff, changed files, and stats.
 
-**IMPORTANT:** All args must be populated from Step 1. `changedFiles` and `claudeMdPaths` MUST be JSON arrays, not strings.
-
-For **PR reviews**, set `diffCommand` to the `gh pr diff` command (including `--repo` flag):
-
+**For PR reviews:**
 ```
 Workflow({
   scriptPath: "<this skill's directory>/workflow.js",
   args: {
-    diffCommand: "gh pr diff 123 --repo owner/repo",
-    changedFiles: ["src/foo.py", "src/bar.go"],
-    diffStat: "5 files changed, 120 insertions(+), 30 deletions(-)",
-    skillDir: "<absolute path to this skill's directory>",
-    claudeMdPaths: ["./CLAUDE.md"],
+    scope: "pr",
     repo: "owner/repo",
-    prNumber: 123
+    prNumber: 123,
+    skillDir: "<absolute path to this skill's directory>"
   }
 })
 ```
 
-For **local reviews**, set `diffCommand` to the git diff command:
-
+**For local reviews:**
 ```
 Workflow({
   scriptPath: "<this skill's directory>/workflow.js",
   args: {
-    diffCommand: "git diff origin/main...HEAD",
-    changedFiles: ["src/foo.py", "src/bar.go"],
-    diffStat: "3 files changed, 50 insertions(+), 20 deletions(-)",
-    skillDir: "<absolute path to this skill's directory>",
-    claudeMdPaths: ["./CLAUDE.md"]
+    scope: "branch",
+    skillDir: "<absolute path to this skill's directory>"
   }
 })
 ```
 
-The workflow returns `{ confirmed: [...findings], stats: {...} }`.
+Valid scope values: `"pr"`, `"branch"`, `"staged"`, `"commit"`
+
+The workflow:
+- Gathers context via a Haiku agent (diff, changed files, CLAUDE.md files)
+- Scales 3/5/7 review agents based on file count (≤3 / ≤15 / >15)
+- Runs specialized Sonnet review agents in parallel
+- Deduplicates findings (boosts confidence for multi-agent agreement)
+- Runs adversarial Haiku verifiers that try to REFUTE each finding
+- Returns only findings surviving verification with score ≥ 70
+- Returns `{ confirmed: [...findings], stats: {...} }`
 
 ### Step 3: Output Results
 
@@ -127,12 +92,11 @@ N raw findings → N after dedup → N confirmed after verification
 ### Verdict: [Clean | Needs Attention | Needs Work]
 ```
 
-**For PR reviews**, post findings as a GitHub review using JSON input:
+**For PR reviews**, post findings as a GitHub review using JSON input.
+
+CRITICAL: Use `--input -` with a heredoc. The `--field 'comments[0][...]'` syntax does NOT produce valid JSON arrays and GitHub will reject it.
 
 ```bash
-# Build a JSON file with the review body and inline comments.
-# CRITICAL: Use --input with a heredoc — --field syntax does NOT work for comment arrays.
-
 gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
   --method POST --input - <<'EOF'
 {
@@ -151,7 +115,7 @@ EOF
 
 Build the `comments` array from the workflow's `confirmed` findings:
 - `path` = finding.file
-- `line` = finding.line_end (GitHub uses the last line of the range)
+- `line` = finding.line_end (GitHub uses the last line of the hunk)
 - `body` = formatted finding with title, description, and suggestion block if `suggested_fix` exists
 
 Verdict mapping:
@@ -159,7 +123,7 @@ Verdict mapping:
 - **COMMENT** — only medium/low severity issues
 - **REQUEST_CHANGES** — any critical or high severity issues
 
-Always output a local summary too, so the user sees results even for PR reviews.
+Always show a local summary too so the user sees results even for PR reviews.
 
 ## Language Support
 
