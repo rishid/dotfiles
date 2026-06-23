@@ -28,15 +28,17 @@ gh repo view --json nameWithOwner -q .nameWithOwner
 
 Use the `Workflow` tool with `workflow.js` from this skill's directory. Pass **minimal args** — the workflow's context agent handles gathering the diff, changed files, and stats.
 
+**CRITICAL:** The `args` parameter MUST be a JSON object, NOT a JSON string. The Workflow tool accepts raw JSON values.
+
 **For PR reviews:**
 ```
 Workflow({
   scriptPath: "<this skill's directory>/workflow.js",
   args: {
-    scope: "pr",
-    repo: "owner/repo",
-    prNumber: 123,
-    skillDir: "<absolute path to this skill's directory>"
+    "scope": "pr",
+    "repo": "owner/repo",
+    "prNumber": 123,
+    "skillDir": "<absolute path to this skill's directory>"
   }
 })
 ```

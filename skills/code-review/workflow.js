@@ -70,11 +70,18 @@ const CONTEXT_SCHEMA = {
 // Staged:       { scope: "staged", skillDir: "..." }
 // Last commit:  { scope: "commit", skillDir: "..." }
 
-const safeArgs = args || {}
+// Handle args passed as JSON string (common mistake) or object
+let safeArgs = args || {}
+if (typeof safeArgs === 'string') {
+  try { safeArgs = JSON.parse(safeArgs) } catch (e) { safeArgs = {} }
+}
+
 const scope = safeArgs.scope || 'branch'
 const repo = safeArgs.repo || null
-const prNumber = safeArgs.prNumber || null
-const skillDir = safeArgs.skillDir || null
+const prNumber = safeArgs.prNumber || safeArgs.pr_number || safeArgs.pr || null
+const skillDir = safeArgs.skillDir || safeArgs.skill_dir || null
+
+log(`Args received — scope: ${scope}, repo: ${repo}, prNumber: ${prNumber}, skillDir: ${skillDir ? 'yes' : 'missing'}`)
 
 // --- Phase 1: Context agent ALWAYS runs to gather the correct diff ---
 
