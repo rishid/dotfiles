@@ -49,11 +49,11 @@ gh pr view <number> --json title,body,labels,reviews
 
 ### Step 3: Launch Workflow
 
-Construct the workflow args and launch:
+Use the `Workflow` tool (built-in Claude Code tool) with `workflow.js` from this skill's directory. The workflow script orchestrates parallel subagents and returns structured results.
 
 ```
 Workflow({
-  scriptPath: "<skill-dir>/workflow.js",
+  scriptPath: "<this skill's directory>/workflow.js",
   args: {
     diffCommand: "<the diff command from Step 1>",
     changedFiles: ["file1.py", "file2.go"],
