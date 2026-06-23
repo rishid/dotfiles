@@ -2,6 +2,7 @@ export const meta = {
   name: 'code-review',
   description: 'Multi-agent code review with adversarial verification',
   phases: [
+    { title: 'Context', detail: 'Gather review scope if not provided' },
     { title: 'Review', detail: 'Parallel specialized review agents', model: 'sonnet' },
     { title: 'Verify', detail: 'Adversarial verification of findings', model: 'haiku' },
   ],
@@ -52,7 +53,67 @@ const VERDICT_SCHEMA = {
   required: ['refuted', 'reason', 'adjusted_score'],
 }
 
-const { diffCommand, changedFiles, diffStat, skillDir, claudeMdPaths } = args
+// --- Resolve args, filling in missing values via a context agent ---
+
+const CONTEXT_SCHEMA = {
+  type: 'object',
+  properties: {
+    diffCommand: { type: 'string' },
+    changedFiles: { type: 'array', items: { type: 'string' } },
+    diffStat: { type: 'string' },
+    claudeMdPaths: { type: 'array', items: { type: 'string' } },
+    skillDir: { type: 'string' },
+  },
+  required: ['diffCommand', 'changedFiles', 'diffStat', 'claudeMdPaths'],
+}
+
+const safeArgs = args || {}
+let diffCommand = safeArgs.diffCommand
+let changedFiles = Array.isArray(safeArgs.changedFiles) ? safeArgs.changedFiles : null
+let diffStat = safeArgs.diffStat
+let skillDir = safeArgs.skillDir
+let claudeMdPaths = Array.isArray(safeArgs.claudeMdPaths) ? safeArgs.claudeMdPaths : null
+
+if (!diffCommand || !changedFiles || !diffStat) {
+  log('Missing args — launching context agent to gather review scope')
+  const ctx = await agent(
+    `Determine the code review scope for this repo. Run these commands and return the results:
+
+1. Detect the base branch:
+   git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main"
+
+2. Detect the current branch:
+   git branch --show-current
+
+3. If on a feature branch (different from base), the diff command is:
+   git diff origin/<base>...HEAD
+   If on main/master with staged changes: git diff --staged
+   If on main/master with nothing staged: git show HEAD
+
+4. Get changed files: run the diff command with --name-only
+5. Get diff stats: run the diff command with --stat
+6. Find CLAUDE.md files: find . -name 'CLAUDE.md' -maxdepth 3 -not -path '*/node_modules/*'
+
+${safeArgs.skillDir ? 'skillDir: ' + safeArgs.skillDir : ''}
+
+Return structured results. changedFiles must be an array of file paths. claudeMdPaths must be an array of paths.`,
+    { label: 'gather-context', model: 'haiku', schema: CONTEXT_SCHEMA }
+  )
+  if (ctx) {
+    diffCommand = diffCommand || ctx.diffCommand
+    changedFiles = changedFiles || ctx.changedFiles || []
+    diffStat = diffStat || ctx.diffStat || ''
+    claudeMdPaths = claudeMdPaths || ctx.claudeMdPaths || []
+  }
+}
+
+changedFiles = changedFiles || []
+claudeMdPaths = claudeMdPaths || []
+
+if (changedFiles.length === 0) {
+  log('No changed files found — nothing to review')
+  return { confirmed: [], stats: { total: 0, deduped: 0, verified: 0, confirmed: 0, agentCount: 0 } }
+}
 
 const langMap = {
   '.py': 'python', '.go': 'go', '.c': 'c', '.h': 'c',
