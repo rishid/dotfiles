@@ -9,71 +9,97 @@ Multi-agent code review with adversarial verification. Scales agent count by dif
 
 ## Process
 
-### Step 1: Detect Scope
+### Step 1: Detect Scope & Gather Context
 
-Determine what to review using this priority:
+Determine what to review and collect all context before launching the workflow.
 
-1. **User specifies PR** — `review PR 123` or a GitHub PR URL → use `gh pr diff <number>`
-2. **User specifies commit** — `review commit abc123` → use `git show <sha>`
-3. **User specifies files** — `review src/auth.py` → use `git diff HEAD -- <files>`
-4. **On a feature branch** — `git diff origin/<base>...HEAD`
-5. **On main/master with staged changes** — `git diff --staged`
-6. **On main/master, nothing staged** — `git show HEAD`
+**Scope priority:**
+
+1. **User specifies PR** — `review PR 123` or a GitHub PR URL
+2. **User specifies commit** — `review commit abc123`
+3. **User specifies files** — `review src/auth.py`
+4. **On a feature branch** — diff against base
+5. **On main/master with staged changes** — staged diff
+6. **On main/master, nothing staged** — latest commit
+
+**For PR reviews:**
 
 ```bash
-# Detect base branch
-git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main"
+# Get PR metadata
+REPO="<owner/repo>"  # from gh repo view or PR URL
+PR_NUM=<number>
+gh pr view $PR_NUM --repo $REPO --json baseRefName,headRefName,number,url,title
 
-# For PR reviews
-gh pr view <number> --json baseRefName,headRefName,number,url
-gh pr diff <number>
+# Get diff — this is the diffCommand for PR reviews
+gh pr diff $PR_NUM --repo $REPO
+
+# Get changed files
+gh pr diff $PR_NUM --repo $REPO --name-only
+
+# Get diff stats (line count from diff)
+gh pr diff $PR_NUM --repo $REPO | grep -c '^[+-]' || echo "unknown"
+```
+
+**For local branch reviews:**
+
+```bash
+BASE=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")
+# diffCommand: git diff origin/$BASE...HEAD
+git diff --name-only origin/$BASE...HEAD
+git diff --stat origin/$BASE...HEAD
+```
+
+Also find project guidelines:
+
+```bash
+find . -name 'CLAUDE.md' -maxdepth 3 -not -path '*/node_modules/*'
 ```
 
 If nothing to review, explain and stop.
 
-### Step 2: Gather Context
+### Step 2: Launch Workflow
 
-Run these commands and collect the results:
+Use the `Workflow` tool with `workflow.js` from this skill's directory.
 
-```bash
-DIFF_CMD="<the appropriate git diff command from Step 1>"
-CHANGED_FILES=$($DIFF_CMD --name-only)
-DIFF_STAT=$($DIFF_CMD --stat)
+**IMPORTANT:** All args must be populated from Step 1. `changedFiles` and `claudeMdPaths` MUST be JSON arrays, not strings.
 
-# Find CLAUDE.md files
-find . -name 'CLAUDE.md' -maxdepth 3
-
-# For PR mode, also get PR metadata
-gh pr view <number> --json title,body,labels,reviews
-```
-
-### Step 3: Launch Workflow
-
-Use the `Workflow` tool (built-in Claude Code tool) with `workflow.js` from this skill's directory. The workflow script orchestrates parallel subagents and returns structured results.
+For **PR reviews**, set `diffCommand` to the `gh pr diff` command (including `--repo` flag):
 
 ```
 Workflow({
   scriptPath: "<this skill's directory>/workflow.js",
   args: {
-    diffCommand: "<the diff command from Step 1>",
-    changedFiles: ["file1.py", "file2.go"],
-    diffStat: "<output of --stat>",
+    diffCommand: "gh pr diff 123 --repo owner/repo",
+    changedFiles: ["src/foo.py", "src/bar.go"],
+    diffStat: "5 files changed, 120 insertions(+), 30 deletions(-)",
     skillDir: "<absolute path to this skill's directory>",
-    claudeMdPaths: ["./CLAUDE.md", "./src/CLAUDE.md"],
+    claudeMdPaths: ["./CLAUDE.md"],
+    repo: "owner/repo",
+    prNumber: 123
   }
 })
 ```
 
-The workflow:
-- Scales 3/5/7 agents based on file count (≤3 / ≤15 / >15)
-- Runs specialized Sonnet review agents in parallel
-- Deduplicates findings (boosts confidence for multi-agent agreement)
-- Runs adversarial Haiku verifiers that try to REFUTE each finding
-- Returns only findings that survive verification with score ≥ 70
+For **local reviews**, set `diffCommand` to the git diff command:
 
-### Step 4: Output Results
+```
+Workflow({
+  scriptPath: "<this skill's directory>/workflow.js",
+  args: {
+    diffCommand: "git diff origin/main...HEAD",
+    changedFiles: ["src/foo.py", "src/bar.go"],
+    diffStat: "3 files changed, 50 insertions(+), 20 deletions(-)",
+    skillDir: "<absolute path to this skill's directory>",
+    claudeMdPaths: ["./CLAUDE.md"]
+  }
+})
+```
 
-**For local reviews** (no PR), format a report:
+The workflow returns `{ confirmed: [...findings], stats: {...} }`.
+
+### Step 3: Output Results
+
+**For local reviews**, format a markdown report:
 
 ```markdown
 ## Code Review
@@ -95,42 +121,44 @@ The workflow:
 \`\`\`
 
 ### Summary
-- N raw findings → N after dedup → N confirmed after verification
-- Checked: bugs, security, failure modes, edge cases, conventions, test gaps
+N raw findings → N after dedup → N confirmed after verification
 
 ### Verdict: [Clean | Needs Attention | Needs Work]
 ```
 
-**For PR reviews**, post findings as an inline GitHub review:
+**For PR reviews**, post findings as a GitHub review using JSON input:
 
 ```bash
-# Build the review JSON
-# Each confirmed finding becomes an inline comment at file:line
-# Use suggestion blocks for findings that have a suggested_fix
+# Build a JSON file with the review body and inline comments.
+# CRITICAL: Use --input with a heredoc — --field syntax does NOT work for comment arrays.
 
 gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
-  --method POST \
-  --field event="<APPROVE|REQUEST_CHANGES|COMMENT>" \
-  --field body="## Code Review Summary
-N issues found (N critical, N high, N medium)
-Reviewed by N specialized agents with adversarial verification." \
-  --field 'comments[0][path]=<file>' \
-  --field 'comments[0][line]=<line>' \
-  --field 'comments[0][body]=**<title>** (<category>, <severity>)
-
-<description>
-
-\`\`\`suggestion
-<suggested_fix>
-\`\`\`'
+  --method POST --input - <<'EOF'
+{
+  "event": "<APPROVE|REQUEST_CHANGES|COMMENT>",
+  "body": "## Code Review Summary\n\nN issues found. Reviewed by N agents with adversarial verification.",
+  "comments": [
+    {
+      "path": "src/file.py",
+      "line": 42,
+      "body": "**Title** (category, severity — Score: N)\n\nDescription.\n\n```suggestion\nsuggested fix code\n```"
+    }
+  ]
+}
+EOF
 ```
 
+Build the `comments` array from the workflow's `confirmed` findings:
+- `path` = finding.file
+- `line` = finding.line_end (GitHub uses the last line of the range)
+- `body` = formatted finding with title, description, and suggestion block if `suggested_fix` exists
+
 Verdict mapping:
-- **APPROVE** — 0 issues, or only low-severity issues
-- **COMMENT** — medium issues only, no critical/high
+- **APPROVE** — 0 confirmed issues
+- **COMMENT** — only medium/low severity issues
 - **REQUEST_CHANGES** — any critical or high severity issues
 
-Also output a local summary so the user sees results even for PR reviews.
+Always output a local summary too, so the user sees results even for PR reviews.
 
 ## Language Support
 
@@ -150,10 +178,4 @@ The workflow auto-detects languages from file extensions and loads matching rule
 ## Adding Language Support
 
 Create `rules/<language>.md` following the structure of existing rule files:
-- Risk Signals
-- Security
-- Async/Concurrency
-- Resource Management
-- Error Handling
-- Performance
-- Idioms
+- Risk Signals, Security, Async/Concurrency, Resource Management, Error Handling, Performance, Idioms

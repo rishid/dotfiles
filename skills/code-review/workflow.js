@@ -140,10 +140,20 @@ const rulesInstruction = [
   ...(claudeMdPaths.length > 0 ? claudeMdPaths.map(p => `- ${p}`) : ['(none found)']),
 ].join('\n')
 
+const repo = safeArgs.repo || null
+const prNumber = safeArgs.prNumber || null
+const isPR = !!(repo && prNumber)
+
 const diffInstruction = [
   `To see the diff under review, run: ${diffCommand}`,
   `Changed files: ${changedFiles.join(', ')}`,
   `Stats: ${diffStat}`,
+  ...(isPR ? [
+    '',
+    `This is a GitHub PR review (PR #${prNumber} on ${repo}).`,
+    `To read a file's full content: gh api repos/${repo}/contents/{path}?ref=$(gh pr view ${prNumber} --repo ${repo} --json headRefName -q .headRefName) --jq .content | base64 -d`,
+    `Or use: gh pr diff ${prNumber} --repo ${repo} to see the full diff.`,
+  ] : []),
 ].join('\n')
 
 const falsePositiveGuidance = `
