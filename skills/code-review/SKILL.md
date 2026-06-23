@@ -36,8 +36,9 @@ gh pr diff $PR_NUM --repo $REPO
 # Get changed files
 gh pr diff $PR_NUM --repo $REPO --name-only
 
-# Get diff stats (line count from diff)
-gh pr diff $PR_NUM --repo $REPO | grep -c '^[+-]' || echo "unknown"
+# Get diff stats via API (gh pr diff has no --stat flag)
+gh pr view $PR_NUM --repo $REPO --json additions,deletions,changedFiles \
+  --template '{{.changedFiles}} files changed, {{.additions}} insertions(+), {{.deletions}} deletions(-)'
 ```
 
 **For local branch reviews:**
