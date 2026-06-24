@@ -232,7 +232,7 @@ DO NOT flag: pre-existing issues, linter/type issues, issues on unmodified lines
 DO flag even if minor: missing error handling, edge case gaps, null access without guards, resource leaks, test gaps, security vulns.`
 
 const previousCommentsSection = (isIncremental && previousComments)
-  ? `\n\n## Issues Raised in Last Review\n\nThese are the inline comments posted during the last review. For each, check if the new diff addresses it:\n\n\`\`\`json\n${previousComments}\n\`\`\`\n\nFor each previous comment: does the new code resolve the concern? Flag any that are still unaddressed as findings (category: "convention", title: "Unresolved: {original title}").`
+  ? `\n\n## Issues Raised in Last Review\n\nThese are the inline comments posted during the last review:\n\n\`\`\`json\n${previousComments}\n\`\`\`\n\nFor unresolved previous comments: only re-surface as a finding if the issue is clearly critical or high severity (a real bug, security issue, or data integrity risk). Do NOT re-flag unresolved low-severity, style, or convention issues — the contributor has seen them and they are their call to address.`
   : ''
 
 const reviewScope = isIncremental && lastReviewSha
