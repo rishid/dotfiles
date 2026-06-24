@@ -4,13 +4,13 @@
 [tools]
 # === Programming Languages & Runtimes ===
 go = "1.26.4"
-node = "24.17.0"
+node = "24.18.0"
 python = "3.14.6"
 rust = "stable"                   # Required for Cargo-based tools
-uv = "0.11.23"
+uv = "0.11.24"
 
 # === Development Tools ===
-"aqua:anthropics/claude-code" = "2.1.186"
+"aqua:anthropics/claude-code" = "2.1.187"
 "aqua:openai/codex" = "0.142.0"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.95.0"
