@@ -139,6 +139,33 @@ Verdict mapping:
 
 Always show a local summary too so the user sees results even for PR reviews.
 
+### Step 4: Review Conversation
+
+After posting the report, enter follow-up mode. The findings are in your context. End your report with:
+
+> Questions? You can ask me about any finding, raise your own concerns, or ask me to post an additional comment on the PR.
+
+**What you can do in follow-up:**
+
+- **Explain a finding** — "why is finding #2 a problem?" → answer from the findings context
+- **Investigate a user concern** — "I'm worried about the locking in rate_limiter.py" → fetch that file and the relevant diff hunk, give a direct answer
+- **Post an additional inline comment** — if the user raises a valid concern, post it to the PR on their behalf:
+  ```bash
+  gh api repos/{owner}/{repo}/pulls/{pr_number}/comments \
+    --method POST --input - <<'EOF'
+  {
+    "body": "**User concern:** description\n\nAnalysis and recommendation.",
+    "path": "src/file.py",
+    "line": 42,
+    "commit_id": "<head sha>"
+  }
+  EOF
+  ```
+- **Dismiss a finding** — if the user says a finding is wrong or intentional, acknowledge it and note it's dismissed
+- **Re-review a specific file** — fetch the file + diff and do a focused analysis
+
+Stay in this mode until the user is done or explicitly ends the review.
+
 ## Language Support
 
 The workflow auto-detects languages from file extensions and loads matching rule files from `rules/`:
