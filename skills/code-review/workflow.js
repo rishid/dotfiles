@@ -27,7 +27,8 @@ const FINDING_SCHEMA = {
           title: { type: 'string', description: 'Under 80 chars' },
           description: { type: 'string' },
           evidence: { type: 'string' },
-          suggested_fix: { type: 'string' },
+          suggested_fix: { type: 'string', description: 'The EXACT replacement code for those lines only — verbatim, ready to apply. Omit if the fix spans multiple locations or requires structural changes.' },
+          fix_is_inline: { type: 'boolean', description: 'true if suggested_fix is a clean line-for-line replacement suitable for a GitHub suggestion block. false if the fix is multi-location or structural.' },
           self_score: { type: 'integer', minimum: 0, maximum: 100 },
         },
         required: ['file', 'line_start', 'line_end', 'category', 'severity', 'title', 'description', 'self_score'],
@@ -192,6 +193,8 @@ IMPORTANT TOKEN EFFICIENCY RULES:
 - Do NOT read full file contents unless you need surrounding context to confirm a specific bug.
 - Limit file reads to at most 5 files, only when the diff alone is ambiguous.
 - Return at most 7 findings, prioritized by severity. Quality over quantity.
+
+For suggested_fix: provide the EXACT replacement lines of code, not a description. It will be applied verbatim via GitHub's suggestion feature. Set fix_is_inline=true only if it's a clean replacement for those specific lines. If the fix requires changes elsewhere or is structural, omit suggested_fix or set fix_is_inline=false.
 
 Score each finding 0-100 on confidence it is a real NEW issue in this diff.`
 

@@ -74,11 +74,11 @@ The workflow:
 
 **Branch:** `<branch>` → `<base>`
 **Files Changed:** N files (+added/-removed lines)
-**Agents:** N review agents, N findings verified
+**Agents:** N review agents
 
 ### Issues Found
 
-**1. <title>** (Score: N, Severity: high)
+**1. <title>** (Severity: high, Score: N)
 - **Location:** `file.py:42-45`
 - **Category:** bug
 - **Details:** <description>
@@ -89,7 +89,7 @@ The workflow:
 \`\`\`
 
 ### Summary
-N raw findings → N after dedup → N confirmed after verification
+N raw findings → N after dedup → N challenged by adversarial verifiers → N survived
 
 ### Verdict: [Clean | Needs Attention | Needs Work]
 ```
@@ -98,27 +98,39 @@ N raw findings → N after dedup → N confirmed after verification
 
 CRITICAL: Use `--input -` with a heredoc. The `--field 'comments[0][...]'` syntax does NOT produce valid JSON arrays and GitHub will reject it.
 
+**Inline suggestion rules:**
+- `suggested_fix` MUST be the actual replacement code for those exact lines — not a description, not a pointer. GitHub's "Apply suggestion" button replaces the highlighted lines verbatim with whatever is in the suggestion block.
+- If the fix is not a clean line replacement (e.g. a multi-file change, or adding a new function elsewhere), do NOT use a suggestion block. Use a plain code block instead.
+- For findings with suggestions, also include a link to the file+line in the PR review body so the author can navigate directly.
+
 ```bash
 gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
   --method POST --input - <<'EOF'
 {
   "event": "<APPROVE|REQUEST_CHANGES|COMMENT>",
-  "body": "## Code Review Summary\n\nN issues found. Reviewed by N agents with adversarial verification.",
+  "body": "## Code Review\n\nN issues found (N critical, N high). Reviewed by N specialized agents with adversarial verification.\n\n### Issues\n- [**Title 1**](https://github.com/{owner}/{repo}/blob/{head_sha}/src/file.py#L42) — brief reason\n- [**Title 2**](https://github.com/{owner}/{repo}/blob/{head_sha}/src/file2.py#L87) — brief reason",
   "comments": [
     {
       "path": "src/file.py",
       "line": 42,
-      "body": "**Title** (category, severity — Score: N)\n\nDescription.\n\n```suggestion\nsuggested fix code\n```"
+      "body": "**Title** (category, severity)\n\nDescription of the issue and why it matters.\n\n```suggestion\nexact replacement code for these lines\n```"
+    },
+    {
+      "path": "src/file2.py",
+      "line": 87,
+      "body": "**Title** (category, severity)\n\nDescription. Fix requires changes in multiple places — see summary above.\n\n```python\n// example of the fix pattern\n```"
     }
   ]
 }
 EOF
 ```
 
-Build the `comments` array from the workflow's `confirmed` findings:
-- `path` = finding.file
-- `line` = finding.line_end (GitHub uses the last line of the hunk)
-- `body` = formatted finding with title, description, and suggestion block if `suggested_fix` exists
+Build the review:
+- `body` = summary with a linked list of all findings (`[Title](github-url#Lline)`)
+- `comments[].path` = finding.file
+- `comments[].line` = finding.line_end
+- `comments[].body` = title, description, then either a `suggestion` block (if fix is a clean line replacement) or a plain code block (if fix spans multiple locations)
+- To build file links: get the PR head SHA with `gh pr view {number} --repo {repo} --json headRefOid -q .headRefOid`
 
 Verdict mapping:
 - **APPROVE** — 0 confirmed issues
