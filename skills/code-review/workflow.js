@@ -56,6 +56,10 @@ const CONTEXT_SCHEMA = {
     changedFiles: { type: 'array', items: { type: 'string' } },
     diffStat: { type: 'string' },
     claudeMdContent: { type: 'string', description: 'Concatenated content of all CLAUDE.md files found' },
+    isIncremental: { type: 'boolean', description: 'true if diff is scoped to changes since last review' },
+    lastReviewSha: { type: 'string', description: 'Commit SHA from last review, if found' },
+    currentSha: { type: 'string', description: 'Current PR head SHA' },
+    previousComments: { type: 'string', description: 'JSON string of inline comments from the last review — path, line, body for each' },
   },
   required: ['diffCommand', 'diffContent', 'changedFiles', 'diffStat'],
 }
@@ -79,7 +83,52 @@ log(`Args — scope: ${scope}, repo: ${repo}, prNumber: ${prNumber}`)
 phase('Context')
 
 let contextPrompt
-if (scope === 'pr' && repo && prNumber) {
+if (scope === 'incremental' && repo && prNumber) {
+  log(`Incremental re-review for PR #${prNumber} on ${repo} — finding last review commit`)
+  contextPrompt = `Gather context for an INCREMENTAL re-review of PR #${prNumber} on ${repo}.
+Goal: review only what changed since the last review, and check if previously raised issues were addressed.
+
+Step 1 — Find the last review by this user:
+  MY_LOGIN=$(gh api user -q .login)
+  gh api repos/${repo}/pulls/${prNumber}/reviews \\
+    --jq --arg login "$MY_LOGIN" '[.[] | select(.user.login == $login)] | sort_by(.submitted_at) | last | {id: .id, commit_id: .commit_id, submitted_at: .submitted_at}'
+  → If result is empty/null: no previous review found, set isIncremental=false and skip to Step 4.
+  → Otherwise: note LAST_REVIEW_ID and LAST_REVIEW_SHA (commit_id)
+
+Step 2 — Fetch inline comments from that review:
+  gh api repos/${repo}/pulls/${prNumber}/reviews/LAST_REVIEW_ID/comments \\
+    --jq '[.[] | {path: .path, line: .line, body: .body, resolved: (.position == null)}]'
+  → Return this as previousComments (JSON string). These are the issues previously flagged.
+
+Step 3 — Get current PR head SHA:
+  gh pr view ${prNumber} --repo ${repo} --json headRefOid -q .headRefOid
+  → CURRENT_SHA
+
+Step 4 — Get the diff:
+  If isIncremental=false (no previous review), do a full PR diff:
+    gh pr diff ${prNumber} --repo ${repo}
+    gh pr view ${prNumber} --repo ${repo} --json additions,deletions,changedFiles \\
+      --template '{{.changedFiles}} files changed, {{.additions}} insertions(+), {{.deletions}} deletions(-)'
+    Set diffCommand to: gh pr diff ${prNumber} --repo ${repo}
+
+  If isIncremental=true and LAST_REVIEW_SHA != CURRENT_SHA, get only changes since last review:
+    gh api repos/${repo}/compare/LAST_REVIEW_SHA...CURRENT_SHA \\
+      --jq '[.files[] | {filename: .filename, patch: .patch, additions: .additions, deletions: .deletions}]'
+    Build diffContent: for each file → "diff --git a/{filename} b/{filename}\\n{patch}\\n"
+    Build changedFiles from filenames (skip files with null patch — binary files).
+    Build diffStat: count total additions/deletions across files.
+    Set diffCommand to: gh api repos/${repo}/compare/LAST_REVIEW_SHA...CURRENT_SHA
+
+  If LAST_REVIEW_SHA == CURRENT_SHA: no new commits since last review. Return changedFiles=[] and diffContent="".
+
+Step 5 — Find CLAUDE.md files:
+  find . -name 'CLAUDE.md' -maxdepth 3 -not -path '*/node_modules/*' 2>/dev/null
+  → concatenate contents into claudeMdContent
+
+Return: diffCommand, diffContent, changedFiles (array), diffStat, claudeMdContent, isIncremental, lastReviewSha, currentSha, previousComments.
+IMPORTANT: diffContent must be complete. Do not truncate.`
+
+} else if (scope === 'pr' && repo && prNumber) {
   log(`Fetching diff for PR #${prNumber} on ${repo}`)
   contextPrompt = `Gather ALL context for reviewing GitHub PR #${prNumber} on ${repo}.
 
@@ -127,7 +176,7 @@ const ctx = await agent(contextPrompt, {
 
 if (!ctx || !ctx.changedFiles || ctx.changedFiles.length === 0) {
   log('No changed files found — nothing to review')
-  return { confirmed: [], stats: { total: 0, deduped: 0, verified: 0, confirmed: 0, agentCount: 0 } }
+  return { confirmed: [], stats: { total: 0, confirmed: 0, agentCount: 0 } }
 }
 
 const diffCommand = ctx.diffCommand
@@ -135,8 +184,18 @@ const diffContent = ctx.diffContent || ''
 const changedFiles = ctx.changedFiles
 const diffStat = ctx.diffStat || ''
 const claudeMdContent = ctx.claudeMdContent || ''
+const isIncremental = ctx.isIncremental || false
+const lastReviewSha = ctx.lastReviewSha || null
+const currentSha = ctx.currentSha || null
+const previousComments = ctx.previousComments || null
 
-log(`${changedFiles.length} files, diff is ${diffContent.length} chars`)
+if (isIncremental && lastReviewSha) {
+  log(`Incremental review: changes from ${lastReviewSha.substring(0, 8)} → ${(currentSha || 'HEAD').substring(0, 8)} (${changedFiles.length} files)`)
+} else if (isIncremental) {
+  log(`No previous review found — falling back to full PR diff`)
+} else {
+  log(`Full review: ${changedFiles.length} files, diff is ${diffContent.length} chars`)
+}
 
 // --- Detect languages ---
 
@@ -172,11 +231,21 @@ const falsePositiveGuidance = `
 DO NOT flag: pre-existing issues, linter/type issues, issues on unmodified lines, pure style nitpicks, intentional behavior.
 DO flag even if minor: missing error handling, edge case gaps, null access without guards, resource leaks, test gaps, security vulns.`
 
+const previousCommentsSection = (isIncremental && previousComments)
+  ? `\n\n## Issues Raised in Last Review\n\nThese are the inline comments posted during the last review. For each, check if the new diff addresses it:\n\n\`\`\`json\n${previousComments}\n\`\`\`\n\nFor each previous comment: does the new code resolve the concern? Flag any that are still unaddressed as findings (category: "convention", title: "Unresolved: {original title}").`
+  : ''
+
+const reviewScope = isIncremental && lastReviewSha
+  ? `INCREMENTAL RE-REVIEW: This diff shows ONLY changes made since the last review (commit ${lastReviewSha.substring(0, 8)}). Focus on: (1) new issues in the changed code, (2) whether previously raised issues (listed above) are resolved.`
+  : `FULL PR REVIEW: This diff shows all changes in the PR.`
+
 // The diff is embedded directly — agents do NOT run git/gh commands to get it
 const buildPrompt = (role, focus) => `${role}
-${rulesInstruction}${guidelinesSection}
+${rulesInstruction}${guidelinesSection}${previousCommentsSection}
 
 ## Diff Under Review
+
+${reviewScope}
 
 Changed files: ${changedFiles.join(', ')}
 Stats: ${diffStat}
@@ -307,7 +376,7 @@ const allFindings = reviews.filter(Boolean).flatMap(r => r.findings)
 log(`Found ${allFindings.length} raw findings across ${agentConfig.length} agents`)
 
 if (allFindings.length === 0) {
-  return { confirmed: [], stats: { total: 0, deduped: 0, verified: 0, confirmed: 0, agentCount: agentConfig.length } }
+  return { confirmed: [], stats: { total: 0, confirmed: 0, agentCount: agentConfig.length } }
 }
 
 // --- Dedup ---
@@ -345,7 +414,7 @@ if (allWorthVerifying.length > MAX_VERIFIERS) {
 log(`${worthVerifying.length} findings to verify`)
 
 if (worthVerifying.length === 0) {
-  return { confirmed: [], stats: { total: allFindings.length, deduped: deduped.length, verified: 0, confirmed: 0, agentCount: agentConfig.length } }
+  return { confirmed: [], stats: { total: allFindings.length, confirmed: 0, agentCount: agentConfig.length } }
 }
 
 // --- Phase 3: Adversarial Verification ---
@@ -413,10 +482,12 @@ log(`${confirmed.length} findings confirmed (${worthVerifying.length - confirmed
 
 return {
   confirmed,
+  isIncremental,
+  lastReviewSha,
+  currentSha,
+  previousComments,
   stats: {
     total: allFindings.length,
-    deduped: deduped.length,
-    verified: worthVerifying.length,
     confirmed: confirmed.length,
     agentCount: agentConfig.length,
   },

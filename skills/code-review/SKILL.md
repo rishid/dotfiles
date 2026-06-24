@@ -13,11 +13,12 @@ Multi-agent code review with adversarial verification. Scales agent count by dif
 
 Determine what to review:
 
-1. **User specifies PR** — `review PR 123` or a GitHub PR URL → scope is `pr`
-2. **User specifies commit** — `review commit abc123` → scope is `commit`
-3. **On a feature branch** (not main/master) → scope is `branch`
-4. **On main/master with staged changes** → scope is `staged`
-5. **On main/master, nothing staged** → scope is `commit`
+1. **User says "re-review", "incremental", "check changes since my review"** → scope is `incremental`
+2. **User specifies PR** — `review PR 123` or a GitHub PR URL → scope is `pr`
+3. **User specifies commit** — `review commit abc123` → scope is `commit`
+4. **On a feature branch** (not main/master) → scope is `branch`
+5. **On main/master with staged changes** → scope is `staged`
+6. **On main/master, nothing staged** → scope is `commit`
 
 For PR reviews, extract the repo (`owner/repo`) and PR number from the URL or user input. If not obvious, run:
 ```bash
@@ -36,6 +37,19 @@ Workflow({
   scriptPath: "<this skill's directory>/workflow.js",
   args: {
     "scope": "pr",
+    "repo": "owner/repo",
+    "prNumber": 123,
+    "skillDir": "<absolute path to this skill's directory>"
+  }
+})
+```
+
+**For incremental re-reviews** (changes since last review):
+```
+Workflow({
+  scriptPath: "<this skill's directory>/workflow.js",
+  args: {
+    "scope": "incremental",
     "repo": "owner/repo",
     "prNumber": 123,
     "skillDir": "<absolute path to this skill's directory>"
@@ -89,7 +103,9 @@ The workflow:
 \`\`\`
 
 ### Summary
-N raw findings → N after dedup → N challenged by adversarial verifiers → N survived
+N findings across N agents → N confirmed after adversarial verification
+
+_(For incremental re-reviews, prefix the report title with "**Incremental Re-review** (changes since commit `{lastReviewSha[:8]}`):")_
 
 ### Verdict: [Clean | Needs Attention | Needs Work]
 ```
