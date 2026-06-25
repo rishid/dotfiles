@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Install agent skills via npx skills CLI
 # Re-runs whenever this file changes OR any skill in skills/ changes
-# skills-hash: {{ output "find" (joinPath .chezmoi.sourceDir "..") "-path" "*/skills/*/SKILL.md" "-exec" "cat" "{}" "+" | sha256sum }}
+# skills-hash: {{ output "find" (joinPath .chezmoi.sourceDir ".." "skills") "-type" "f" "-exec" "cat" "{}" "+" | sha256sum }}
 set -euo pipefail
 
 # Disable telemetry
