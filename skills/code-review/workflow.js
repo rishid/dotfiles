@@ -249,11 +249,17 @@ const reviewScope = isIncremental && lastReviewSha
   ? `INCREMENTAL RE-REVIEW: This diff shows ONLY changes made since the last review (commit ${lastReviewSha.substring(0, 8)}). Focus on: (1) new issues in the changed code, (2) whether previously raised issues (listed above) are resolved.`
   : `FULL PR REVIEW: This diff shows all changes in the PR.`
 
-const tokenRules = `
+const tokenRulesDefault = `
 IMPORTANT TOKEN EFFICIENCY RULES:
 - The diff above contains ALL the changes. Do NOT re-fetch it with git or gh commands.
 - Do NOT read full file contents unless you need surrounding context to confirm a specific bug.
 - Limit file reads to at most 5 files, only when the diff alone is ambiguous.
+- Return at most 7 findings, prioritized by severity. Quality over quantity.`
+
+const tokenRulesDeep = `
+TOKEN RULES:
+- The diff above contains ALL the changes. Do NOT re-fetch it with git or gh commands.
+- You MAY read source files and framework/library internals to confirm bugs — up to 10 file reads.
 - Return at most 7 findings, prioritized by severity. Quality over quantity.`
 
 const fixInstructions = `
@@ -261,7 +267,9 @@ For suggested_fix: provide the EXACT replacement lines of code, not a descriptio
 
 Score each finding 0-100 on confidence it is a real NEW issue in this diff.`
 
-const buildPrompt = (role, focus) => `${role}
+const buildPrompt = (role, focus, opts) => {
+  const rules = (opts && opts.deep) ? tokenRulesDeep : tokenRulesDefault
+  return `${role}
 ${rulesInstruction}${guidelinesSection}${previousCommentsSection}
 
 ## Diff Under Review
@@ -277,8 +285,9 @@ ${diffContent}
 
 ${focus}
 ${falsePositiveGuidance}
-${tokenRules}
+${rules}
 ${fixInstructions}`
+}
 
 // --- Agent config: 3 base + conditional agents ---
 
@@ -298,22 +307,22 @@ agentConfig.push({
 **Guard correctness**: Does each conditional handle the actual type space? (null, 0, "", empty arrays, etc.)
 **Incomplete coverage**: For switch/if-else chains, are all runtime inputs handled? Missing default/else?
 
-**Exception/error handling audit** — for every error handling site in the diff:
-- Empty catch/except blocks are critical defects, no exceptions.
-- Catch blocks that only log and continue: is the error truly recoverable, or is this hiding a problem?
-- **Broad exception catching with mismatched handlers**: Does \`except Exception\` / \`catch (Exception e)\` dispatch to a handler that expects a specific exception subtype? (e.g., handler accesses \`.detail\` which only exists on HTTPException, not on all Exceptions). List the unexpected error types this could swallow and crash on.
-- Fallback/default values on failure without logging: is the caller aware the fallback happened?
-- Optional chaining (\`?.\`) or null coalescing (\`??\`) that silently skips operations that should not be skippable.
+**Error handling audit** — for every error handling site in the diff:
+- Empty catch/except blocks are critical defects.
+- Broad catch dispatching to a handler that assumes a narrower type — trace all exception types that can reach the handler and check if the handler's attribute accesses are valid for each.
+- Catch-and-continue: is the error truly recoverable, or is this masking a failure?
+- Fallback/default values on failure without logging.
+- Optional chaining or null coalescing that silently skips operations that should not be skippable.
 
-**Framework/library integration bugs** — when code replaces or wraps framework components:
-- Does new middleware/decorator logic preserve framework behaviors (header injection, hooks, decorators)?
-- When calling framework internals with non-standard arguments (e.g., \`endpoint=None\`, \`handler=None\`), does this bypass features that should run?
-- Are private API imports (leading underscore) used? These have no stability guarantee and may break.
-- When old code is replaced, list the behaviors the old code had that the new code might be missing.
+**Framework/library integration** — when code replaces or wraps framework components:
+- Does the replacement preserve all behaviors of the original? Think about what the old code did that the new code might not.
+- When calling framework internals with unusual arguments, trace what happens inside — which features get silently bypassed?
+- Private API imports (underscore-prefixed) from third-party libraries have no stability guarantee.
 
 **Cross-function contracts**: If a changed function calls or is called by another changed function, verify the contract (types, nullability, error propagation) is honored in both directions.
 
-Only read a source file if the diff alone is genuinely ambiguous about a specific bug. Most issues are visible from the diff.`
+Only read a source file if the diff alone is genuinely ambiguous about a specific bug. Most issues are visible from the diff.`,
+    { deep: true }
   ),
 })
 
@@ -347,11 +356,15 @@ agentConfig.push({
 - For each removal: is there a replacement in the \`+\` lines, or was it dropped entirely?
 - If dropped: could any caller, config, test, or downstream system still depend on it?
 
-**Replacement completeness** — when middleware, decorators, or framework components are replaced:
-- List the behaviors/features the OLD component provided (check its docs or source if available in context).
-- Verify each behavior is present in the NEW implementation.
-- Examples: header injection, hook execution, decorator processing, error handling paths.
-- If the old component called framework features (e.g., \`_find_route_handler\`, \`_inject_headers\`), does the new code still call them OR intentionally skip them? If skipped, is there a comment explaining why?
+**Replacement completeness** — when code replaces a framework/library component with a custom implementation:
+- What behaviors did the OLD component provide? Read its source or docs to build the list.
+- Verify each behavior is present in the NEW implementation, or explicitly documented as intentionally skipped.
+- If behaviors are missing and undocumented, flag them.
+
+**Framework internals trace** — when new code calls library/framework methods with unusual arguments (None, empty, non-standard values):
+- READ the source of that method (locate it via grep in site-packages or \`python -c "import X; print(X.__file__)"\`).
+- Trace what happens with the unusual argument: which code paths are skipped? Which features are silently disabled?
+- Flag any silently-disabled features. These are the highest-value bugs — hard to catch, dangerous in production.
 
 **Cross-file caller/callee impact** — for each function/method whose signature, return type, error behavior, or side effects changed:
 - Read at most 3 key callers (use grep to find them, then read only the relevant section) to verify they handle the new contract.
@@ -360,7 +373,8 @@ agentConfig.push({
 
 ${hasSignificantDeletions ? 'This diff has significant deletions — be thorough on the removed-behavior audit.' : 'This diff has few deletions — focus more on cross-file impact.'}
 
-Limit yourself to at most 10 tool calls total (grep + targeted file reads).`
+Limit yourself to at most 15 tool calls total (grep + targeted file reads). Spend more of your budget on framework internals traces when the diff wraps/replaces framework components.`,
+    { deep: true }
   ),
 })
 
@@ -411,7 +425,10 @@ Ask yourself:
 - Are there behaviors that exist in the old code that are simply missing from the new code?
 
 Go deep on a few real issues. Do not surface style or preference nitpicks.
-Prioritize: correctness > reliability > security > maintainability.`
+Prioritize: correctness > reliability > security > maintainability.
+
+If the diff replaces or wraps framework/library components, READ the framework source to understand what the old code did vs what the new code does. This is where the worst bugs hide.`,
+    { deep: true }
   ),
 })
 
@@ -429,6 +446,11 @@ if (fileCount >= 10 || hasTestFiles) {
 - Are error/exception paths tested?
 - Are edge cases (empty input, boundary values, concurrent access) covered?
 - Do tests verify behavior and contracts, not implementation details?
+
+**Test correctness** — for each test in the diff, verify the test body matches its name/docstring:
+- Does the test actually exercise the code path its name claims? (e.g., a test named \`test_non_http_scopes\` that only makes HTTP requests is lying.)
+- Does the test use assertions that would fail if the behavior it claims to test were broken? Trace: if I deleted the code under test, would this test fail?
+- Are there tests that would pass even if the feature they claim to cover were completely removed?
 
 **Simplification** — look for unnecessary complexity:
 - Premature abstractions (helpers/wrappers used exactly once)?
@@ -566,9 +588,9 @@ Based ONLY on the diff above, answer these questions:
 - For impact-analysis findings: does the diff show callers being updated?
 
 **To confirm (finding is real):**
-- For exception-handling: trace ALL error types that can reach the handler. If the handler accesses a subclass attribute (e.g., .detail, .status_code), can a non-subclass exception reach it?
-- For framework-integration: does the new code preserve the old code's behaviors (header injection, decorator processing, exemption checks)? If a behavior is missing, is there an explicit comment explaining why?
-- For latent bugs: does the issue exist even if the bad path is rarely triggered?
+- For exception-handling: trace ALL types that can reach the handler. Can the handler's code actually run on each of those types?
+- For framework-integration: does the new code preserve the old code's behaviors? If a behavior is missing with no comment, that's real.
+- For latent bugs: does the issue exist even if the bad path is rarely triggered? Latent bugs are real bugs.
 
 **Scoring guidance by category:**
 - bug / failure-mode / security: Confirm unless you can PROVE the code is correct. Uncertainty defaults to confirmed.

@@ -48,8 +48,7 @@ Load alongside `universal.md`. Only Python-specific rules here.
 - Flag `except Exception: pass` — silently swallows errors
 - Flag `raise e` instead of `raise` — loses original traceback
 - Flag overly broad `except` when `try` covers multiple distinct operations
-- **Flag exception type mismatches**: `except Exception as e:` followed by code that accesses attributes specific to a subclass (e.g., `e.detail` which only exists on `HTTPException`). If non-HTTPException is raised, accessing `.detail` crashes with `AttributeError`.
-- Flag dispatching caught exceptions to handlers that expect specific exception types without type checking first
+- Flag exception type mismatches — broad catch dispatching to code that assumes a narrower type
 
 ---
 
@@ -69,7 +68,7 @@ Load alongside `universal.md`. Only Python-specific rules here.
 - Mutable default arguments (`def foo(items=[])`) — shared across calls
 - `import *` — pollutes namespace, hides dependencies
 - Missing type hints on public functions/methods
-- **Private API imports**: Importing symbols with leading underscore from third-party libraries (e.g., `from slowapi import _rate_limit_exceeded_handler`) — no stability guarantee, may break on version bumps. Prefer public APIs or copy the implementation.
+- Importing private (underscore-prefixed) symbols from third-party libraries — no stability guarantee
 
 ---
 
