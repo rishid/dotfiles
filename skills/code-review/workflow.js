@@ -239,7 +239,9 @@ const falsePositiveGuidance = `
 - Issues a linter or type checker would catch
 - Intentional behavior evident from comments or context
 - Code that "could be better" but isn't wrong
-- Potential issues that depend on specific inputs or runtime state you cannot verify from the diff`
+- Potential issues that depend on specific inputs or runtime state you cannot verify from the diff
+- **Missing files**: A file not appearing in this diff does NOT mean it doesn't exist. The diff only shows changed files. Other files may already be present in the repository. Never flag "file X doesn't exist" based on its absence from the diff alone.
+- **Tool/platform capability claims**: Do NOT assert that a tool, service, CI system, or package manager does not support a feature based on your training data — your knowledge has a cutoff and these ecosystems evolve rapidly. Only flag if there is explicit evidence in the diff (e.g., an error message in a comment, a locked version that predates the feature).
 
 const previousCommentsSection = (isIncremental && previousComments)
   ? `\n\n## Issues Raised in Last Review\n\nThese are the inline comments posted during the last review:\n\n\`\`\`json\n${previousComments}\n\`\`\`\n\nFor unresolved previous comments: only re-surface as a finding if the issue is clearly critical or high severity (a real bug, security issue, or data integrity risk). Do NOT re-flag unresolved low-severity, style, or convention issues — the contributor has seen them and they are their call to address.`
@@ -586,6 +588,8 @@ Based ONLY on the diff above, answer these questions:
 - Is this pre-existing, not introduced in the + lines?
 - For removed-behavior findings: is there a replacement in the + lines the reviewer missed?
 - For impact-analysis findings: does the diff show callers being updated?
+- **File existence claims**: If the finding says a file doesn't exist — the diff only shows *changed* files. Other files may already be in the repo. Refute these claims unless the diff itself shows the file being deleted.
+- **Tool/platform capability claims**: If the finding claims a tool or service doesn't support a feature (e.g., "Dependabot doesn't support X", "GitHub Actions doesn't allow Y") — training data has a cutoff and ecosystems change. Refute unless the diff contains explicit evidence (e.g., a pinned version that predates the feature, an error comment).
 
 **To confirm (finding is real):**
 - For exception-handling: trace ALL types that can reach the handler. Can the handler's code actually run on each of those types?

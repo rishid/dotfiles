@@ -13,5 +13,5 @@ function claudecr -d "Code review with bypass mode - pass PR URL, number, or tex
     end
 
     set -l input (string join " " $argv)
-    claude --dangerously-skip-permissions --model sonnet "/code-review $input"
+    claude --dangerously-skip-permissions --model claude-sonnet-4-6 "/code-review $input"
 end
