@@ -21,7 +21,7 @@ const FINDING_SCHEMA = {
           line_end: { type: 'integer' },
           category: {
             type: 'string',
-            enum: ['bug', 'security', 'failure-mode', 'edge-case', 'convention', 'test-gap', 'performance', 'simplification'],
+            enum: ['bug', 'security', 'failure-mode', 'edge-case', 'convention', 'test-gap', 'performance', 'simplification', 'removed-behavior', 'bandaid'],
           },
           severity: { type: 'string', enum: ['critical', 'high', 'medium', 'low'] },
           title: { type: 'string', description: 'Under 80 chars' },
@@ -215,6 +215,10 @@ const detectedLangs = [...new Set(
   }).filter(Boolean)
 )]
 
+// --- Detect if diff has deletions worth auditing ---
+
+const hasSignificantDeletions = (diffContent.match(/^-[^-]/gm) || []).length > 5
+
 // --- Build shared prompt parts (diff is INLINE, not fetched per agent) ---
 
 const rulesInstruction = skillDir ? [
@@ -228,8 +232,14 @@ const guidelinesSection = claudeMdContent
   : ''
 
 const falsePositiveGuidance = `
-DO NOT flag: pre-existing issues, linter/type issues, issues on unmodified lines, pure style nitpicks, intentional behavior.
-DO flag even if minor: missing error handling, edge case gaps, null access without guards, resource leaks, test gaps, security vulns.`
+## What NOT to flag (false positives erode trust)
+- Pre-existing issues not introduced in this diff
+- Issues on unmodified lines (context lines without + prefix)
+- Pure style/formatting nitpicks unless CLAUDE.md explicitly requires them
+- Issues a linter or type checker would catch
+- Intentional behavior evident from comments or context
+- Code that "could be better" but isn't wrong
+- Potential issues that depend on specific inputs or runtime state you cannot verify from the diff`
 
 const previousCommentsSection = (isIncremental && previousComments)
   ? `\n\n## Issues Raised in Last Review\n\nThese are the inline comments posted during the last review:\n\n\`\`\`json\n${previousComments}\n\`\`\`\n\nFor unresolved previous comments: only re-surface as a finding if the issue is clearly critical or high severity (a real bug, security issue, or data integrity risk). Do NOT re-flag unresolved low-severity, style, or convention issues — the contributor has seen them and they are their call to address.`
@@ -239,7 +249,18 @@ const reviewScope = isIncremental && lastReviewSha
   ? `INCREMENTAL RE-REVIEW: This diff shows ONLY changes made since the last review (commit ${lastReviewSha.substring(0, 8)}). Focus on: (1) new issues in the changed code, (2) whether previously raised issues (listed above) are resolved.`
   : `FULL PR REVIEW: This diff shows all changes in the PR.`
 
-// The diff is embedded directly — agents do NOT run git/gh commands to get it
+const tokenRules = `
+IMPORTANT TOKEN EFFICIENCY RULES:
+- The diff above contains ALL the changes. Do NOT re-fetch it with git or gh commands.
+- Do NOT read full file contents unless you need surrounding context to confirm a specific bug.
+- Limit file reads to at most 5 files, only when the diff alone is ambiguous.
+- Return at most 7 findings, prioritized by severity. Quality over quantity.`
+
+const fixInstructions = `
+For suggested_fix: provide the EXACT replacement lines of code, not a description. It will be applied verbatim via GitHub's suggestion feature. Set fix_is_inline=true only if it's a clean replacement for those specific lines. If the fix requires changes elsewhere or is structural, omit suggested_fix or set fix_is_inline=false.
+
+Score each finding 0-100 on confidence it is a real NEW issue in this diff.`
+
 const buildPrompt = (role, focus) => `${role}
 ${rulesInstruction}${guidelinesSection}${previousCommentsSection}
 
@@ -256,101 +277,145 @@ ${diffContent}
 
 ${focus}
 ${falsePositiveGuidance}
+${tokenRules}
+${fixInstructions}`
 
-IMPORTANT TOKEN EFFICIENCY RULES:
-- The diff above contains ALL the changes. Do NOT re-fetch it with git or gh commands.
-- Do NOT read full file contents unless you need surrounding context to confirm a specific bug.
-- Limit file reads to at most 5 files, only when the diff alone is ambiguous.
-- Return at most 7 findings, prioritized by severity. Quality over quantity.
-
-For suggested_fix: provide the EXACT replacement lines of code, not a description. It will be applied verbatim via GitHub's suggestion feature. Set fix_is_inline=true only if it's a clean replacement for those specific lines. If the fix requires changes elsewhere or is structural, omit suggested_fix or set fix_is_inline=false.
-
-Score each finding 0-100 on confidence it is a real NEW issue in this diff.`
-
-// --- Scale agents: 3 base, +1 at 10 files, +1 at 20 files (max 5) ---
+// --- Agent config: 3 base + conditional agents ---
 
 const fileCount = changedFiles.length
 const agentConfig = []
 
-// Always: combined bug + failure mode scanner
+// --- Agent 1: Bug hunter + silent failure auditor (always) ---
 agentConfig.push({
   label: 'bugs-and-failures',
   effort: 'high',
   prompt: buildPrompt(
-    'You are a bug hunter and failure mode analyst.',
-    `Scan the diff for bugs at multiple depths:
+    'You are a bug hunter and error handling auditor. You have zero tolerance for code that will produce wrong results or silently swallow errors.',
+    `Scan the diff for bugs at multiple depths and audit every error handling path:
 
-**Surface**: Typos, wrong variable names, missing returns, copy-paste errors.
-**Logic**: Trace conditionals/loops with concrete inputs. For each branch, what input takes that path?
-**Failure modes**: For each operation — what if it fails? Null returns, exceptions, unhandled rejections, timeouts.
-**Edge cases**: Empty inputs, boundary values, malformed data, zero/negative values.
-**Cross-function**: If a changed function calls another changed function, verify the contract is honored.
-**Guard correctness**: Does each conditional handle the actual type space? (null, 0, "", arrays, etc.)
-**Incomplete coverage**: For switch/if-else chains, are all runtime inputs handled?
+**Surface bugs**: Typos, wrong variable names, missing returns, copy-paste errors, off-by-one.
+**Logic bugs**: Trace conditionals and loops with concrete inputs. For each branch, what input takes that path? Would it produce the right result?
+**Guard correctness**: Does each conditional handle the actual type space? (null, 0, "", empty arrays, etc.)
+**Incomplete coverage**: For switch/if-else chains, are all runtime inputs handled? Missing default/else?
+
+**Silent failure audit** — for every error handling site in the diff:
+- Empty catch/except blocks are critical defects, no exceptions.
+- Catch blocks that only log and continue: is the error truly recoverable, or is this hiding a problem?
+- Broad exception catching (bare \`except:\`, \`catch (Exception e)\`): list the unexpected error types this could swallow.
+- Fallback/default values on failure without logging: is the caller aware the fallback happened?
+- Optional chaining (\`?.\`) or null coalescing (\`??\`) that silently skips operations that should not be skippable.
+
+**Cross-function contracts**: If a changed function calls or is called by another changed function, verify the contract (types, nullability, error propagation) is honored in both directions.
 
 Only read a source file if the diff alone is genuinely ambiguous about a specific bug. Most issues are visible from the diff.`
   ),
 })
 
-// Always: security
+// --- Agent 2: Security (always) ---
 agentConfig.push({
   label: 'security',
   prompt: buildPrompt(
-    'You are a security specialist.',
+    'You are a security specialist focused exclusively on vulnerabilities introduced in this diff.',
     `Check for:
-- **Injection**: SQL, command, XSS, template injection via string interpolation
-- **Auth/Authz**: Missing checks, privilege escalation, insecure sessions
-- **Secrets**: Hardcoded credentials, API keys, tokens
-- **Input validation**: Missing validation at trust boundaries
-- **Data exposure**: Error messages leaking internals, PII in logs
-- **Unsafe ops**: Deserialization of untrusted data, path traversal`
+- **Injection**: SQL, command, XSS, template injection via string interpolation — require parameterized queries or safe APIs
+- **Auth/Authz**: Missing checks, privilege escalation, insecure sessions, token handling
+- **Secrets**: Hardcoded credentials, API keys, tokens, connection strings — require env vars or secrets manager
+- **Input validation**: Missing validation at trust boundaries (user input, external APIs, deserialized data)
+- **Data exposure**: Error messages leaking internals, PII in logs, overly verbose debug output
+- **Unsafe ops**: Deserialization of untrusted data, path traversal, SSRF, open redirects
+- **Crypto**: Weak algorithms, hardcoded IVs/salts, custom crypto instead of standard libraries`
   ),
 })
 
-// Always: conventions + simplification + tests (combined to save an agent)
+// --- Agent 3: Removed behavior + cross-file impact (always) ---
 agentConfig.push({
-  label: 'quality-and-tests',
+  label: 'impact-analysis',
   prompt: buildPrompt(
-    'You are a code quality, test coverage, and simplification reviewer.',
-    `**Conventions**: Check compliance with project guidelines above (if any). Flag only explicit violations.
+    'You are a change impact analyst. You trace the blast radius of modifications — what was removed, what was changed, and who depends on it.',
+    `Two focus areas:
 
-**Test coverage**:
-- New code paths: Is there a corresponding test?
-- Error paths tested? Edge cases?
-- Critical paths (auth, data integrity): proportionate coverage?
+**Removed behavior audit** — examine every deleted line (lines starting with \`-\`) in the diff:
+- Was a function, method, class, endpoint, config key, or export removed or renamed?
+- Was a default value, fallback, or error handler removed?
+- Was a validation check, guard clause, or security check removed?
+- For each removal: is there a replacement in the \`+\` lines, or was it dropped entirely?
+- If dropped: could any caller, config, test, or downstream system still depend on it?
 
-**Simplification**:
-- Could this be simpler? Premature abstractions? Helpers used once?
-- Over-configured solutions for simple problems?
-- Could existing patterns/libraries handle this?`
+**Cross-file caller/callee impact** — for each function/method whose signature, return type, error behavior, or side effects changed:
+- Read at most 3 key callers (use grep to find them, then read only the relevant section) to verify they handle the new contract.
+- Check: does the caller handle new error types? Does it expect the old return shape? Does it pass arguments the new signature still accepts?
+- Flag if a changed function is exported/public and callers outside the diff may break.
+
+${hasSignificantDeletions ? 'This diff has significant deletions — be thorough on the removed-behavior audit.' : 'This diff has few deletions — focus more on cross-file impact.'}
+
+Limit yourself to at most 8 tool calls total (grep + targeted file reads).`
   ),
 })
 
-// 10+ files: add context/patterns agent
-if (fileCount >= 10) {
+// --- Agent 4: CLAUDE.md compliance (only when CLAUDE.md exists) ---
+if (claudeMdContent) {
   agentConfig.push({
-    label: 'context-and-patterns',
+    label: 'guidelines-compliance',
     prompt: buildPrompt(
-      'You are a historical context and pattern analyst.',
-      `Check if changes break established patterns or contradict existing code.
-Run git blame on at most 3 key modified files (the most complex ones) to understand why code was written that way.
-Check at most 2 sibling files for pattern consistency.
-Flag only issues where historical context reveals a real problem.
+      'You are a project guidelines compliance auditor. You verify that code changes follow the explicit rules in the project\'s CLAUDE.md files.',
+      `Your ONLY job is to check the diff against the Project Guidelines above.
 
-Limit yourself to at most 10 tool calls total.`
+For each rule in the CLAUDE.md:
+- Is it relevant to the files changed? (Only apply rules to files in matching directories.)
+- Does the new code (+lines) violate it?
+- Quote the exact rule being violated and the exact code that breaks it.
+
+DO NOT flag:
+- Rules that are guidance for AI assistants rather than code requirements
+- Violations on unchanged/context lines (only \`-\` prefix or no prefix)
+- Style preferences not explicitly stated as rules
+- Issues already silenced by lint-ignore comments or equivalent
+
+Only flag issues where you can cite BOTH the exact CLAUDE.md rule AND the exact violating code. If you cannot quote both, do not flag it.`
     ),
   })
 }
 
-// 20+ files: add performance + deployment agent
+// --- Agent 5: Quality, tests, altitude check (10+ files) ---
+if (fileCount >= 10) {
+  agentConfig.push({
+    label: 'quality-tests-altitude',
+    prompt: buildPrompt(
+      'You are a code quality, test coverage, and design altitude reviewer.',
+      `Three focus areas:
+
+**Test coverage** — for new/changed code paths:
+- Is there a corresponding test? If not, is this a critical path (auth, data integrity, financial) that MUST have one?
+- Are error/exception paths tested?
+- Are edge cases (empty input, boundary values, concurrent access) covered?
+- Do tests verify behavior and contracts, not implementation details?
+
+**Simplification** — look for unnecessary complexity:
+- Premature abstractions (helpers/wrappers used exactly once)?
+- Over-engineered solutions for simple problems?
+- Could existing project patterns or standard library features replace custom code?
+- Redundant code introduced across multiple files that could share a single implementation?
+
+**Altitude check** — is this the right fix at the right level?
+- Does this change fix the symptom but not the root cause? (e.g., adding a null check instead of fixing why the value is null)
+- Does it add a workaround that will need to be cleaned up later?
+- Is there a string/regex/manual approach where a proper parser, schema, or type would be more robust?
+- Is a retry/timeout being added to paper over an architectural issue?
+
+Be constructive — only flag altitude issues when there is a clearly better alternative, not just because the approach is "not ideal".`
+    ),
+  })
+}
+
+// --- Agent 6: Performance + deployment (20+ files) ---
 if (fileCount >= 20) {
   agentConfig.push({
     label: 'perf-and-deploy',
     prompt: buildPrompt(
       'You are a performance and deployment safety reviewer.',
-      `**Performance**: N+1 queries, blocking I/O in async, unnecessary recomputations, memory leaks, missing pagination.
-**Breaking changes**: Public API modifications? Consumer-breaking type changes?
-**Deployment**: Migration risks? Backwards compatibility? Rollback safety? Observability gaps?`
+      `**Performance**: N+1 queries, blocking I/O in async contexts, unnecessary recomputations, memory leaks (event listeners, closures, growing collections), missing pagination on unbounded queries.
+**Breaking changes**: Public API modifications? Changed response shapes? Removed exports? Consumer-breaking type changes?
+**Deployment**: Migration risks? Backwards compatibility with existing data? Rollback safety? Feature flags needed?`
     ),
   })
 }
@@ -418,8 +483,6 @@ if (worthVerifying.length === 0) {
 }
 
 // --- Phase 3: Adversarial Verification ---
-// Verifiers get the diff excerpt INLINE and must NOT use tools (no file reads, no git commands).
-// This keeps each verifier under ~5k tokens instead of 30-45k.
 
 phase('Verify')
 log(`Launching ${worthVerifying.length} adversarial verifiers (tool-free, diff inline)`)
@@ -453,6 +516,8 @@ Based ONLY on the diff above, try to refute:
 - Would the language/runtime prevent this?
 - Is this a style preference, not a correctness issue?
 - Could this be pre-existing (not introduced in the + lines)?
+- For removed-behavior findings: is there a replacement in the + lines that the reviewer missed?
+- For impact-analysis findings: does the diff itself show the callers being updated?
 
 Default to refuted=true if the diff doesn't clearly confirm the issue.
 Score 0-100. Below 70 = refuted.`,

@@ -1,4 +1,7 @@
 function claudecr -d "Code review with bypass mode - pass PR URL, number, or text"
+    # claudecr exists because the /review skill spawns many tools and bash commands,
+    # making interactive permission prompts extremely disruptive. This wrapper skips
+    # permissions and pins the model so reviews are consistent and uninterrupted.
     if test (count $argv) -eq 0
         echo "Usage: claudecr <PR_URL | PR_NUMBER | TEXT>"
         echo "Examples:"
@@ -10,5 +13,5 @@ function claudecr -d "Code review with bypass mode - pass PR URL, number, or tex
     end
 
     set -l input (string join " " $argv)
-    claude --dangerously-skip-permissions "review $input"
+    claude --dangerously-skip-permissions --model sonnet "/code-review $input"
 end
