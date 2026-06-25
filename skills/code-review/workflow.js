@@ -246,11 +246,12 @@ const previousCommentsSection = (isIncremental && previousComments)
 const reviewScope = isIncremental && lastReviewSha
   ? `INCREMENTAL RE-REVIEW: This diff shows ONLY changes made since the last review (commit ${lastReviewSha.substring(0, 8)}).
 
-Your two jobs, in priority order:
+Your three jobs, in priority order:
 1. **Verify fixes**: For each issue raised in the last review (listed above), check if the new diff addresses it. Report as a finding ONLY if a previously-flagged critical/high issue is still clearly broken. Do NOT re-flag low-severity or style issues.
 2. **Catch regressions**: Check if the new changes introduce NEW bugs. The contributor was editing code to fix review feedback — did they break something else in the process? Focus on logic errors, off-by-ones, and incomplete fixes.
+3. **Review new code**: If the diff contains changes unrelated to the previous review findings (new features, refactors, additions beyond what was requested), review that new code with the same rigor as a full review. New code sneaking in alongside fixes still needs proper review.
 
-Do NOT do a broad review. This is a focused follow-up, not a fresh review.`
+This is a focused follow-up — but "focused" means prioritizing fix verification, not ignoring new code.`
   : `FULL PR REVIEW: This diff shows all changes in the PR.`
 
 const tokenRules = `
