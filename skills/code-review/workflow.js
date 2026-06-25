@@ -3,7 +3,7 @@ export const meta = {
   description: 'Multi-agent code review with adversarial verification',
   phases: [
     { title: 'Context', detail: 'Gather diff and project guidelines' },
-    { title: 'Review', detail: 'Parallel specialized review agents', model: 'sonnet' },
+    { title: 'Review', detail: 'Parallel specialized + holistic review agents', model: 'sonnet' },
     { title: 'Verify', detail: 'Adversarial verification of findings', model: 'haiku' },
   ],
 }
@@ -298,12 +298,18 @@ agentConfig.push({
 **Guard correctness**: Does each conditional handle the actual type space? (null, 0, "", empty arrays, etc.)
 **Incomplete coverage**: For switch/if-else chains, are all runtime inputs handled? Missing default/else?
 
-**Silent failure audit** — for every error handling site in the diff:
+**Exception/error handling audit** — for every error handling site in the diff:
 - Empty catch/except blocks are critical defects, no exceptions.
 - Catch blocks that only log and continue: is the error truly recoverable, or is this hiding a problem?
-- Broad exception catching (bare \`except:\`, \`catch (Exception e)\`): list the unexpected error types this could swallow.
+- **Broad exception catching with mismatched handlers**: Does \`except Exception\` / \`catch (Exception e)\` dispatch to a handler that expects a specific exception subtype? (e.g., handler accesses \`.detail\` which only exists on HTTPException, not on all Exceptions). List the unexpected error types this could swallow and crash on.
 - Fallback/default values on failure without logging: is the caller aware the fallback happened?
 - Optional chaining (\`?.\`) or null coalescing (\`??\`) that silently skips operations that should not be skippable.
+
+**Framework/library integration bugs** — when code replaces or wraps framework components:
+- Does new middleware/decorator logic preserve framework behaviors (header injection, hooks, decorators)?
+- When calling framework internals with non-standard arguments (e.g., \`endpoint=None\`, \`handler=None\`), does this bypass features that should run?
+- Are private API imports (leading underscore) used? These have no stability guarantee and may break.
+- When old code is replaced, list the behaviors the old code had that the new code might be missing.
 
 **Cross-function contracts**: If a changed function calls or is called by another changed function, verify the contract (types, nullability, error propagation) is honored in both directions.
 
@@ -332,7 +338,7 @@ agentConfig.push({
   label: 'impact-analysis',
   prompt: buildPrompt(
     'You are a change impact analyst. You trace the blast radius of modifications — what was removed, what was changed, and who depends on it.',
-    `Two focus areas:
+    `Three focus areas:
 
 **Removed behavior audit** — examine every deleted line (lines starting with \`-\`) in the diff:
 - Was a function, method, class, endpoint, config key, or export removed or renamed?
@@ -341,6 +347,12 @@ agentConfig.push({
 - For each removal: is there a replacement in the \`+\` lines, or was it dropped entirely?
 - If dropped: could any caller, config, test, or downstream system still depend on it?
 
+**Replacement completeness** — when middleware, decorators, or framework components are replaced:
+- List the behaviors/features the OLD component provided (check its docs or source if available in context).
+- Verify each behavior is present in the NEW implementation.
+- Examples: header injection, hook execution, decorator processing, error handling paths.
+- If the old component called framework features (e.g., \`_find_route_handler\`, \`_inject_headers\`), does the new code still call them OR intentionally skip them? If skipped, is there a comment explaining why?
+
 **Cross-file caller/callee impact** — for each function/method whose signature, return type, error behavior, or side effects changed:
 - Read at most 3 key callers (use grep to find them, then read only the relevant section) to verify they handle the new contract.
 - Check: does the caller handle new error types? Does it expect the old return shape? Does it pass arguments the new signature still accepts?
@@ -348,7 +360,7 @@ agentConfig.push({
 
 ${hasSignificantDeletions ? 'This diff has significant deletions — be thorough on the removed-behavior audit.' : 'This diff has few deletions — focus more on cross-file impact.'}
 
-Limit yourself to at most 8 tool calls total (grep + targeted file reads).`
+Limit yourself to at most 10 tool calls total (grep + targeted file reads).`
   ),
 })
 
@@ -376,8 +388,36 @@ Only flag issues where you can cite BOTH the exact CLAUDE.md rule AND the exact 
   })
 }
 
-// --- Agent 5: Quality, tests, altitude check (10+ files) ---
-if (fileCount >= 10) {
+// --- Agent 5: Holistic reader (always) — finds what checklists miss ---
+// Deliberately minimal prescription. Reads the diff as a whole, reasons about
+// what the code does, what changed, and what could go wrong. Catches novel
+// patterns that don't map to any specific checklist item.
+agentConfig.push({
+  label: 'holistic-reader',
+  effort: 'high',
+  prompt: buildPrompt(
+    'You are a senior engineer doing a deep holistic code review. You have no checklist. You read code and think.',
+    `Read the entire diff carefully and find real problems.
+
+Your job is NOT to pattern-match against a list of known issues. It is to understand what this code does and reason about what could go wrong.
+
+Ask yourself:
+- What is this change trying to do? Is it achieving that goal correctly?
+- If I were the on-call engineer at 3am when this breaks, what scenario would page me?
+- What assumptions does this code make that could be wrong in production?
+- What was the old code doing that the new code no longer does?
+- Are there conditions under which this code produces incorrect results, crashes, or silently misbehaves?
+- Does the code's description (comments, PR description) match what it actually does?
+- Are there behaviors that exist in the old code that are simply missing from the new code?
+
+Go deep on a few real issues. Do not surface style or preference nitpicks.
+Prioritize: correctness > reliability > security > maintainability.`
+  ),
+})
+
+// --- Agent 6: Quality, tests, altitude check (always when test files changed, else 10+ files) ---
+const hasTestFiles = changedFiles.some(f => f.includes('test') || f.includes('spec'))
+if (fileCount >= 10 || hasTestFiles) {
   agentConfig.push({
     label: 'quality-tests-altitude',
     prompt: buildPrompt(
@@ -407,7 +447,7 @@ Be constructive — only flag altitude issues when there is a clearly better alt
   })
 }
 
-// --- Agent 6: Performance + deployment (20+ files) ---
+// --- Agent 7: Performance + deployment (20+ files) ---
 if (fileCount >= 20) {
   agentConfig.push({
     label: 'perf-and-deploy',
@@ -464,10 +504,15 @@ for (const f of allFindings) {
 
 log(`${deduped.length} unique findings after dedup`)
 
-// Filter + cap: raise threshold and limit verifier count
-const MAX_VERIFIERS = 15
+// Filter + cap: lower threshold to 50 (was 55) to pass more borderline findings to verifier
+const SELF_SCORE_THRESHOLD = 50
+const MAX_VERIFIERS = 20
+const dropped = deduped.filter(f => f.self_score < SELF_SCORE_THRESHOLD)
+if (dropped.length > 0) {
+  log(`Dropped ${dropped.length} findings below score ${SELF_SCORE_THRESHOLD}: ${dropped.map(f => `[${f.severity}] ${f.title} (${f.self_score})`).join(' | ')}`)
+}
 const allWorthVerifying = deduped
-  .filter(f => f.self_score >= 55)
+  .filter(f => f.self_score >= SELF_SCORE_THRESHOLD)
   .sort((a, b) => {
     const sev = { critical: 0, high: 1, medium: 2, low: 3 }
     return (sev[a.severity] - sev[b.severity]) || (b.self_score - a.self_score)
@@ -510,17 +555,28 @@ ${f.evidence ? '- Evidence: ' + f.evidence : ''}
 ${fileHunks}
 \`\`\`
 
-Based ONLY on the diff above, try to refute:
-- Is the code actually correct? Is this a false positive?
-- Does the diff context show this is intentional?
-- Would the language/runtime prevent this?
-- Is this a style preference, not a correctness issue?
-- Could this be pre-existing (not introduced in the + lines)?
-- For removed-behavior findings: is there a replacement in the + lines that the reviewer missed?
-- For impact-analysis findings: does the diff itself show the callers being updated?
+Based ONLY on the diff above, answer these questions:
 
-Default to refuted=true if the diff doesn't clearly confirm the issue.
-Score 0-100. Below 70 = refuted.`,
+**To refute (finding is wrong):**
+- Is the code actually correct — can you trace through it and show it works?
+- Does the diff context or a comment show this is explicitly intentional?
+- Would the language/runtime prevent this issue from occurring?
+- Is this pre-existing, not introduced in the + lines?
+- For removed-behavior findings: is there a replacement in the + lines the reviewer missed?
+- For impact-analysis findings: does the diff show callers being updated?
+
+**To confirm (finding is real):**
+- For exception-handling: trace ALL error types that can reach the handler. If the handler accesses a subclass attribute (e.g., .detail, .status_code), can a non-subclass exception reach it?
+- For framework-integration: does the new code preserve the old code's behaviors (header injection, decorator processing, exemption checks)? If a behavior is missing, is there an explicit comment explaining why?
+- For latent bugs: does the issue exist even if the bad path is rarely triggered?
+
+**Scoring guidance by category:**
+- bug / failure-mode / security: Confirm unless you can PROVE the code is correct. Uncertainty defaults to confirmed.
+- removed-behavior / test-gap: Confirm if the behavior/test is clearly missing.
+- convention / simplification: Confirm only if clearly supported by diff evidence.
+- Do NOT refute just because "it probably works" or "it's unlikely to happen" — latent bugs are real bugs.
+
+Score 0–100. Below 65 = refuted.`,
       {
         label: `verify:${f.file}:${f.line_start}`,
         phase: 'Verify',
@@ -534,7 +590,7 @@ Score 0-100. Below 70 = refuted.`,
 const confirmed = worthVerifying
   .map((f, i) => {
     const v = verifications[i]
-    if (!v || v.refuted || v.adjusted_score < 70) return null
+    if (!v || v.refuted || v.adjusted_score < 65) return null
     return { ...f, verified_score: v.adjusted_score, verification_note: v.reason }
   })
   .filter(Boolean)

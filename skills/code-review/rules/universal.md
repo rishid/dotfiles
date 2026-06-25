@@ -36,6 +36,7 @@ These rules apply regardless of language. Load alongside the relevant language-s
 
 - Flag empty catch/except blocks — swallowed errors hide bugs
 - Flag catching broadest exception type where a specific type is appropriate
+- **Flag exception handler type mismatches**: Catching broad exception type (e.g., `Exception`) then dispatching to a handler that expects a narrower type (handler accesses subclass-specific attributes like `.detail`, `.status_code`)
 - Flag exceptions used for normal control flow (prefer return values)
 - Flag error context lost when re-throwing — wrap with original cause
 
@@ -48,3 +49,12 @@ These rules apply regardless of language. Load alongside the relevant language-s
 - Flag synchronous I/O on a thread/event loop serving concurrent requests
 - Flag large objects serialized/deserialized repeatedly that could be cached
 - Flag string concatenation in tight loops — use builder or join
+
+---
+
+## Framework Integration / Replacements
+
+When middleware, decorators, or framework components are replaced with custom implementations:
+- **Behavioral regressions**: Does the old component inject headers, call hooks, process decorators, or trigger lifecycle events? Verify the new code preserves these OR explicitly documents why they're skipped.
+- **Partial framework feature usage**: Calling framework internals with non-standard arguments (e.g., `handler=None`, `endpoint=None`) may bypass features that depend on those arguments (exemptions, per-route limits, header injection). Verify this is documented.
+- **Private API imports**: Importing underscore-prefixed symbols from frameworks/libraries — no stability guarantee, prefer public APIs or project-defined alternatives.
