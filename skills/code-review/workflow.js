@@ -244,7 +244,13 @@ const previousCommentsSection = (isIncremental && previousComments)
   : ''
 
 const reviewScope = isIncremental && lastReviewSha
-  ? `INCREMENTAL RE-REVIEW: This diff shows ONLY changes made since the last review (commit ${lastReviewSha.substring(0, 8)}). Focus on: (1) new issues in the changed code, (2) whether previously raised issues (listed above) are resolved.`
+  ? `INCREMENTAL RE-REVIEW: This diff shows ONLY changes made since the last review (commit ${lastReviewSha.substring(0, 8)}).
+
+Your two jobs, in priority order:
+1. **Verify fixes**: For each issue raised in the last review (listed above), check if the new diff addresses it. Report as a finding ONLY if a previously-flagged critical/high issue is still clearly broken. Do NOT re-flag low-severity or style issues.
+2. **Catch regressions**: Check if the new changes introduce NEW bugs. The contributor was editing code to fix review feedback — did they break something else in the process? Focus on logic errors, off-by-ones, and incomplete fixes.
+
+Do NOT do a broad review. This is a focused follow-up, not a fresh review.`
   : `FULL PR REVIEW: This diff shows all changes in the PR.`
 
 const tokenRules = `
@@ -281,18 +287,14 @@ ${tokenRules}
 ${fixInstructions}`
 }
 
-// --- Agent config: 3 base + conditional agents ---
+// --- Agent config ---
 
 const fileCount = changedFiles.length
 const agentConfig = []
 
-// --- Agent 1: Bug hunter + silent failure auditor (always) ---
-agentConfig.push({
-  label: 'bugs-and-failures',
-  effort: 'high',
-  prompt: buildPrompt(
-    'You are a bug hunter and error handling auditor. You have zero tolerance for code that will produce wrong results or silently swallow errors.',
-    `Scan the diff for bugs at multiple depths and audit every error handling path:
+const bugsPrompt = buildPrompt(
+  'You are a bug hunter and error handling auditor. You have zero tolerance for code that will produce wrong results or silently swallow errors.',
+  `Scan the diff for bugs at multiple depths and audit every error handling path:
 
 **Surface bugs**: Typos, wrong variable names, missing returns, copy-paste errors, off-by-one.
 **Logic bugs**: Trace conditionals and loops with concrete inputs. For each branch, what input takes that path? Would it produce the right result?
@@ -314,15 +316,11 @@ agentConfig.push({
 **Cross-function contracts**: If a changed function calls or is called by another changed function, verify the contract (types, nullability, error propagation) is honored in both directions.
 
 Only read a source file if the diff alone is genuinely ambiguous about a specific bug. Most issues are visible from the diff.`
-  ),
-})
+)
 
-// --- Agent 2: Security (always) ---
-agentConfig.push({
-  label: 'security',
-  prompt: buildPrompt(
-    'You are a security specialist focused exclusively on vulnerabilities introduced in this diff.',
-    `Check for:
+const securityPrompt = buildPrompt(
+  'You are a security specialist focused exclusively on vulnerabilities introduced in this diff.',
+  `Check for:
 - **Injection**: SQL, command, XSS, template injection via string interpolation — require parameterized queries or safe APIs
 - **Auth/Authz**: Missing checks, privilege escalation, insecure sessions, token handling
 - **Secrets**: Hardcoded credentials, API keys, tokens, connection strings — require env vars or secrets manager
@@ -330,16 +328,11 @@ agentConfig.push({
 - **Data exposure**: Error messages leaking internals, PII in logs, overly verbose debug output
 - **Unsafe ops**: Deserialization of untrusted data, path traversal, SSRF, open redirects
 - **Crypto**: Weak algorithms, hardcoded IVs/salts, custom crypto instead of standard libraries`
-  ),
-})
+)
 
-// --- Agent 3: Holistic reader (always) — finds what checklists miss ---
-agentConfig.push({
-  label: 'holistic-reader',
-  effort: 'high',
-  prompt: buildPrompt(
-    'You are a senior engineer doing a deep holistic code review. You have no checklist. You read code and think.',
-    `Read the entire diff carefully and find real problems.
+const holisticPrompt = buildPrompt(
+  'You are a senior engineer doing a deep holistic code review. You have no checklist. You read code and think.',
+  `Read the entire diff carefully and find real problems.
 
 Your job is NOT to pattern-match against a list of known issues. It is to understand what this code does and reason about what could go wrong.
 
@@ -363,8 +356,19 @@ Ask yourself:
 
 Go deep on a few real issues. Do not surface style or preference nitpicks.
 Prioritize: correctness > reliability > security > maintainability.`
-  ),
-})
+)
+
+if (isIncremental) {
+  // Incremental re-review: 2 focused agents — bugs + holistic
+  // Security agent only if the delta touches auth/crypto/input-handling files
+  agentConfig.push({ label: 'bugs-and-failures', effort: 'high', prompt: bugsPrompt })
+  agentConfig.push({ label: 'holistic-reader', effort: 'high', prompt: holisticPrompt })
+} else {
+  // Full review: 3 agents
+  agentConfig.push({ label: 'bugs-and-failures', effort: 'high', prompt: bugsPrompt })
+  agentConfig.push({ label: 'security', prompt: securityPrompt })
+  agentConfig.push({ label: 'holistic-reader', effort: 'high', prompt: holisticPrompt })
+}
 
 // --- Phase 2: Review ---
 
