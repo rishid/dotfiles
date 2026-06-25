@@ -72,11 +72,10 @@ Valid scope values: `"pr"`, `"branch"`, `"staged"`, `"commit"`
 
 The workflow:
 - Gathers context via a Haiku agent (diff, changed files, CLAUDE.md files)
-- Scales 3/5/7 review agents based on file count (≤3 / ≤15 / >15)
-- Runs specialized Sonnet review agents in parallel
+- Runs 3 specialized Sonnet review agents in parallel (bugs, security, holistic)
 - Deduplicates findings (boosts confidence for multi-agent agreement)
-- Runs adversarial Haiku verifiers that try to REFUTE each finding
-- Returns only findings surviving verification with score ≥ 70
+- Runs adversarial Sonnet verifiers that try to REFUTE each finding (with repo file access)
+- Returns only findings surviving verification with score ≥ 75
 - Returns `{ confirmed: [...findings], stats: {...} }`
 
 ### Step 3: Output Results

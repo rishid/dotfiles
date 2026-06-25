@@ -4,7 +4,7 @@ export const meta = {
   phases: [
     { title: 'Context', detail: 'Gather diff and project guidelines' },
     { title: 'Review', detail: 'Parallel specialized + holistic review agents', model: 'sonnet' },
-    { title: 'Verify', detail: 'Adversarial verification of findings', model: 'haiku' },
+    { title: 'Verify', detail: 'Adversarial verification of findings', model: 'sonnet' },
   ],
 }
 
@@ -215,10 +215,6 @@ const detectedLangs = [...new Set(
   }).filter(Boolean)
 )]
 
-// --- Detect if diff has deletions worth auditing ---
-
-const hasSignificantDeletions = (diffContent.match(/^-[^-]/gm) || []).length > 5
-
 // --- Build shared prompt parts (diff is INLINE, not fetched per agent) ---
 
 const rulesInstruction = skillDir ? [
@@ -241,7 +237,7 @@ const falsePositiveGuidance = `
 - Code that "could be better" but isn't wrong
 - Potential issues that depend on specific inputs or runtime state you cannot verify from the diff
 - **Missing files**: A file not appearing in this diff does NOT mean it doesn't exist. The diff only shows changed files. Other files may already be present in the repository. Never flag "file X doesn't exist" based on its absence from the diff alone.
-- **Tool/platform capability claims**: Do NOT assert that a tool, service, CI system, or package manager does not support a feature based on your training data — your knowledge has a cutoff and these ecosystems evolve rapidly. Only flag if there is explicit evidence in the diff (e.g., an error message in a comment, a locked version that predates the feature).
+- **Tool/platform capability claims**: Do NOT assert that a tool, service, CI system, or package manager does not support a feature based on your training data — your knowledge has a cutoff and these ecosystems evolve rapidly. Only flag if there is explicit evidence in the diff (e.g., an error message in a comment, a locked version that predates the feature).`
 
 const previousCommentsSection = (isIncremental && previousComments)
   ? `\n\n## Issues Raised in Last Review\n\nThese are the inline comments posted during the last review:\n\n\`\`\`json\n${previousComments}\n\`\`\`\n\nFor unresolved previous comments: only re-surface as a finding if the issue is clearly critical or high severity (a real bug, security issue, or data integrity risk). Do NOT re-flag unresolved low-severity, style, or convention issues — the contributor has seen them and they are their call to address.`
@@ -251,26 +247,20 @@ const reviewScope = isIncremental && lastReviewSha
   ? `INCREMENTAL RE-REVIEW: This diff shows ONLY changes made since the last review (commit ${lastReviewSha.substring(0, 8)}). Focus on: (1) new issues in the changed code, (2) whether previously raised issues (listed above) are resolved.`
   : `FULL PR REVIEW: This diff shows all changes in the PR.`
 
-const tokenRulesDefault = `
-IMPORTANT TOKEN EFFICIENCY RULES:
+const tokenRules = `
+RULES:
 - The diff above contains ALL the changes. Do NOT re-fetch it with git or gh commands.
-- Do NOT read full file contents unless you need surrounding context to confirm a specific bug.
-- Limit file reads to at most 5 files, only when the diff alone is ambiguous.
-- Return at most 7 findings, prioritized by severity. Quality over quantity.`
-
-const tokenRulesDeep = `
-TOKEN RULES:
-- The diff above contains ALL the changes. Do NOT re-fetch it with git or gh commands.
-- You MAY read source files and framework/library internals to confirm bugs — up to 10 file reads.
-- Return at most 7 findings, prioritized by severity. Quality over quantity.`
+- You MAY and SHOULD read repository files to VERIFY assumptions. If a finding depends on something outside the diff (a config file, a Dockerfile, a base image, a caller, an import), READ that file before reporting. Do not guess.
+- Limit file reads to at most 10 files total.
+- Return at most 5 findings, prioritized by severity. Quality over quantity — 2 real issues beats 5 with 3 false positives.
+- Only report findings you have HIGH confidence are real, new issues introduced in this diff. If you are unsure, do not report it.`
 
 const fixInstructions = `
 For suggested_fix: provide the EXACT replacement lines of code, not a description. It will be applied verbatim via GitHub's suggestion feature. Set fix_is_inline=true only if it's a clean replacement for those specific lines. If the fix requires changes elsewhere or is structural, omit suggested_fix or set fix_is_inline=false.
 
 Score each finding 0-100 on confidence it is a real NEW issue in this diff.`
 
-const buildPrompt = (role, focus, opts) => {
-  const rules = (opts && opts.deep) ? tokenRulesDeep : tokenRulesDefault
+const buildPrompt = (role, focus) => {
   return `${role}
 ${rulesInstruction}${guidelinesSection}${previousCommentsSection}
 
@@ -287,7 +277,7 @@ ${diffContent}
 
 ${focus}
 ${falsePositiveGuidance}
-${rules}
+${tokenRules}
 ${fixInstructions}`
 }
 
@@ -323,8 +313,7 @@ agentConfig.push({
 
 **Cross-function contracts**: If a changed function calls or is called by another changed function, verify the contract (types, nullability, error propagation) is honored in both directions.
 
-Only read a source file if the diff alone is genuinely ambiguous about a specific bug. Most issues are visible from the diff.`,
-    { deep: true }
+Only read a source file if the diff alone is genuinely ambiguous about a specific bug. Most issues are visible from the diff.`
   ),
 })
 
@@ -344,70 +333,7 @@ agentConfig.push({
   ),
 })
 
-// --- Agent 3: Removed behavior + cross-file impact (always) ---
-agentConfig.push({
-  label: 'impact-analysis',
-  prompt: buildPrompt(
-    'You are a change impact analyst. You trace the blast radius of modifications — what was removed, what was changed, and who depends on it.',
-    `Three focus areas:
-
-**Removed behavior audit** — examine every deleted line (lines starting with \`-\`) in the diff:
-- Was a function, method, class, endpoint, config key, or export removed or renamed?
-- Was a default value, fallback, or error handler removed?
-- Was a validation check, guard clause, or security check removed?
-- For each removal: is there a replacement in the \`+\` lines, or was it dropped entirely?
-- If dropped: could any caller, config, test, or downstream system still depend on it?
-
-**Replacement completeness** — when code replaces a framework/library component with a custom implementation:
-- What behaviors did the OLD component provide? Read its source or docs to build the list.
-- Verify each behavior is present in the NEW implementation, or explicitly documented as intentionally skipped.
-- If behaviors are missing and undocumented, flag them.
-
-**Framework internals trace** — when new code calls library/framework methods with unusual arguments (None, empty, non-standard values):
-- READ the source of that method (locate it via grep in site-packages or \`python -c "import X; print(X.__file__)"\`).
-- Trace what happens with the unusual argument: which code paths are skipped? Which features are silently disabled?
-- Flag any silently-disabled features. These are the highest-value bugs — hard to catch, dangerous in production.
-
-**Cross-file caller/callee impact** — for each function/method whose signature, return type, error behavior, or side effects changed:
-- Read at most 3 key callers (use grep to find them, then read only the relevant section) to verify they handle the new contract.
-- Check: does the caller handle new error types? Does it expect the old return shape? Does it pass arguments the new signature still accepts?
-- Flag if a changed function is exported/public and callers outside the diff may break.
-
-${hasSignificantDeletions ? 'This diff has significant deletions — be thorough on the removed-behavior audit.' : 'This diff has few deletions — focus more on cross-file impact.'}
-
-Limit yourself to at most 15 tool calls total (grep + targeted file reads). Spend more of your budget on framework internals traces when the diff wraps/replaces framework components.`,
-    { deep: true }
-  ),
-})
-
-// --- Agent 4: CLAUDE.md compliance (only when CLAUDE.md exists) ---
-if (claudeMdContent) {
-  agentConfig.push({
-    label: 'guidelines-compliance',
-    prompt: buildPrompt(
-      'You are a project guidelines compliance auditor. You verify that code changes follow the explicit rules in the project\'s CLAUDE.md files.',
-      `Your ONLY job is to check the diff against the Project Guidelines above.
-
-For each rule in the CLAUDE.md:
-- Is it relevant to the files changed? (Only apply rules to files in matching directories.)
-- Does the new code (+lines) violate it?
-- Quote the exact rule being violated and the exact code that breaks it.
-
-DO NOT flag:
-- Rules that are guidance for AI assistants rather than code requirements
-- Violations on unchanged/context lines (only \`-\` prefix or no prefix)
-- Style preferences not explicitly stated as rules
-- Issues already silenced by lint-ignore comments or equivalent
-
-Only flag issues where you can cite BOTH the exact CLAUDE.md rule AND the exact violating code. If you cannot quote both, do not flag it.`
-    ),
-  })
-}
-
-// --- Agent 5: Holistic reader (always) — finds what checklists miss ---
-// Deliberately minimal prescription. Reads the diff as a whole, reasons about
-// what the code does, what changed, and what could go wrong. Catches novel
-// patterns that don't map to any specific checklist item.
+// --- Agent 3: Holistic reader (always) — finds what checklists miss ---
 agentConfig.push({
   label: 'holistic-reader',
   effort: 'high',
@@ -423,66 +349,22 @@ Ask yourself:
 - What assumptions does this code make that could be wrong in production?
 - What was the old code doing that the new code no longer does?
 - Are there conditions under which this code produces incorrect results, crashes, or silently misbehaves?
-- Does the code's description (comments, PR description) match what it actually does?
 - Are there behaviors that exist in the old code that are simply missing from the new code?
 
-Go deep on a few real issues. Do not surface style or preference nitpicks.
-Prioritize: correctness > reliability > security > maintainability.
+**Cross-file impact** — for functions whose signature, return type, or error behavior changed:
+- Grep for callers and read at most 3 to verify they handle the new contract.
+- Flag if a changed function is exported/public and callers outside the diff may break.
 
-If the diff replaces or wraps framework/library components, READ the framework source to understand what the old code did vs what the new code does. This is where the worst bugs hide.`,
-    { deep: true }
+**Test correctness** — if the diff includes test files:
+- Does each test actually exercise the code path its name claims?
+- Would the test fail if the code under test were deleted? If not, the test is lying.
+
+**IMPORTANT: Verify before reporting.** If a finding depends on anything outside the diff (a config file, Dockerfile, base image, installed packages, tool capabilities), READ that file or grep for it. Do not guess or assume based on file names or your training data.
+
+Go deep on a few real issues. Do not surface style or preference nitpicks.
+Prioritize: correctness > reliability > security > maintainability.`
   ),
 })
-
-// --- Agent 6: Quality, tests, altitude check (always when test files changed, else 10+ files) ---
-const hasTestFiles = changedFiles.some(f => f.includes('test') || f.includes('spec'))
-if (fileCount >= 10 || hasTestFiles) {
-  agentConfig.push({
-    label: 'quality-tests-altitude',
-    prompt: buildPrompt(
-      'You are a code quality, test coverage, and design altitude reviewer.',
-      `Three focus areas:
-
-**Test coverage** — for new/changed code paths:
-- Is there a corresponding test? If not, is this a critical path (auth, data integrity, financial) that MUST have one?
-- Are error/exception paths tested?
-- Are edge cases (empty input, boundary values, concurrent access) covered?
-- Do tests verify behavior and contracts, not implementation details?
-
-**Test correctness** — for each test in the diff, verify the test body matches its name/docstring:
-- Does the test actually exercise the code path its name claims? (e.g., a test named \`test_non_http_scopes\` that only makes HTTP requests is lying.)
-- Does the test use assertions that would fail if the behavior it claims to test were broken? Trace: if I deleted the code under test, would this test fail?
-- Are there tests that would pass even if the feature they claim to cover were completely removed?
-
-**Simplification** — look for unnecessary complexity:
-- Premature abstractions (helpers/wrappers used exactly once)?
-- Over-engineered solutions for simple problems?
-- Could existing project patterns or standard library features replace custom code?
-- Redundant code introduced across multiple files that could share a single implementation?
-
-**Altitude check** — is this the right fix at the right level?
-- Does this change fix the symptom but not the root cause? (e.g., adding a null check instead of fixing why the value is null)
-- Does it add a workaround that will need to be cleaned up later?
-- Is there a string/regex/manual approach where a proper parser, schema, or type would be more robust?
-- Is a retry/timeout being added to paper over an architectural issue?
-
-Be constructive — only flag altitude issues when there is a clearly better alternative, not just because the approach is "not ideal".`
-    ),
-  })
-}
-
-// --- Agent 7: Performance + deployment (20+ files) ---
-if (fileCount >= 20) {
-  agentConfig.push({
-    label: 'perf-and-deploy',
-    prompt: buildPrompt(
-      'You are a performance and deployment safety reviewer.',
-      `**Performance**: N+1 queries, blocking I/O in async contexts, unnecessary recomputations, memory leaks (event listeners, closures, growing collections), missing pagination on unbounded queries.
-**Breaking changes**: Public API modifications? Changed response shapes? Removed exports? Consumer-breaking type changes?
-**Deployment**: Migration risks? Backwards compatibility with existing data? Rollback safety? Feature flags needed?`
-    ),
-  })
-}
 
 // --- Phase 2: Review ---
 
@@ -528,9 +410,8 @@ for (const f of allFindings) {
 
 log(`${deduped.length} unique findings after dedup`)
 
-// Filter + cap: lower threshold to 50 (was 55) to pass more borderline findings to verifier
-const SELF_SCORE_THRESHOLD = 50
-const MAX_VERIFIERS = 20
+const SELF_SCORE_THRESHOLD = 70
+const MAX_VERIFIERS = 10
 const dropped = deduped.filter(f => f.self_score < SELF_SCORE_THRESHOLD)
 if (dropped.length > 0) {
   log(`Dropped ${dropped.length} findings below score ${SELF_SCORE_THRESHOLD}: ${dropped.map(f => `[${f.severity}] ${f.title} (${f.self_score})`).join(' | ')}`)
@@ -564,9 +445,7 @@ const verifications = await parallel(
       .substring(0, 4000)
 
     return () => agent(
-      `You are an adversarial verifier. Your ONLY job is to decide if this finding is real or a false positive.
-
-DO NOT read files. DO NOT run any commands. All the information you need is below.
+      `You are an adversarial verifier. Your ONLY job is to decide if this finding is real or a false positive. Default to skepticism — most findings are wrong.
 
 **Finding:** ${f.title}
 - File: ${f.file}, Line: ${f.line_start}-${f.line_end}
@@ -579,34 +458,29 @@ ${f.evidence ? '- Evidence: ' + f.evidence : ''}
 ${fileHunks}
 \`\`\`
 
-Based ONLY on the diff above, answer these questions:
+You have the diff above for context. You MAY read up to 3 repository files to verify factual claims (check if a file exists, read a Dockerfile or config, check a caller). Do NOT re-fetch the diff. Do NOT run tests or builds.
 
-**To refute (finding is wrong):**
-- Is the code actually correct — can you trace through it and show it works?
+**To refute (finding is wrong) — actively look for reasons to refute:**
+- Is the code actually correct? Trace through it and show it works.
 - Does the diff context or a comment show this is explicitly intentional?
-- Would the language/runtime prevent this issue from occurring?
+- Would the language/runtime prevent this issue?
 - Is this pre-existing, not introduced in the + lines?
-- For removed-behavior findings: is there a replacement in the + lines the reviewer missed?
-- For impact-analysis findings: does the diff show callers being updated?
-- **File existence claims**: If the finding says a file doesn't exist — the diff only shows *changed* files. Other files may already be in the repo. Refute these claims unless the diff itself shows the file being deleted.
-- **Tool/platform capability claims**: If the finding claims a tool or service doesn't support a feature (e.g., "Dependabot doesn't support X", "GitHub Actions doesn't allow Y") — training data has a cutoff and ecosystems change. Refute unless the diff contains explicit evidence (e.g., a pinned version that predates the feature, an error comment).
+- Does the finding depend on assumptions about files, configs, or runtime that you can VERIFY by reading a file? If so, read the file. If the assumption is wrong, refute.
+- Does the finding claim a tool or platform doesn't support something? Your training data has a cutoff — refute unless the diff itself contains evidence.
+- Is this a "nice to have" or "could be better" rather than an actual bug? Refute.
+- Is the scenario described so unlikely it would never occur in practice? Refute.
 
-**To confirm (finding is real):**
-- For exception-handling: trace ALL types that can reach the handler. Can the handler's code actually run on each of those types?
-- For framework-integration: does the new code preserve the old code's behaviors? If a behavior is missing with no comment, that's real.
-- For latent bugs: does the issue exist even if the bad path is rarely triggered? Latent bugs are real bugs.
+**To confirm (finding is real) — the bar is high:**
+- You must be able to describe a concrete, realistic scenario where this code fails.
+- "It could theoretically..." is not enough. "When X happens (and X is common/plausible), Y breaks because Z" is enough.
+- For bug / failure-mode / security: confirm only if you can trace concrete wrong behavior.
+- For convention / simplification / test-gap: confirm only if clearly supported by evidence.
 
-**Scoring guidance by category:**
-- bug / failure-mode / security: Confirm unless you can PROVE the code is correct. Uncertainty defaults to confirmed.
-- removed-behavior / test-gap: Confirm if the behavior/test is clearly missing.
-- convention / simplification: Confirm only if clearly supported by diff evidence.
-- Do NOT refute just because "it probably works" or "it's unlikely to happen" — latent bugs are real bugs.
-
-Score 0–100. Below 65 = refuted.`,
+Score 0–100. Below 75 = refuted.`,
       {
         label: `verify:${f.file}:${f.line_start}`,
         phase: 'Verify',
-        model: 'haiku',
+        model: 'sonnet',
         schema: VERDICT_SCHEMA,
       }
     )
@@ -616,7 +490,7 @@ Score 0–100. Below 65 = refuted.`,
 const confirmed = worthVerifying
   .map((f, i) => {
     const v = verifications[i]
-    if (!v || v.refuted || v.adjusted_score < 65) return null
+    if (!v || v.refuted || v.adjusted_score < 75) return null
     return { ...f, verified_score: v.adjusted_score, verification_note: v.reason }
   })
   .filter(Boolean)
