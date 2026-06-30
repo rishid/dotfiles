@@ -10,7 +10,7 @@ rust = "stable"                   # Required for Cargo-based tools
 uv = "0.11.25"
 
 # === Development Tools ===
-"aqua:anthropics/claude-code" = "2.1.195"
+"aqua:anthropics/claude-code" = "2.1.196"
 "aqua:openai/codex" = "0.142.4"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.95.0"
@@ -18,7 +18,7 @@ github-cli = "2.95.0"
 helm = "4.2.2"
 kubectl = "1.36.2"
 "aqua:argoproj/argo-cd" = "3.4.4"
-"aqua:aws/aws-cli" = "2.35.11"
+"aqua:aws/aws-cli" = "2.35.12"
 "pipx:linode-cli" = "5.68.0"
 "aqua:go-task/task" = "3.51.1"
 terraform = "1.15.7"
@@ -36,7 +36,7 @@ yq = "4.53.3"                    # YAML processor
 "aqua:sharkdp/numbat" = "1.23.0"                 # Calculator
 "aqua:BurntSushi/ripgrep" = "15.1.0"             # Better grep
 "aqua:starship/starship" = "1.26.0"              # Shell prompt
-"aqua:aquasecurity/trivy" = "0.71.2"             # Security scanner
+"aqua:aquasecurity/trivy" = "0.72.0"             # Security scanner
 "aqua:ajeetdsouza/zoxide" = "0.9.9"              # Better cd
 "aqua:twpayne/chezmoi" = "2.70.5"
 "cargo:tokei" = "14" # count lines of code
