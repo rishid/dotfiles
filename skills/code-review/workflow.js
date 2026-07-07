@@ -237,7 +237,7 @@ const falsePositiveGuidance = `
 - Code that "could be better" but isn't wrong
 - Potential issues that depend on specific inputs or runtime state you cannot verify from the diff
 - **Missing files**: A file not appearing in this diff does NOT mean it doesn't exist. The diff only shows changed files. Other files may already be present in the repository. Never flag "file X doesn't exist" based on its absence from the diff alone.
-- **Tool/platform capability claims**: Do NOT assert that a tool, service, CI system, or package manager does not support a feature based on your training data — your knowledge has a cutoff and these ecosystems evolve rapidly. Only flag if there is explicit evidence in the diff (e.g., an error message in a comment, a locked version that predates the feature).`
+- **External state claims**: NEVER use your training data to make factual claims about the current state of external systems — available versions, release tags, supported features, compatibility, deprecation status, or API behavior of third-party tools, actions, packages, or services. Your knowledge has a cutoff and these things change constantly. If a finding depends on "X doesn't exist" or "latest version is Y" or "Z doesn't support W", you MUST verify it by running a command (e.g. \`gh release list\`, \`npm view\`, \`pip index versions\`) or omit the finding entirely.`
 
 const previousCommentsSection = (isIncremental && previousComments)
   ? `\n\n## Issues Raised in Last Review\n\nThese are the inline comments posted during the last review:\n\n\`\`\`json\n${previousComments}\n\`\`\`\n\nFor unresolved previous comments: only re-surface as a finding if the issue is clearly critical or high severity (a real bug, security issue, or data integrity risk). Do NOT re-flag unresolved low-severity, style, or convention issues — the contributor has seen them and they are their call to address.`
@@ -463,7 +463,7 @@ ${f.evidence ? '- Evidence: ' + f.evidence : ''}
 ${fileHunks}
 \`\`\`
 
-You have the diff above for context. You MAY read up to 3 repository files to verify factual claims (check if a file exists, read a Dockerfile or config, check a caller). Do NOT re-fetch the diff. Do NOT run tests or builds.
+You have the diff above for context. You MAY read up to 3 repository files to verify factual claims (check if a file exists, read a Dockerfile or config, check a caller). You MAY run up to 2 quick commands to verify external state (e.g. \`gh release list --repo owner/repo --limit 5\`, \`pip index versions pkg\`). Do NOT re-fetch the diff. Do NOT run tests or builds.
 
 **To refute (finding is wrong) — actively look for reasons to refute:**
 - Is the code actually correct? Trace through it and show it works.
@@ -471,7 +471,7 @@ You have the diff above for context. You MAY read up to 3 repository files to ve
 - Would the language/runtime prevent this issue?
 - Is this pre-existing, not introduced in the + lines?
 - Does the finding depend on assumptions about files, configs, or runtime that you can VERIFY by reading a file? If so, read the file. If the assumption is wrong, refute.
-- Does the finding claim a tool or platform doesn't support something? Your training data has a cutoff — refute unless the diff itself contains evidence.
+- Does the finding make claims about external state (available versions, supported features, latest releases, deprecation status)? VERIFY by running a command (e.g. \`gh release list\`). Never trust your training data for external facts — it has a cutoff.
 - Is this a "nice to have" or "could be better" rather than an actual bug? Refute.
 - Is the scenario described so unlikely it would never occur in practice? Refute.
 
