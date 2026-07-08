@@ -3,22 +3,22 @@
 
 [tools]
 # === Programming Languages & Runtimes ===
-go = "1.26.4"
+go = "1.26.5"
 node = "24.18.0"
 python = "3.14.6"
 rust = "stable"                   # Required for Cargo-based tools
-uv = "0.11.27"
+uv = "0.11.28"
 
 # === Development Tools ===
-"aqua:anthropics/claude-code" = "2.1.202"
-"aqua:openai/codex" = "0.142.5"
+"aqua:anthropics/claude-code" = "2.1.204"
+"aqua:openai/codex" = "0.143.0"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.96.0"
 "aqua:hadolint/hadolint" = "2.14.0" # Dockerfile linter
 helm = "4.2.2"
 kubectl = "1.36.2"
 "aqua:argoproj/argo-cd" = "3.4.4"
-"aqua:aws/aws-cli" = "2.35.16"
+"aqua:aws/aws-cli" = "2.35.17"
 "pipx:linode-cli" = "5.68.0"
 "aqua:go-task/task" = "3.52.0"
 terraform = "1.15.7"
@@ -38,7 +38,7 @@ yq = "4.53.3"                    # YAML processor
 "aqua:starship/starship" = "1.26.0"              # Shell prompt
 "aqua:aquasecurity/trivy" = "0.72.0"             # Security scanner
 "aqua:ajeetdsouza/zoxide" = "0.10.0"              # Better cd
-"aqua:twpayne/chezmoi" = "2.70.5"
+"aqua:twpayne/chezmoi" = "2.71.0"
 "cargo:tokei" = "14" # count lines of code
 "pipx:httpie" = "3.2.4"  # Better curl
 
