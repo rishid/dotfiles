@@ -125,7 +125,7 @@
         ],
         "defaultMode": "acceptEdits"
     },
-    "model": "claude-sonnet-5-0",
+    "model": "claude-sonnet-5",
     "statusLine": {
         "type": "command",
         "command": "~/.claude/status-line.sh",
