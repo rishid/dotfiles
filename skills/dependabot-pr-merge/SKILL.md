@@ -3,7 +3,7 @@ name: dependabot-pr-merge
 description: Find open Dependabot PRs for a GitHub repo, review CI status, and approve+merge them one at a time.
 user-invocable: true
 argument-hint: "OWNER/REPO or GitHub URL (omit to infer from current repo)"
-allowed-tools: Bash, AskUserQuestion
+allowed-tools: Bash, AskUserQuestion, Agent
 ---
 
 # Dependabot PR Merge
@@ -45,19 +45,21 @@ Otherwise, show a summary table: count of open PRs, list of PR numbers + titles.
 
 ## Step 3: Check CI Status for All PRs
 
-Before merging anything, check CI on **every** open PR:
+Before merging anything, check CI on **every** open PR. This is pure mechanical data-gathering (run a command per PR, bucket the result — no judgment calls), so delegate it to a Haiku subagent instead of doing it inline:
 
-```bash
-gh pr checks NUMBER --repo OWNER/REPO
-```
-
-Run this for each PR. Categorize each PR into one of three buckets:
+Invoke the `Agent` tool once with `model: "haiku"` and a prompt listing every open PR number and OWNER/REPO. Instruct it to:
+1. Run `gh pr checks NUMBER --repo OWNER/REPO` for each PR number given.
+2. Categorize each PR into one of three buckets:
 
 | Bucket | Criteria |
 |--------|----------|
 | **passing** | All checks pass, or no checks configured |
 | **pending** | Some checks are still running |
 | **failed** | One or more checks failed |
+
+3. Return the buckets as plain lists of PR numbers (e.g. `passing: [121, 123, 125]`, `pending: [124]`, `failed: [122]`), nothing else.
+
+Use the returned buckets directly — don't re-run the checks yourself. If a PR count is very small (1-2 PRs), it's fine to just run the checks inline instead of spawning a subagent for it.
 
 After checking all PRs, display a triage summary:
 
