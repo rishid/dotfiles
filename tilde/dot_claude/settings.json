@@ -123,7 +123,7 @@
             "WebFetch",
             "WebSearch"
         ],
-        "defaultMode": "acceptEdits"
+        "defaultMode": "auto"
     },
     "model": "claude-sonnet-5",
     "statusLine": {
