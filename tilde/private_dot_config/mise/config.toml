@@ -7,18 +7,18 @@ go = "1.26.5"
 node = "24.18.0"
 python = "3.14.6"
 rust = "stable"                   # Required for Cargo-based tools
-uv = "0.11.29"
+uv = "0.11.31"
 
 # === Development Tools ===
-"aqua:anthropics/claude-code" = "2.1.215"
-"aqua:openai/codex" = "0.144.6"
+"aqua:anthropics/claude-code" = "2.1.217"
+"aqua:openai/codex" = "0.145.0"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.96.0"
 "aqua:hadolint/hadolint" = "2.14.0" # Dockerfile linter
 helm = "4.2.3"
 kubectl = "1.36.2"
 "aqua:argoproj/argo-cd" = "3.4.5"
-"aqua:aws/aws-cli" = "2.36.2"
+"aqua:aws/aws-cli" = "2.36.5"
 "pipx:linode-cli" = "5.68.0"
 "aqua:go-task/task" = "3.52.0"
 terraform = "1.15.8"
@@ -38,14 +38,14 @@ yq = "4.53.3"                    # YAML processor
 "aqua:starship/starship" = "1.26.0"              # Shell prompt
 "aqua:aquasecurity/trivy" = "0.72.0"             # Security scanner
 "aqua:ajeetdsouza/zoxide" = "0.10.0"              # Better cd
-"aqua:twpayne/chezmoi" = "2.71.0"
+"aqua:twpayne/chezmoi" = "2.71.1"
 "cargo:tokei" = "14" # count lines of code
 "pipx:httpie" = "3.2.4"  # Better curl
 
 
 # === Build & CI Tools ===
 "pipx:black" = "26.5.1"          # Python formatter
-"pipx:pre-commit" = "4.6.0"      # Git hook framework
+"pipx:pre-commit" = "4.6.1"      # Git hook framework
 "pipx:yamllint" = "1.38.0"       # YAML linter
 
 # === NPM Global Tools ===
