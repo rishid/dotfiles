@@ -3,6 +3,11 @@
 # This file is sourced by fish and bash
 source "$XDG_CONFIG_HOME/shell/exports.sh"
 
+# Secrets (age-encrypted; see tilde/private_dot_config/shell/encrypted_*.age)
+if test -f "$XDG_CONFIG_HOME/shell/opencode-keys.sh"
+    source "$XDG_CONFIG_HOME/shell/opencode-keys.sh"
+end
+
 source "$__fish_config_dir/variables.fish"
 
 # automatically loads plugins under "$fisher_path"
