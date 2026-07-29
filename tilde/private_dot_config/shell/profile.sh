@@ -18,7 +18,4 @@ export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 [ ! -f "${XDG_CONFIG_HOME}/shell/aliases.sh" ] || . "${XDG_CONFIG_HOME}/shell/aliases.sh"
 [ ! -f "${XDG_CONFIG_HOME}/shell/functions.sh" ] || . "${XDG_CONFIG_HOME}/shell/functions.sh"
 
-# Secrets (age-encrypted; see tilde/private_dot_config/shell/encrypted_*.age)
-[ ! -f "${XDG_CONFIG_HOME}/shell/opencode-keys.sh" ] || . "${XDG_CONFIG_HOME}/shell/opencode-keys.sh"
-
 true
