@@ -4,7 +4,7 @@
 [tools]
 # === Programming Languages & Runtimes ===
 go = "1.26.5"
-node = "24.18.0"
+node = "24.18.1"
 python = "3.14.6"
 rust = "stable"                   # Required for Cargo-based tools
 uv = "0.12.0"
@@ -19,7 +19,7 @@ github-cli = "2.96.0"
 helm = "4.2.3"
 kubectl = "1.36.3"
 "aqua:argoproj/argo-cd" = "3.4.5"
-"aqua:aws/aws-cli" = "2.36.10"
+"aqua:aws/aws-cli" = "2.36.11"
 "pipx:linode-cli" = "5.68.0"
 "aqua:go-task/task" = "3.52.0"
 terraform = "1.15.8"
