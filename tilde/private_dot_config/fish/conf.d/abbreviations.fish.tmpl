@@ -44,7 +44,7 @@ abbr -a gs 'git status'
 abbr -a gsb 'git show-branch'
 abbr -a gb 'git branch'
 
-{{- $eza_params := list "--git" "--icons" "--classify" "--group-directories-first" "--time-style=long-iso" "--group" "--color-scale"  | join " " }}
+{{- $eza_params := list "--git" "--icons" "--classify" "--group-directories-first" "--time-style=long-iso" "--group" "--color-scale=all"  | join " " }}
 
 {{- if ne .chezmoi.os "windows" }}
     alias ls='eza {{ $eza_params }}'
