@@ -43,6 +43,9 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
 export PATH="$PATH:$CARGO_HOME/bin"
 
+### Codex
+export CODEX_HOME="$XDG_CONFIG_HOME/codex"
+
 ### Docker
 export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
 

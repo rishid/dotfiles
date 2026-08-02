@@ -1,0 +1,14 @@
+model = "gpt-5.6-sol"
+model_reasoning_effort = "high"
+personality = "pragmatic"
+
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"
+
+[projects."/home/rdhupar/w/mcp/mcp-server"]
+trust_level = "trusted"
+
+[projects."/home/rdhupar/w/mcp/mcp-server-terraform"]
+trust_level = "trusted"
+
