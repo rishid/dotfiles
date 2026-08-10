@@ -6,9 +6,8 @@ sandbox_mode = "workspace-write"
 approval_policy = "on-request"
 approvals_reviewer = "auto_review"
 
-[projects."/home/rdhupar/w/mcp/mcp-server"]
+[projects."/home/rdhupar/p"]
 trust_level = "trusted"
 
-[projects."/home/rdhupar/w/mcp/mcp-server-terraform"]
+[projects."/home/rdhupar/w"]
 trust_level = "trusted"
-
