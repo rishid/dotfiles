@@ -11,7 +11,7 @@ uv = "0.12.5"
 
 # === Development Tools ===
 "aqua:anomalyco/opencode" = "1.18.18"
-"aqua:anthropics/claude-code" = "2.1.233"
+"aqua:anthropics/claude-code" = "2.1.234"
 "aqua:openai/codex" = "0.147.0"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.97.0"
@@ -19,7 +19,7 @@ github-cli = "2.97.0"
 helm = "4.2.4"
 kubectl = "1.36.3"
 "aqua:argoproj/argo-cd" = "3.5.1"
-"aqua:aws/aws-cli" = "2.36.24"
+"aqua:aws/aws-cli" = "2.36.25"
 "pipx:linode-cli" = "5.68.0"
 "aqua:go-task/task" = "3.52.0"
 terraform = "1.15.8"
