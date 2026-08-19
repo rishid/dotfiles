@@ -8,6 +8,24 @@
 
 set -uo pipefail   # -e removed: we handle errors explicitly for better messages
 
+# This script is documented to run as `curl ... | bash`, which makes our own
+# stdin (fd 0) the live pipe still streaming the rest of this script's own
+# source. Any command below that reads from stdin without its own explicit
+# redirect (interactive prompts, or just an HTTP client logging response
+# metadata to stdout in a way that ends up interleaved on the same stream)
+# can steal bytes meant for bash's own parser, corrupting execution far away
+# from the actual cause — e.g. a stray "status=200 ...: command not found"
+# with no connection to anything in this file. Reopen stdin from the real
+# terminal once, up front, so every command from here on gets a clean stdin
+# without us having to remember to redirect each one individually.
+if [[ ! -t 0 ]]; then
+    if [[ -r /dev/tty ]]; then
+        exec < /dev/tty
+    else
+        exec < /dev/null
+    fi
+fi
+
 DOTFILES_REPO="rishid"
 DOTFILES_DIR="$HOME/.dotfiles"
 
