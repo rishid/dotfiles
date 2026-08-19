@@ -52,6 +52,13 @@ fi
 step "3/7  Homebrew"
 if ! command -v brew &>/dev/null; then
     info "Installing Homebrew..."
+    # The installer runs with NONINTERACTIVE=1 below, which makes it check sudo
+    # access via a non-prompting `sudo -n` instead of asking for a password. On
+    # a fresh account with no cached sudo ticket, that check fails even for
+    # admins. Priming a ticket here (interactive prompt, reading from the real
+    # tty since stdin is occupied by the curl pipe) fixes it.
+    info "You may be prompted for your account password (for sudo access)..."
+    sudo -v < /dev/tty || die "sudo access is required to install Homebrew"
     NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
         || die "Homebrew installation failed"
 else
