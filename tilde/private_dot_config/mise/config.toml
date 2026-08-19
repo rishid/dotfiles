@@ -11,8 +11,8 @@ uv = "0.12.5"
 
 # === Development Tools ===
 "aqua:anomalyco/opencode" = "1.18.18"
-"aqua:anthropics/claude-code" = "2.1.234"
-"aqua:openai/codex" = "0.147.0"
+"aqua:anthropics/claude-code" = "2.1.235"
+"aqua:openai/codex" = "0.148.0"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.97.0"
 "aqua:hadolint/hadolint" = "2.15.1" # Dockerfile linter
@@ -21,7 +21,7 @@ kubectl = "1.36.3"
 "aqua:argoproj/argo-cd" = "3.5.1"
 "aqua:aws/aws-cli" = "2.36.25"
 "pipx:linode-cli" = "5.68.0"
-"aqua:go-task/task" = "3.52.0"
+"aqua:go-task/task" = "3.53.1"
 terraform = "1.15.8"
 
 # === CLI Utilities ===
@@ -31,7 +31,7 @@ terraform = "1.15.8"
 "aqua:sharkdp/fd" = "10.4.2"                     # Better find
 "aqua:junegunn/fzf" = "0.74.3"                  # Fuzzy finder (junegunn originally, now mirrors exist)
 "aqua:jqlang/jq" = "1.8.2"                       # JSON processor
-"aqua:dundee/gdu" = "5.36.1"                     # Disk usage analyzer
+"aqua:dundee/gdu" = "5.37.0"                     # Disk usage analyzer
 "aqua:sharkdp/hexyl" = "0.17.0"                  # Hex viewer
 "aqua:sharkdp/hyperfine" = "1.20.0"              # Benchmarking tool
 "aqua:sharkdp/numbat" = "1.23.0"                 # Calculator
@@ -43,7 +43,7 @@ terraform = "1.15.8"
 "aqua:twpayne/chezmoi" = "2.72.0"
 "cargo:tokei" = "14" # count lines of code
 "pipx:httpie" = "3.2.4"  # Better curl
-yq = "4.53.3"                    # YAML processor
+yq = "4.53.4"                    # YAML processor
 
 
 # === Build & CI Tools ===
