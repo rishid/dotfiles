@@ -59,7 +59,13 @@ if ! command -v brew &>/dev/null; then
     # tty since stdin is occupied by the curl pipe) fixes it.
     info "You may be prompted for your account password (for sudo access)..."
     sudo -v < /dev/tty || die "sudo access is required to install Homebrew"
-    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
+    # This whole bootstrap script runs as `curl ... | bash`, so our own stdin is
+    # a live pipe still streaming the rest of this script's source. Without an
+    # explicit redirect, this nested installer inherits that same pipe, and if
+    # anything inside it reads from stdin, it steals bytes meant for our own
+    # parser (same class of issue as the CLT/sudo prompts above). NONINTERACTIVE=1
+    # means it never needs input, so close stdin outright.
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" < /dev/null \
         || die "Homebrew installation failed"
 else
     success "Already installed: $(brew --version | head -1)"
