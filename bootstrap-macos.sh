@@ -65,8 +65,14 @@ if ! command -v brew &>/dev/null; then
     # anything inside it reads from stdin, it steals bytes meant for our own
     # parser (same class of issue as the CLT/sudo prompts above). NONINTERACTIVE=1
     # means it never needs input, so close stdin outright.
-    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" < /dev/null \
-        || die "Homebrew installation failed"
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" < /dev/null || true
+    # Homebrew's own installer/updater can throw a spurious trailing error
+    # (e.g. a stray "status=200: command not found" from its post-install
+    # `brew update`) even when the actual install fully succeeded. Trust the
+    # filesystem, not this command's exit code, to decide whether it worked.
+    if [[ ! -x /opt/homebrew/bin/brew && ! -x /usr/local/bin/brew ]]; then
+        die "Homebrew installation failed"
+    fi
 else
     success "Already installed: $(brew --version | head -1)"
 fi
