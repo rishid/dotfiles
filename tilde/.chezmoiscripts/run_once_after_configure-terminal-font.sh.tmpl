@@ -1,0 +1,42 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+
+set -uo pipefail
+
+# Terminal.app defaults to SF Mono, which has no Nerd Font glyphs, so tide's
+# icons render as "?" boxes. run_once_before_install-fonts.sh.tmpl already
+# installed the patched font file — this just points Terminal.app's default
+# profile at it. Runs in the "after" phase so it's guaranteed to run after
+# that font-install script (which runs in the "before" phase).
+
+FONT_FILE_NAME="JetBrainsMonoNerdFont-Regular"
+# Terminal.app's "font name" is the font's internal PostScript name, which
+# does not match this patched font's filename (confirmed via:
+# system_profiler SPFontsDataType | grep -A6 JetBrainsMonoNerdFont-Regular).
+FONT_NAME="JetBrainsMonoNF-Regular"
+FONT_SIZE=13
+FONT_FILE="$HOME/Library/Fonts/${FONT_FILE_NAME}.ttf"
+
+if [[ ! -f "$FONT_FILE" ]]; then
+    echo "WARNING: $FONT_FILE not found — skipping Terminal.app font setup."
+    exit 0
+fi
+
+echo "Setting Terminal.app default font to ${FONT_NAME} ${FONT_SIZE}pt..."
+if ! osascript <<EOF 2>/dev/null
+tell application "Terminal"
+    set font name of default settings to "${FONT_NAME}"
+    set font size of default settings to ${FONT_SIZE}
+    set font name of startup settings to "${FONT_NAME}"
+    set font size of startup settings to ${FONT_SIZE}
+end tell
+EOF
+then
+    echo "WARNING: could not set Terminal.app font automatically."
+    echo "This usually means macOS is asking for Automation permission —"
+    echo "check System Settings > Privacy & Security > Automation for Terminal."
+    echo "Or set it manually: Terminal > Settings > Profiles > Text > Font."
+fi
+
+echo "Done. Open a new Terminal window/tab to see the new font."
+{{ end -}}
