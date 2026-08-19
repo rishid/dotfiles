@@ -84,7 +84,9 @@ fi
 step "4/7  mise"
 # Install mise via official installer so that mise self-update works
 if [[ -x "$HOME/.local/bin/mise" ]]; then
-    success "mise already installed: $($HOME/.local/bin/mise --version)"
+    info "mise already installed — checking for updates..."
+    "$HOME/.local/bin/mise" self-update -y || warn "mise self-update failed — continuing with existing version"
+    success "mise: $($HOME/.local/bin/mise --version)"
 else
     info "Installing mise via official installer..."
     curl https://mise.run | sh || die "mise installation failed"
