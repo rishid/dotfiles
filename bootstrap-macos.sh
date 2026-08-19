@@ -48,59 +48,41 @@ else
     success "Already installed: $(xcode-select -p)"
 fi
 
-# ── 3. Homebrew ───────────────────────────────────────────────────────────────
-step "3/7  Homebrew"
-if ! command -v brew &>/dev/null; then
-    info "Installing Homebrew..."
-    # The installer runs with NONINTERACTIVE=1 below, which makes it check sudo
-    # access via a non-prompting `sudo -n` instead of asking for a password. On
-    # a fresh account with no cached sudo ticket, that check fails even for
-    # admins. Priming a ticket here (interactive prompt, reading from the real
-    # tty since stdin is occupied by the curl pipe) fixes it.
-    info "You may be prompted for your account password (for sudo access)..."
-    sudo -v < /dev/tty || die "sudo access is required to install Homebrew"
-    # This whole bootstrap script runs as `curl ... | bash`, so our own stdin is
-    # a live pipe still streaming the rest of this script's source. Without an
-    # explicit redirect, this nested installer inherits that same pipe, and if
-    # anything inside it reads from stdin, it steals bytes meant for our own
-    # parser (same class of issue as the CLT/sudo prompts above). NONINTERACTIVE=1
-    # means it never needs input, so close stdin outright.
-    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" < /dev/null || true
-    # Homebrew's own installer/updater can throw a spurious trailing error
-    # (e.g. a stray "status=200: command not found" from its post-install
-    # `brew update`) even when the actual install fully succeeded. Trust the
-    # filesystem, not this command's exit code, to decide whether it worked.
-    if [[ ! -x /opt/homebrew/bin/brew && ! -x /usr/local/bin/brew ]]; then
-        die "Homebrew installation failed"
-    fi
+# ── 3. Fish shell ─────────────────────────────────────────────────────────────
+# git and curl already ship with Xcode CLT above, so the only thing we still
+# need a real installer for is fish (chezmoi and mise get their own official
+# installers in step 4). Pulling the latest .pkg from GitHub releases avoids
+# hardcoding a version that will go stale.
+step "3/7  Fish shell"
+if command -v fish &>/dev/null; then
+    success "Already installed: $(fish --version)"
 else
-    success "Already installed: $(brew --version | head -1)"
+    info "Looking up latest fish-shell release..."
+    FISH_PKG_URL="$(curl -fsSL https://api.github.com/repos/fish-shell/fish-shell/releases/latest \
+        | grep -m1 -o '"browser_download_url": *"[^"]*\.pkg"' \
+        | sed -E 's/.*"(https:[^"]+)"$/\1/')"
+    [[ -n "$FISH_PKG_URL" ]] || die "Could not find a .pkg asset in the latest fish-shell release"
+
+    FISH_TMP_DIR="$(mktemp -d)"
+    FISH_PKG="$FISH_TMP_DIR/fish.pkg"
+    info "Downloading ${FISH_PKG_URL}..."
+    curl -fsSL -o "$FISH_PKG" "$FISH_PKG_URL" || die "Failed to download fish .pkg"
+
+    pkgutil --check-signature "$FISH_PKG" &>/dev/null \
+        || warn "fish .pkg signature could not be verified — proceeding anyway"
+
+    info "Installing fish (you may be prompted for your account password)..."
+    sudo -v < /dev/tty || die "sudo access is required to install fish"
+    sudo installer -pkg "$FISH_PKG" -target / || die "fish installation failed"
+    rm -rf "$FISH_TMP_DIR"
+
+    command -v fish &>/dev/null || die "fish installation reported success but fish is not on PATH"
+    success "Installed fish: $(fish --version)"
 fi
 
-# Load Homebrew into current shell session
-if [[ -x /opt/homebrew/bin/brew ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-    success "Homebrew in PATH (Apple Silicon: /opt/homebrew)"
-elif [[ -x /usr/local/bin/brew ]]; then
-    eval "$(/usr/local/bin/brew shellenv)"
-    success "Homebrew in PATH (Intel: /usr/local)"
-else
-    die "Homebrew installed but brew not found in /opt/homebrew or /usr/local"
-fi
-
-# ── 4. Essential bootstrap tools ─────────────────────────────────────────────
-step "4/7  Essential tools (git, curl, fish, chezmoi)"
-for pkg in git curl fish chezmoi; do
-    if brew list --formula "$pkg" &>/dev/null; then
-        success "$pkg already installed"
-    else
-        info "Installing $pkg..."
-        brew install "$pkg" || die "Failed to install $pkg"
-        success "Installed $pkg"
-    fi
-done
-
-# Install mise via official installer (not brew) so that mise self-update works
+# ── 4. mise ────────────────────────────────────────────────────────────────────
+step "4/7  mise"
+# Install mise via official installer so that mise self-update works
 if [[ -x "$HOME/.local/bin/mise" ]]; then
     success "mise already installed: $($HOME/.local/bin/mise --version)"
 else
@@ -113,15 +95,24 @@ export PATH="$HOME/.local/bin:$PATH"
 # ── 5. chezmoi init & apply ───────────────────────────────────────────────────
 step "5/7  chezmoi init + apply"
 info "chezmoi will prompt for your age key passphrase to decrypt secrets."
+# chezmoi is already declared in mise/config.toml for ongoing version
+# management (step 6 installs it there), so we only need a throwaway copy
+# here to do the initial clone + apply. get.chezmoi.io's installer supports
+# downloading and immediately running chezmoi in one shot: pass -b for a
+# temp bindir plus the chezmoi subcommand/args to run after downloading.
+CHEZMOI_TMP_DIR="$(mktemp -d)"
 if [[ -d "$DOTFILES_DIR/.git" ]]; then
     info "Dotfiles already at $DOTFILES_DIR — running update..."
-    chezmoi update || die "chezmoi update failed"
+    sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$CHEZMOI_TMP_DIR" update \
+        || die "chezmoi update failed"
 else
     info "Cloning dotfiles to $DOTFILES_DIR and applying..."
     # Use the same flags as the documented install command in README
-    chezmoi init --source "$DOTFILES_DIR" --apply "$DOTFILES_REPO" \
+    sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$CHEZMOI_TMP_DIR" \
+        init --source "$DOTFILES_DIR" --apply "$DOTFILES_REPO" \
         || die "chezmoi init failed — check output above for details"
 fi
+rm -rf "$CHEZMOI_TMP_DIR"
 success "chezmoi apply complete"
 
 # ── 6. Install all mise tools ─────────────────────────────────────────────────
@@ -147,7 +138,7 @@ for p in /opt/homebrew/bin/fish /usr/local/bin/fish; do
 done
 
 if [[ -z "$FISH_PATH" ]]; then
-    die "fish not found — 'brew install fish' should have succeeded above"
+    die "fish not found — the fish install in step 3 should have succeeded above"
 fi
 
 # On MDM-managed work Macs, security policy blocks editing /etc/shells and
