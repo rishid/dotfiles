@@ -12,7 +12,7 @@ uv = "0.12.5"
 # === Development Tools ===
 "aqua:anomalyco/opencode" = "1.18.21"
 "aqua:anthropics/claude-code" = "2.1.241"
-"aqua:openai/codex" = "0.149.0"
+"aqua:openai/codex" = "0.149.1"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.98.0"
 "aqua:hadolint/hadolint" = "2.15.1" # Dockerfile linter
@@ -34,7 +34,7 @@ terraform = "1.15.9"
 "aqua:dundee/gdu" = "5.37.0"                     # Disk usage analyzer
 "aqua:sharkdp/hexyl" = "0.17.0"                  # Hex viewer
 "aqua:sharkdp/hyperfine" = "1.20.0"              # Benchmarking tool
-"aqua:sharkdp/numbat" = "1.23.0"                 # Calculator
+"aqua:sharkdp/numbat" = "1.24.0"                 # Calculator
 "aqua:BurntSushi/ripgrep" = "15.2.0"             # Better grep
 "aqua:starship/starship" = "1.26.0"              # Shell prompt
 "aqua:tealdeer-rs/tealdeer" = "1.8.1"            # Fast tldr client
