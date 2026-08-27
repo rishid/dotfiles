@@ -4,22 +4,22 @@
 [tools]
 # === Programming Languages & Runtimes ===
 go = "1.27.0"
-node = "24.19.0"
+node = "24.20.0"
 python = "3.14.7"
 rust = "stable"                   # Required for Cargo-based tools
 uv = "0.12.6"
 
 # === Development Tools ===
 "aqua:anomalyco/opencode" = "1.18.23"
-"aqua:anthropics/claude-code" = "2.1.246"
-"aqua:openai/codex" = "0.149.1"
+"aqua:anthropics/claude-code" = "2.1.247"
+"aqua:openai/codex" = "0.150.1"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.98.0"
 "aqua:hadolint/hadolint" = "2.15.1" # Dockerfile linter
 helm = "4.2.4"
-kubectl = "1.36.4"
-"aqua:argoproj/argo-cd" = "3.5.1"
-"aqua:aws/aws-cli" = "2.36.31"
+kubectl = "1.37.0"
+"aqua:argoproj/argo-cd" = "3.5.2"
+"aqua:aws/aws-cli" = "2.36.32"
 "pipx:linode-cli" = "5.68.0"
 "aqua:go-task/task" = "3.53.1"
 terraform = "1.15.9"
@@ -28,7 +28,7 @@ terraform = "1.15.9"
 "aqua:FiloSottile/age" = "1.3.1"                 # File encryption
 "aqua:sharkdp/bat" = "0.26.1"                    # Better cat
 "cargo:eza" = "0.23.5"                            # Better ls
-"aqua:sharkdp/fd" = "10.4.2"                     # Better find
+"aqua:sharkdp/fd" = "10.5.0"                     # Better find
 "aqua:junegunn/fzf" = "0.74.3"                  # Fuzzy finder (junegunn originally, now mirrors exist)
 "aqua:jqlang/jq" = "1.8.2"                       # JSON processor
 "aqua:dundee/gdu" = "5.37.0"                     # Disk usage analyzer
