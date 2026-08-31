@@ -22,6 +22,7 @@ apt:
     - dos2unix            # Text file conversion
     - socat               # Network utility
     - pv                  # Progress viewer
+    - bubblewrap           # Sandboxing (used by codex CLI)
 
 
 plugins:
