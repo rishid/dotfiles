@@ -11,7 +11,7 @@ uv = "0.12.10"
 
 # === Development Tools ===
 "aqua:anomalyco/opencode" = "1.18.29"
-"aqua:anthropics/claude-code" = "2.1.261"
+"aqua:anthropics/claude-code" = "2.1.263"
 "aqua:openai/codex" = "0.153.4"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.100.0"
