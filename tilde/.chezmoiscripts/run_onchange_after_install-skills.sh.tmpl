@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install agent skills via npx skills CLI
+# Install agent skills for Claude Code, Codex, and OpenCode via npx skills CLI
 # Re-runs whenever this file changes OR any skill in skills/ changes
 # skills-hash: {{ output "find" (joinPath .chezmoi.sourceDir ".." "skills") "-type" "f" "-exec" "cat" "{}" "+" | sha256sum }}
 set -euo pipefail
@@ -29,16 +29,25 @@ if ! command -v npx &>/dev/null; then
     exit 0
 fi
 
-# Helper to add a skill to Claude Code
+# Install skills globally for each coding agent in use.
 add_skill() {
-    npx skills add "$1" -a claude-code "${@:2}" -y
+    local source="$1"
+    shift
+
+    npx skills add "$source" \
+        --global \
+        --agent claude-code \
+        --agent codex \
+        --agent opencode \
+        "$@" \
+        --yes
 }
 
 echo "Installing agent skills..."
 
 # Personal skills from dotfiles repo (skills/ at repo root, one subdir per skill)
 # Note: .chezmoiroot is "tilde" so sourceDir is ~/.dotfiles/tilde/; go up one level for repo root
-add_skill "{{ .chezmoi.sourceDir }}/.." --all
+add_skill "{{ .chezmoi.sourceDir }}/.." --skill '*'
 
 # Third-party skills (from GitHub)
 add_skill anthropics/skills@frontend-design
