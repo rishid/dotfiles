@@ -11,7 +11,7 @@ uv = "0.12.13"
 
 # === Development Tools ===
 "aqua:anomalyco/opencode" = "1.18.30"
-"aqua:anthropics/claude-code" = "2.1.268"
+"aqua:anthropics/claude-code" = "2.1.269"
 "aqua:openai/codex" = "0.154.0"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.100.0"
@@ -19,7 +19,7 @@ github-cli = "2.100.0"
 helm = "4.3.0"
 kubectl = "1.37.0"
 "aqua:argoproj/argo-cd" = "3.5.2"
-"aqua:aws/aws-cli" = "2.36.43"
+"aqua:aws/aws-cli" = "2.36.44"
 "pipx:linode-cli" = "5.68.0"
 "aqua:go-task/task" = "3.53.1"
 terraform = "1.16.2"
@@ -29,7 +29,7 @@ terraform = "1.16.2"
 "aqua:sharkdp/bat" = "0.26.1"                    # Better cat
 "cargo:eza" = "0.23.5"                            # Better ls
 "aqua:sharkdp/fd" = "10.5.0"                     # Better find
-"aqua:junegunn/fzf" = "0.74.3"                  # Fuzzy finder (junegunn originally, now mirrors exist)
+"aqua:junegunn/fzf" = "0.74.4"                  # Fuzzy finder (junegunn originally, now mirrors exist)
 "aqua:jqlang/jq" = "1.8.2"                       # JSON processor
 "aqua:dundee/gdu" = "5.37.0"                     # Disk usage analyzer
 "aqua:sharkdp/hexyl" = "0.17.0"                  # Hex viewer
