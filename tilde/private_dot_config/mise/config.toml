@@ -10,8 +10,8 @@ rust = "stable"                   # Required for Cargo-based tools
 uv = "0.12.13"
 
 # === Development Tools ===
-"aqua:anomalyco/opencode" = "2.0.2"
-"aqua:anthropics/claude-code" = "2.1.269"
+"aqua:anomalyco/opencode" = "2.0.3"
+"aqua:anthropics/claude-code" = "2.1.270"
 "aqua:openai/codex" = "0.154.0"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.100.0"
