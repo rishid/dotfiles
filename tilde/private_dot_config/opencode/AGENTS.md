@@ -1,9 +1,7 @@
 # Global Instructions
 
-Personal defaults for opencode across all projects. Ported from the Claude Code
-instruction set in `~/.claude/instructions/` (those files aren't wired into any
-`CLAUDE.md` import, so they weren't actually loaded there — consolidated here so
-they're active).
+Personal defaults for OpenCode across all projects. Claude Code's corresponding
+guidance lives in `~/.claude/CLAUDE.md`.
 
 ## Editor Configuration
 
@@ -33,20 +31,16 @@ they're active).
 - Actively search the web for unfamiliar libraries/frameworks, API docs, best
   practices, error messages, or recent syntax/feature changes — don't assume
   knowledge about rapidly changing technologies.
-- If research is insufficient: report what was tried and what's still unknown,
-  and ask for guidance rather than filling gaps with assumptions.
+- If research is insufficient, explain the uncertainty and ask for guidance
+  when the missing answer would materially change the outcome.
 
 ## Git
 
 - Prioritize Git MCP server tools over bash commands for Git operations when
   an MCP server is available.
-- Analyze all changes before committing; identify logical units of work and
-  never mix unrelated changes (different features, different bugfixes,
-  different components, code vs. config vs. docs) into a single commit.
-- Acceptable to bundle: code with its tests, a feature with its docs, a bugfix
-  with its test case, config changes that directly support the same feature.
-- Propose the commit split to the user before executing when a change touches
-  multiple logical units.
+- For commit and PR requests, follow the `git-workflow` skill and the
+  repository's branch and review rules. Review the intended diff and stage only
+  related work; keep related code, tests, docs, and configuration together.
 
 ## General Reminders
 
