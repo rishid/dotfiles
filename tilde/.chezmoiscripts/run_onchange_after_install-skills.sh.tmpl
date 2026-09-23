@@ -45,21 +45,17 @@ add_skill() {
 
 echo "Installing agent skills..."
 
-# Personal skills from dotfiles repo (skills/ at repo root, one subdir per skill)
-# Note: .chezmoiroot is "tilde" so sourceDir is ~/.dotfiles/tilde/; go up one level for repo root
-add_skill "{{ .chezmoi.sourceDir }}/.." --skill '*'
-
 # Third-party skills (from GitHub)
-add_skill anthropics/skills@frontend-design
-
 add_skill akin-ozer/cc-devops-skills --skill dockerfile-generator
 add_skill akin-ozer/cc-devops-skills --skill github-actions-validator
 add_skill akin-ozer/cc-devops-skills --skill helm-validator
-add_skill vercel-labs/agent-skills --skill vercel-react-best-practices
-add_skill mvanhorn/last30days-skill --skill last30days
-add_skill obra/superpowers
 add_skill blader/humanizer --skill humanizer
 add_skill VictoriaMetrics/skills --skill victoriametrics-query
 add_skill VictoriaMetrics/skills --skill victorialogs-query
+
+# Personal skills, including locally maintained frontend and React guidance.
+# Install these last so a third-party installation cannot replace them.
+# .chezmoiroot is "tilde", so go up one level for the repository root.
+add_skill "{{ .chezmoi.sourceDir }}/.." --skill '*'
 
 echo "Agent skills installed successfully."

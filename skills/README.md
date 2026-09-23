@@ -1,6 +1,6 @@
 # Personal agent skills
 
-Custom skills shared across Claude Code, Codex, and OpenCode. Each subdirectory contains a single `SKILL.md`.
+Custom skills shared across Claude Code, Codex, and OpenCode. Each subdirectory contains a `SKILL.md` and any supporting files it needs.
 
 They are installed globally for all three agents by the
 [chezmoi skills installer](../tilde/.chezmoiscripts/run_onchange_after_install-skills.sh.tmpl)
@@ -21,4 +21,5 @@ the skill is installed consistently for Claude Code, Codex, and OpenCode.
 ## Notes
 
 - Encrypted/private skills live in `tilde/dot_claude/skills/` instead (age-encrypted, deployed by chezmoi)
-- Third-party skills (Anthropic, Vercel, etc.) are listed in the installer, not stored here
+- Third-party skills are listed in the installer. Locally maintained frontend
+  design, React performance, and Git workflow guidance is stored here and installed last.

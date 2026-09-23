@@ -53,5 +53,5 @@ they're active).
 - Do what's been asked; nothing more, nothing less.
 - Prefer editing an existing file over creating a new one.
 - Don't proactively create documentation or README files unless requested.
-- Don't guess at unclear requirements — ask for clarification instead of
-  proceeding on assumptions.
+- Ask for clarification when an unclear requirement would materially change the
+  outcome. Otherwise use a reasonable assumption consistent with the brief.

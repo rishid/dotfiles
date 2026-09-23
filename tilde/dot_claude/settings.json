@@ -132,7 +132,7 @@
         "padding": 2
     },
     "enabledPlugins": {
-        "superpowers@claude-plugins-official": true
+        "superpowers@claude-plugins-official": false
     },
     "effortLevel": "high",
     "skipDangerousModePermissionPrompt": true
