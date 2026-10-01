@@ -5,21 +5,21 @@
 # === Programming Languages & Runtimes ===
 go = "1.27.1"
 node = "24.21.0"
-python = "3.14.7"
+python = "3.14.8"
 rust = "stable"                   # Required for Cargo-based tools
 uv = "0.12.21"
 
 # === Development Tools ===
-"aqua:anomalyco/opencode" = "2.0.20"
-"aqua:anthropics/claude-code" = "2.1.285"
-"aqua:openai/codex" = "0.159.2"
+"aqua:anomalyco/opencode" = "2.0.21"
+"aqua:anthropics/claude-code" = "2.1.286"
+"aqua:openai/codex" = "0.159.3"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.102.0"
 "aqua:hadolint/hadolint" = "2.15.1" # Dockerfile linter
 helm = "4.3.0"
 kubectl = "1.37.1"
 "aqua:argoproj/argo-cd" = "3.5.3"
-"aqua:aws/aws-cli" = "2.37.6"
+"aqua:aws/aws-cli" = "2.37.7"
 "pipx:linode-cli" = "5.69.0"
 "aqua:go-task/task" = "3.53.1"
 terraform = "1.16.4"
