@@ -7,11 +7,11 @@ go = "1.27.1"
 node = "24.21.0"
 python = "3.14.8"
 rust = "stable"                   # Required for Cargo-based tools
-uv = "0.12.22"
+uv = "0.12.23"
 
 # === Development Tools ===
 "aqua:anomalyco/opencode" = "2.0.22"
-"aqua:anthropics/claude-code" = "2.1.288"
+"aqua:anthropics/claude-code" = "2.1.289"
 "aqua:openai/codex" = "0.160.0"
 direnv = "2.37.1"                # Environment variable management
 github-cli = "2.102.0"
