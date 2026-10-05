@@ -31,7 +31,7 @@ terraform = "1.16.5"
 "aqua:sharkdp/fd" = "10.5.0"                     # Better find
 "aqua:junegunn/fzf" = "0.74.4"                  # Fuzzy finder (junegunn originally, now mirrors exist)
 "aqua:jqlang/jq" = "1.8.2"                       # JSON processor
-"aqua:dundee/gdu" = "5.37.0"                     # Disk usage analyzer
+"aqua:dundee/gdu" = "5.38.0"                     # Disk usage analyzer
 "aqua:sharkdp/hexyl" = "0.17.0"                  # Hex viewer
 "aqua:sharkdp/hyperfine" = "1.20.0"              # Benchmarking tool
 "aqua:sharkdp/numbat" = "1.24.0"                 # Calculator
@@ -47,7 +47,7 @@ yq = "4.54.1"                    # YAML processor
 
 
 # === Build & CI Tools ===
-"pipx:black" = "26.5.1"          # Python formatter
+"pipx:black" = "26.10.0"          # Python formatter
 "pipx:pre-commit" = "4.6.2"      # Git hook framework
 "pipx:yamllint" = "1.38.0"       # YAML linter
 
