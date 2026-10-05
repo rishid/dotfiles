@@ -23,3 +23,4 @@ the skill is installed consistently for Claude Code, Codex, and OpenCode.
 - Encrypted/private skills live in `tilde/dot_claude/skills/` instead (age-encrypted, deployed by chezmoi)
 - Third-party skills are listed in the installer. Locally maintained frontend
   design, React performance, and Git workflow guidance is stored here and installed last.
+
