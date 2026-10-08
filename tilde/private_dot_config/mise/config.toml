@@ -11,8 +11,8 @@ uv = "0.12.23"
 
 # === Development Tools ===
 "aqua:anomalyco/opencode" = "1.18.35"
-"aqua:anthropics/claude-code" = "2.1.292"
-"aqua:openai/codex" = "0.160.1"
+"aqua:anthropics/claude-code" = "2.1.294"
+"aqua:openai/codex" = "0.161.0"
 direnv = "2.38.1"                # Environment variable management
 github-cli = "2.102.0"
 "aqua:hadolint/hadolint" = "2.15.1" # Dockerfile linter
