@@ -27,9 +27,10 @@
       // The mise manager defaults aqua tools to github-tags, which picks up
       // non-release tags (e.g. opencode v2.x, argo-cd rc tags) and yields
       // uninstallable versions (404). aqua downloads release assets, so track
-      // releases instead. aws/aws-cli, golang/go and python/cpython publish tags only.
+      // releases instead. Scoped to aqua tools so go, python etc. keep their
+      // default datasource. aws/aws-cli publishes tags only.
       matchManagers: ['mise'],
-      matchPackageNames: ['/^[^/]+\\/[^/]+$/', '!aws/aws-cli', '!golang/go', '!python/cpython'],
+      matchDepNames: ['/^aqua:/', '!aqua:aws/aws-cli'],
       overrideDatasource: 'github-releases',
     },
     {
