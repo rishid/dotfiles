@@ -55,7 +55,7 @@ yq = "4.54.1"                    # YAML processor
 
 
 [settings]
-always_keep_download = true
+always_keep_download = false
 paranoid = false
 
 # Use specific plugin repositories if needed
