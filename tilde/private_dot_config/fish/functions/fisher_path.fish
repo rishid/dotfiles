@@ -6,7 +6,9 @@ if test -z "$fisher_path" || test "$fisher_path" = "$__fish_config_dir"
 end
 
 set fish_complete_path $fish_complete_path[1] $fisher_path/completions $fish_complete_path[2..]
-set fish_function_path $fish_function_path[1] $fisher_path/functions $fish_function_path[2..]
+if not contains -- "$fisher_path/functions" $fish_function_path
+    set fish_function_path $fish_function_path[1] $fisher_path/functions $fish_function_path[2..]
+end
 
 for file in $fisher_path/conf.d/*.fish
     if ! test -f (string replace -r "^.*/" $__fish_config_dir/conf.d/ -- $file)

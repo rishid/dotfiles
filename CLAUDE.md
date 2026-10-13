@@ -23,7 +23,7 @@ Encrypted files use age. Identity at `~/.config/chezmoi/key.txt`.
 
 ## Fish Shell
 
-- `config.fish` sources `variables.fish` (tide/fisher config) and `functions/fisher_path.fish` (loads plugins from `~/.config/fish/plugins/`)
+- `conf.d/000-init.fish` adds Fisher's functions to fish's search path early; `config.fish` sources `variables.fish` (Tide config) and `functions/fisher_path.fish` (loads plugins from `~/.config/fish/plugins/`)
 - Fisher plugins are managed in `fish_plugins`; the chezmoi script `run_onchange_after_install-fisher.fish.tmpl` runs `fisher update` whenever `fish_plugins` changes
 - `jorgebucaran/fisher` must be listed in `fish_plugins` so fisher persists to `$fisher_path/functions/fisher.fish` across sessions
 
