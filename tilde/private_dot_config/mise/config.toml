@@ -10,8 +10,8 @@ rust = "stable"                   # Required for Cargo-based tools
 uv = "0.13.1"
 
 # === Development Tools ===
-"aqua:anomalyco/opencode" = "1.19.2"
-"aqua:anthropics/claude-code" = "2.1.301"
+"aqua:anomalyco/opencode" = "1.19.3"
+"aqua:anthropics/claude-code" = "2.1.302"
 "aqua:openai/codex" = "0.163.0"
 direnv = "2.38.2"                # Environment variable management
 github-cli = "2.102.0"
@@ -36,7 +36,7 @@ terraform = "1.16.6"
 "aqua:sharkdp/hyperfine" = "2.0.0"              # Benchmarking tool
 "aqua:sharkdp/numbat" = "1.24.0"                 # Calculator
 "aqua:BurntSushi/ripgrep" = "15.2.0"             # Better grep
-"aqua:starship/starship" = "1.26.0"              # Shell prompt
+"aqua:starship/starship" = "1.27.0"              # Shell prompt
 "aqua:tealdeer-rs/tealdeer" = "1.9.0"            # Fast tldr client
 "aqua:aquasecurity/trivy" = "0.76.0"             # Security scanner
 "aqua:ajeetdsouza/zoxide" = "0.10.0"              # Better cd
