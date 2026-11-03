@@ -1,0 +1,20 @@
+#!/bin/sh
+# Managed codex settings; codex-written per-machine tables ([projects.*] trust
+# entries and [tui.model_availability_nux]) are preserved from the existing file.
+cat <<'EOF'
+model = "gpt-6.1-sol"
+model_reasoning_effort = "medium"
+personality = "pragmatic"
+
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"
+
+[tui]
+screen_reader_detection_done = true
+EOF
+awk '
+  /^\[/ { keep = ($0 ~ /^\[projects\./ || $0 ~ /^\[tui\.model_availability_nux\]/) }
+  keep && !seen { print ""; seen = 1 }
+  keep { print }
+'
