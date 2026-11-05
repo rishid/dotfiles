@@ -26,6 +26,8 @@ repos:
       - id: check-merge-conflict
       - id: check-executables-have-shebangs
       - id: check-toml
+        # chezmoi modify script (shell) that emits TOML; not valid TOML itself
+        exclude: "^tilde/private_dot_config/codex/modify_private_config\\.toml$"
       - id: check-yaml
       - id: file-contents-sorter
         files: "^(tilde/private_dot_config/fish/fish_plugins)$"
