@@ -45,9 +45,6 @@ Include ~/.ssh/personal.cfg
     {{- if (stat (joinPath .chezmoi.homeDir ".ssh/akamai.cfg")) }}
 Include ~/.ssh/akamai.cfg
     {{- end }}
-    {{- if (stat (joinPath .chezmoi.homeDir ".ssh/linode.cfg")) }}
-Include ~/.ssh/linode.cfg
-    {{- end }}
 {{- end }}
 
 # ---------------------------------------------------------------------------
