@@ -23,10 +23,11 @@
   commitMessageExtra: 'to {{newVersion}}',
   commitMessageSuffix: '',
 
-  regexManagers: [
+  customManagers: [
     {
+      customType: 'regex',
       description: 'Process various dependencies in YAML files',
-      fileMatch: ['\\.ya?ml$'],
+      managerFilePatterns: ['/\\.ya?ml$/'],
       matchStrings: [
         '\\S+:\\s+"?(?<currentValue>[^"\\s]+)"?\\s*# ?renovate: depName=(?<depName>\\S+)( datasource=(?<datasource>\\S+))?( versioning=(?<versioning>\\S+))?( extractVersion=(?<extractVersion>\\S+))?',
         '(?m:^\\s+# ?renovate: depName=(?<depName>\\S+)( datasource=(?<datasource>\\S+))?( versioning=(?<versioning>\\S+))?( extractVersion=(?<extractVersion>\\S+))?\\n[ \\t ]*? \\S+: "?(?<currentValue>[^" ]+)"?$)',
