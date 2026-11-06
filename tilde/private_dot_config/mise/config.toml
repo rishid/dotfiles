@@ -12,14 +12,14 @@ uv = "0.13.7"
 # === Development Tools ===
 "aqua:anomalyco/opencode" = "2.2.5"
 "aqua:anthropics/claude-code" = "2.1.318"
-"aqua:openai/codex" = "0.166.0"
+"aqua:openai/codex" = "0.167.0"
 direnv = "2.38.2"                # Environment variable management
 github-cli = "2.103.3"
 "aqua:hadolint/hadolint" = "2.15.1" # Dockerfile linter
 helm = "4.3.1"
 kubectl = "1.37.2"
 "aqua:argoproj/argo-cd" = "3.6.1"
-"aqua:aws/aws-cli" = "2.39.4"
+"aqua:aws/aws-cli" = "2.39.5"
 "pipx:linode-cli" = "5.70.0"
 "aqua:go-task/task" = "3.54.0"
 terraform = "1.17.1"
@@ -43,7 +43,7 @@ terraform = "1.17.1"
 "aqua:twpayne/chezmoi" = "2.74.0"
 "cargo:tokei" = "14" # count lines of code
 "pipx:httpie" = "3.2.4"  # Better curl
-yq = "4.54.1"                    # YAML processor
+yq = "4.54.2"                    # YAML processor
 
 
 # === Build & CI Tools ===
