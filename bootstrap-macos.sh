@@ -2,7 +2,7 @@
 # Bootstrap a fresh macOS machine with chezmoi dotfiles.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/rishid/dotfiles/master/bootstrap-macos.sh | bash
+#   curl -q -fsSL https://raw.githubusercontent.com/rishid/dotfiles/master/bootstrap-macos.sh | bash
 #   # or clone first then run:
 #   ./bootstrap-macos.sh
 
@@ -25,6 +25,11 @@ if [[ ! -t 0 ]]; then
         exec < /dev/null
     fi
 fi
+
+# Ignore the user's curlrc for every curl call in this script (and inside
+# `sh -c "$(curl ...)"`): a `-w` write-out there pollutes stdout and corrupts
+# anything we pipe or capture. `-q` must be curl's first argument.
+curl() { command curl -q "$@"; }
 
 DOTFILES_REPO="rishid"
 DOTFILES_DIR="$HOME/.dotfiles"

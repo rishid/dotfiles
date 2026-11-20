@@ -5,7 +5,7 @@
 Run the bootstrap script — it installs Xcode CLT, Homebrew, fish, chezmoi, and applies dotfiles in one shot:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rishid/dotfiles/master/bootstrap-macos.sh | bash
+curl -q -fsSL https://raw.githubusercontent.com/rishid/dotfiles/master/bootstrap-macos.sh | bash
 ```
 
 Or clone first and run locally:
@@ -22,7 +22,7 @@ bash /tmp/dotfiles/bootstrap-macos.sh
 
 ```bash
 # Fresh install
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init -S $HOME/.dotfiles --apply rishid
+sh -c "$(curl -q -fsLS get.chezmoi.io)" -- init -S $HOME/.dotfiles --apply rishid
 
 # Update (re-apply)
 chezmoi update   # or abbreviation: cu
