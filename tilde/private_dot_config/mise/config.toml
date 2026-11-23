@@ -10,7 +10,7 @@ rust = "stable"                   # Required for Cargo-based tools
 uv = "0.13.9"
 
 # === Development Tools ===
-"aqua:anomalyco/opencode" = "2.3.2"
+"aqua:anomalyco/opencode" = "2.4.1"
 "aqua:anthropics/claude-code" = "2.1.330"
 "aqua:openai/codex" = "0.171.0"
 direnv = "2.38.2"                # Environment variable management
@@ -40,7 +40,7 @@ terraform = "1.17.2"
 "aqua:tealdeer-rs/tealdeer" = "1.9.1"            # Fast tldr client
 "aqua:aquasecurity/trivy" = "0.76.2"             # Security scanner
 "aqua:ajeetdsouza/zoxide" = "0.10.0"              # Better cd
-"aqua:twpayne/chezmoi" = "2.74.1"
+"aqua:twpayne/chezmoi" = "2.74.2"
 "cargo:tokei" = "14" # count lines of code
 "pipx:httpie" = "3.2.4"  # Better curl
 yq = "4.54.3"                    # YAML processor
