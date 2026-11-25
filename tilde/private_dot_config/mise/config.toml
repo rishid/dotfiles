@@ -7,19 +7,19 @@ go = "1.27.4"
 node = "26.13.1"
 python = "3.15.2"
 rust = "stable"                   # Required for Cargo-based tools
-uv = "0.13.9"
+uv = "0.13.10"
 
 # === Development Tools ===
 "aqua:anomalyco/opencode" = "2.4.1"
-"aqua:anthropics/claude-code" = "2.1.331"
+"aqua:anthropics/claude-code" = "2.1.332"
 "aqua:openai/codex" = "0.172.0"
 direnv = "2.38.2"                # Environment variable management
 github-cli = { version = "2.105.0", postinstall = "gh extension install github/gh-stack --force" }
 "aqua:hadolint/hadolint" = "2.15.1" # Dockerfile linter
 helm = "4.3.2"
-kubectl = "1.37.2"
-"aqua:argoproj/argo-cd" = "3.6.2"
-"aqua:aws/aws-cli" = "2.42.2"
+kubectl = "1.37.3"
+"aqua:argoproj/argo-cd" = "3.6.3"
+"aqua:aws/aws-cli" = "2.42.3"
 "pipx:linode-cli" = "5.70.0"
 "aqua:go-task/task" = "3.54.0"
 terraform = "1.17.2"
